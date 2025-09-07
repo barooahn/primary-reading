@@ -10,6 +10,9 @@
 !.yarn/releases
 !.yarn/versions
 
+# npm lock file (use yarn.lock instead)
+package-lock.json
+
 # testing
 /coverage
 
@@ -39,3 +42,55 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Sensitive files and credentials
+*.key
+*.pem
+*.p12
+*.p8
+*.cer
+*.crt
+*.der
+*.pfx
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Screenshots and images (if they contain sensitive data)
+screenshots/
+test-results/
+playwright-report/
+navbar-*.png
+
+# API keys and secrets
+secrets.json
+config/secrets.*
