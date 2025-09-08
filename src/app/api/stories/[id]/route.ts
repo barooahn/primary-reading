@@ -314,6 +314,7 @@ export async function GET(
 				];
 			}
 		}
+	}
 
 		// Parse questions from raw content if no structured questions exist
 		let questions = story.questions || [];
