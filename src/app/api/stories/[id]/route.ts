@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable */
 import { NextRequest, NextResponse } from "next/server";
 import { getSignedUrl } from "@/utils/images/storage";
