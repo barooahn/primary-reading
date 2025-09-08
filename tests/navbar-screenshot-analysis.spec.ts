@@ -9,23 +9,23 @@ test.describe('Navbar Visual Analysis', () => {
     
     // Full page screenshot
     await page.screenshot({ 
-      path: 'navbar-analysis-desktop-full.png',
+      path: 'tests/screenshots/navbar-analysis-desktop-full.png',
       fullPage: false
     });
     
     // Focused navbar screenshot
     const header = page.locator('header').first();
     await expect(header).toBeVisible();
-    await header.screenshot({ path: 'navbar-analysis-desktop-focused.png' });
+    await header.screenshot({ path: 'tests/screenshots/navbar-analysis-desktop-focused.png' });
     
     // Large desktop view - 1440px
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.screenshot({ 
-      path: 'navbar-analysis-large-desktop-full.png',
+      path: 'tests/screenshots/navbar-analysis-large-desktop-full.png',
       fullPage: false
     });
     
-    await header.screenshot({ path: 'navbar-analysis-large-desktop-focused.png' });
+    await header.screenshot({ path: 'tests/screenshots/navbar-analysis-large-desktop-focused.png' });
     
     // Check element dimensions for analysis
     const headerBox = await header.boundingBox();
@@ -64,6 +64,6 @@ test.describe('Navbar Visual Analysis', () => {
     
     // Test mobile view too
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.screenshot({ path: 'navbar-analysis-mobile.png' });
+    await page.screenshot({ path: 'tests/screenshots/navbar-analysis-mobile.png' });
   });
 });

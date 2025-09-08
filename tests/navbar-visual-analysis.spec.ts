@@ -17,14 +17,14 @@ test.describe('Navbar Visual Analysis', () => {
     
     // Take full page screenshot
     await page.screenshot({ 
-      path: 'navbar-desktop-1280-full.png',
+      path: 'tests/screenshots/navbar-desktop-1280-full.png',
       fullPage: true
     });
     
     // Take navbar-focused screenshot
     const header = page.locator('header').first();
     if (await header.isVisible()) {
-      await header.screenshot({ path: 'navbar-desktop-1280-focused.png' });
+      await header.screenshot({ path: 'tests/screenshots/navbar-desktop-1280-focused.png' });
       
       // Get header dimensions and info
       const headerBox = await header.boundingBox();
@@ -63,13 +63,13 @@ test.describe('Navbar Visual Analysis', () => {
     
     // Take full page screenshot
     await page.screenshot({ 
-      path: 'navbar-desktop-1440-full.png',
+      path: 'tests/screenshots/navbar-desktop-1440-full.png',
       fullPage: true
     });
     
     // Take navbar-focused screenshot
     if (await header.isVisible()) {
-      await header.screenshot({ path: 'navbar-desktop-1440-focused.png' });
+      await header.screenshot({ path: 'tests/screenshots/navbar-desktop-1440-focused.png' });
       
       // Get header dimensions and info
       const headerBox = await header.boundingBox();
@@ -184,14 +184,14 @@ test.describe('Navbar Visual Analysis', () => {
       
       // Take screenshot
       await page.screenshot({ 
-        path: `navbar-${pageInfo.name}-page-full.png`,
+        path: `tests/screenshots/navbar-${pageInfo.name}-page-full.png`,
         fullPage: false,
         clip: { x: 0, y: 0, width: 1440, height: 150 } // Just the top navbar area
       });
       
       const header = page.locator('header').first();
       if (await header.isVisible()) {
-        await header.screenshot({ path: `navbar-${pageInfo.name}-page-focused.png` });
+        await header.screenshot({ path: `tests/screenshots/navbar-${pageInfo.name}-page-focused.png` });
         
         const headerBox = await header.boundingBox();
         console.log(`${pageInfo.name} page header dimensions:`, headerBox);

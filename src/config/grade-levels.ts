@@ -49,7 +49,7 @@ export interface GradeLevelConfig {
 export const GRADE_LEVEL_CONFIGS: Record<number, GradeLevelConfig> = {
   1: {
     year: 1,
-    age: 6,
+    age: 5,
     readingLevel: 'beginner',
     wordCount: {
       min: 50,
@@ -85,7 +85,7 @@ export const GRADE_LEVEL_CONFIGS: Record<number, GradeLevelConfig> = {
   
   2: {
     year: 2,
-    age: 7,
+    age: 6,
     readingLevel: 'beginner',
     wordCount: {
       min: 100,
@@ -121,7 +121,7 @@ export const GRADE_LEVEL_CONFIGS: Record<number, GradeLevelConfig> = {
   
   3: {
     year: 3,
-    age: 8,
+    age: 7,
     readingLevel: 'intermediate',
     wordCount: {
       min: 200,
@@ -157,7 +157,7 @@ export const GRADE_LEVEL_CONFIGS: Record<number, GradeLevelConfig> = {
   
   4: {
     year: 4,
-    age: 9,
+    age: 8,
     readingLevel: 'intermediate',
     wordCount: {
       min: 350,
@@ -193,7 +193,7 @@ export const GRADE_LEVEL_CONFIGS: Record<number, GradeLevelConfig> = {
   
   5: {
     year: 5,
-    age: 10,
+    age: 9,
     readingLevel: 'advanced',
     wordCount: {
       min: 500,
@@ -229,7 +229,7 @@ export const GRADE_LEVEL_CONFIGS: Record<number, GradeLevelConfig> = {
   
   6: {
     year: 6,
-    age: 11,
+    age: 10,
     readingLevel: 'advanced',
     wordCount: {
       min: 650,

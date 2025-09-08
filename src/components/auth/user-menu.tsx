@@ -74,14 +74,12 @@ export function UserMenu() {
 		const max = itemRefs.current.length - 1;
 		if (e.key === "ArrowDown") {
 			e.preventDefault();
-			const next =
-				highlightedIndex >= max ? 0 : highlightedIndex + 1;
+			const next = highlightedIndex >= max ? 0 : highlightedIndex + 1;
 			setHighlightedIndex(next);
 			itemRefs.current[next]?.focus();
 		} else if (e.key === "ArrowUp") {
 			e.preventDefault();
-			const prev =
-				highlightedIndex <= 0 ? max : highlightedIndex - 1;
+			const prev = highlightedIndex <= 0 ? max : highlightedIndex - 1;
 			setHighlightedIndex(prev);
 			itemRefs.current[prev]?.focus();
 		} else if (e.key === "Escape") {
@@ -132,7 +130,12 @@ export function UserMenu() {
 					/>
 				) : (
 					<span className='inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white text-[10px] font-semibold'>
-						{displayName.split(" ").map(s => s[0]).join("").slice(0, 2).toUpperCase()}
+						{displayName
+							.split(" ")
+							.map((s) => s[0])
+							.join("")
+							.slice(0, 2)
+							.toUpperCase()}
 					</span>
 				)}
 				<span className='text-sm font-medium whitespace-nowrap'>
@@ -190,6 +193,17 @@ export function UserMenu() {
 					>
 						<BookOpen className='h-4 w-4' />
 						Story Library
+					</Link>
+					<Link
+						href='/my-stories'
+						onClick={() => setOpen(false)}
+						role='menuitem'
+						tabIndex={-1}
+						ref={(el) => setItemRef(el, 4)}
+						className='flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 text-gray-700 focus:bg-gray-50 focus:outline-none'
+					>
+						<BookOpen className='h-4 w-4' />
+						My Stories
 					</Link>
 					<Link
 						href='/create'

@@ -89,8 +89,10 @@ Thumbs.db
 screenshots/
 test-results/
 playwright-report/
-navbar-*.png
+tests/screenshots/navbar-*.png
 
 # API keys and secrets
 secrets.json
 config/secrets.*
+
+.vercel
