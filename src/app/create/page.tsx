@@ -34,70 +34,88 @@ const getAllThemes = () => {
 			description: "Stories about cute pets and their daily fun",
 			year: 1,
 			category: "animals",
-			keywords: ["pets", "cats", "dogs", "animals", "cute"]
+			keywords: ["pets", "cats", "dogs", "animals", "cute"],
 		},
 		{
 			name: "🏠 Family Time",
 			description: "Happy moments with mom, dad, and siblings",
 			year: 1,
 			category: "family",
-			keywords: ["family", "home", "parents", "siblings", "love"]
+			keywords: ["family", "home", "parents", "siblings", "love"],
 		},
 		{
 			name: "🎨 Rainbow World",
 			description: "A magical world full of bright colors",
 			year: 1,
 			category: "fantasy",
-			keywords: ["colors", "rainbow", "bright", "magic", "pretty"]
+			keywords: ["colors", "rainbow", "bright", "magic", "pretty"],
 		},
 		{
 			name: "🦆 Farm Friends",
 			description: "Meeting cows, pigs, chickens, and sheep",
 			year: 1,
 			category: "animals",
-			keywords: ["farm", "animals", "cow", "pig", "chicken", "sheep"]
+			keywords: ["farm", "animals", "cow", "pig", "chicken", "sheep"],
 		},
 		{
 			name: "🧨 Toy Box Magic",
 			description: "When your favorite toys come alive to play",
 			year: 1,
 			category: "fantasy",
-			keywords: ["toys", "play", "magic", "alive", "fun"]
+			keywords: ["toys", "play", "magic", "alive", "fun"],
 		},
 		{
 			name: "🌳 Garden Explorers",
 			description: "Discovering bugs, flowers, and garden secrets",
 			year: 1,
 			category: "nature",
-			keywords: ["garden", "flowers", "bugs", "explore", "nature"]
+			keywords: ["garden", "flowers", "bugs", "explore", "nature"],
 		},
 		{
 			name: "🔮 Minecraft Blocks",
 			description: "Building simple houses with colorful blocks",
 			year: 1,
 			category: "minecraft",
-			keywords: ["minecraft", "blocks", "building", "simple", "house"]
+			keywords: ["minecraft", "blocks", "building", "simple", "house"],
 		},
 		{
 			name: "🌈 YouTube Kids Shows",
 			description: "Fun with Bluey, Peppa Pig, and other favorites",
 			year: 1,
 			category: "youtube",
-			keywords: ["youtube", "bluey", "peppa pig", "kids shows", "cartoons"]
+			keywords: [
+				"youtube",
+				"bluey",
+				"peppa pig",
+				"kids shows",
+				"cartoons",
+			],
 		},
 		{
 			name: "🎵 Nursery Rhyme Fun",
 			description: "Classic songs and rhymes come to life",
 			year: 1,
 			category: "music",
-			keywords: ["songs", "nursery rhymes", "music", "singing", "classic"]
+			keywords: [
+				"songs",
+				"nursery rhymes",
+				"music",
+				"singing",
+				"classic",
+			],
 		},
 		{
 			name: "🎂 Birthday Party",
 			description: "Planning the best birthday party ever",
 			year: 1,
 			category: "celebration",
-			keywords: ["birthday", "party", "cake", "friends", "celebration"]
+			keywords: [
+				"birthday",
+				"party",
+				"cake",
+				"friends",
+				"celebration",
+			],
 		},
 		// Year 2 themes (Age 7) - Learning, school, community
 		{
@@ -105,70 +123,88 @@ const getAllThemes = () => {
 			description: "Making friends and learning cool things at school",
 			year: 2,
 			category: "school",
-			keywords: ["school", "friends", "learning", "teacher", "classroom"]
+			keywords: [
+				"school",
+				"friends",
+				"learning",
+				"teacher",
+				"classroom",
+			],
 		},
 		{
 			name: "🐾 Animal Heroes",
 			description: "Rescuing animals and becoming their hero",
 			year: 2,
 			category: "animals",
-			keywords: ["animals", "rescue", "hero", "save", "help"]
+			keywords: ["animals", "rescue", "hero", "save", "help"],
 		},
 		{
 			name: "🌦️ Weather Magic",
 			description: "Adventures in rain, sunshine, and snow",
 			year: 2,
 			category: "nature",
-			keywords: ["weather", "rain", "sun", "snow", "storm", "rainbow"]
+			keywords: ["weather", "rain", "sun", "snow", "storm", "rainbow"],
 		},
 		{
 			name: "👩‍🚒 Community Heroes",
 			description: "Working with firefighters, doctors, and police",
 			year: 2,
 			category: "community",
-			keywords: ["firefighter", "police", "doctor", "teacher", "helper"]
+			keywords: [
+				"firefighter",
+				"police",
+				"doctor",
+				"teacher",
+				"helper",
+			],
 		},
 		{
 			name: "🚂 Vehicle Adventures",
 			description: "Riding trains, flying planes, and driving cars",
 			year: 2,
 			category: "vehicles",
-			keywords: ["train", "plane", "car", "bus", "vehicle", "travel"]
+			keywords: ["train", "plane", "car", "bus", "vehicle", "travel"],
 		},
 		{
 			name: "🎉 Party Planning",
 			description: "Organizing amazing celebrations and parties",
 			year: 2,
 			category: "celebration",
-			keywords: ["party", "celebration", "birthday", "fun", "friends"]
+			keywords: ["party", "celebration", "birthday", "fun", "friends"],
 		},
 		{
 			name: "⛏️ Minecraft Village",
 			description: "Building villages and meeting friendly villagers",
 			year: 2,
 			category: "minecraft",
-			keywords: ["minecraft", "village", "building", "villager", "house"]
+			keywords: [
+				"minecraft",
+				"village",
+				"building",
+				"villager",
+				"house",
+			],
 		},
 		{
 			name: "🎥 Kid YouTube Stars",
 			description: "Fun with Ryan, Vlad, and other kid YouTubers",
 			year: 2,
 			category: "youtube",
-			keywords: ["ryan", "vlad", "youtube", "toys", "kids", "review"]
+			keywords: ["ryan", "vlad", "youtube", "toys", "kids", "review"],
 		},
 		{
 			name: "🏮 Simple Roblox",
 			description: "Easy and fun Roblox games for beginners",
 			year: 2,
 			category: "roblox",
-			keywords: ["roblox", "simple", "games", "fun", "easy"]
+			keywords: ["roblox", "simple", "games", "fun", "easy"],
 		},
 		{
 			name: "🎨 Art Creation",
 			description: "Making beautiful drawings, crafts, and artwork",
 			year: 2,
 			category: "creative",
-			keywords: ["art", "drawing", "craft", "create", "painting"]
+			keywords: ["art", "drawing", "craft", "create", "painting"],
 		},
 		// Year 3 themes (Age 8) - More complex stories, gaming
 		{
@@ -176,141 +212,178 @@ const getAllThemes = () => {
 			description: "Solving puzzles and catching sneaky villains",
 			year: 3,
 			category: "mystery",
-			keywords: ["mystery", "detective", "puzzle", "solve", "clues"]
+			keywords: ["mystery", "detective", "puzzle", "solve", "clues"],
 		},
 		{
 			name: "🏰 Magic Kingdom",
 			description: "Wizards, dragons, and magical adventures",
 			year: 3,
 			category: "fantasy",
-			keywords: ["magic", "wizard", "dragon", "fantasy", "kingdom"]
+			keywords: ["magic", "wizard", "dragon", "fantasy", "kingdom"],
 		},
 		{
 			name: "😂 Comedy Show",
 			description: "Funny characters in hilarious situations",
 			year: 3,
 			category: "comedy",
-			keywords: ["funny", "comedy", "laugh", "silly", "humor"]
+			keywords: ["funny", "comedy", "laugh", "silly", "humor"],
 		},
 		{
 			name: "⚽ Sports Champions",
 			description: "Winning the big game with teamwork and skill",
 			year: 3,
 			category: "sports",
-			keywords: ["sports", "soccer", "basketball", "team", "win"]
+			keywords: ["sports", "soccer", "basketball", "team", "win"],
 		},
 		{
 			name: "🔩 Minecraft Survival",
 			description: "Surviving creepers and building amazing bases",
 			year: 3,
 			category: "minecraft",
-			keywords: ["minecraft", "survival", "creeper", "build", "base"]
+			keywords: ["minecraft", "survival", "creeper", "build", "base"],
 		},
 		{
 			name: "🏮 Roblox Obbies",
 			description: "Jumping through tricky obstacle courses",
 			year: 3,
 			category: "roblox",
-			keywords: ["roblox", "obby", "obstacle", "jump", "challenge"]
+			keywords: ["roblox", "obby", "obstacle", "jump", "challenge"],
 		},
 		{
 			name: "🚀 Among Us Space",
 			description: "Finding imposters and fixing the spaceship",
 			year: 3,
 			category: "among us",
-			keywords: ["among us", "imposter", "space", "tasks", "crew"]
+			keywords: ["among us", "imposter", "space", "tasks", "crew"],
 		},
 		{
 			name: "🎭 Preston & Friends",
 			description: "Hilarious challenges with Preston and Brianna",
 			year: 3,
 			category: "youtube",
-			keywords: ["preston", "brianna", "challenge", "youtube", "funny"]
+			keywords: [
+				"preston",
+				"brianna",
+				"challenge",
+				"youtube",
+				"funny",
+			],
 		},
 		{
 			name: "🎵 Music Adventures",
 			description: "Singing, dancing, and making awesome music",
 			year: 3,
 			category: "music",
-			keywords: ["music", "sing", "dance", "song", "band"]
+			keywords: ["music", "sing", "dance", "song", "band"],
 		},
 		{
 			name: "🏆 Gaming Tournaments",
 			description: "Competing in epic video game competitions",
 			year: 3,
 			category: "gaming",
-			keywords: ["gaming", "tournament", "compete", "video games", "win"]
+			keywords: [
+				"gaming",
+				"tournament",
+				"compete",
+				"video games",
+				"win",
+			],
 		},
 		// Year 4 themes (Age 9) - Adventure, strategy, popular culture
 		{
 			name: "🦕 Dinosaur Expedition",
-			description: "Discovering T-Rex, velociraptors, and fossil secrets",
+			description:
+				"Discovering T-Rex, velociraptors, and fossil secrets",
 			year: 4,
 			category: "adventure",
-			keywords: ["dinosaur", "t-rex", "fossil", "prehistoric", "expedition"]
+			keywords: [
+				"dinosaur",
+				"t-rex",
+				"fossil",
+				"prehistoric",
+				"expedition",
+			],
 		},
 		{
 			name: "🚀 Space Mission",
 			description: "Meeting aliens and exploring mysterious planets",
 			year: 4,
 			category: "space",
-			keywords: ["space", "alien", "planet", "rocket", "astronaut"]
+			keywords: ["space", "alien", "planet", "rocket", "astronaut"],
 		},
 		{
 			name: "🏰 Minecraft Empire",
 			description: "Building massive castles and ruling kingdoms",
 			year: 4,
 			category: "minecraft",
-			keywords: ["minecraft", "castle", "kingdom", "empire", "build"]
+			keywords: ["minecraft", "castle", "kingdom", "empire", "build"],
 		},
 		{
 			name: "💼 Roblox Business",
 			description: "Creating successful tycoons and earning millions",
 			year: 4,
 			category: "roblox",
-			keywords: ["roblox", "tycoon", "business", "money", "success"]
+			keywords: ["roblox", "tycoon", "business", "money", "success"],
 		},
 		{
 			name: "💰 MrBeast Challenges",
 			description: "Crazy challenges that help people and win prizes",
 			year: 4,
 			category: "youtube",
-			keywords: ["mrbeast", "challenge", "help", "prize", "charity"]
+			keywords: ["mrbeast", "challenge", "help", "prize", "charity"],
 		},
 		{
 			name: "🎆 Fortnite Legends",
 			description: "Epic battles, building, and Victory Royales",
 			year: 4,
 			category: "fortnite",
-			keywords: ["fortnite", "battle", "victory royale", "build", "epic"]
+			keywords: [
+				"fortnite",
+				"battle",
+				"victory royale",
+				"build",
+				"epic",
+			],
 		},
 		{
 			name: "👾 Among Us Crew",
 			description: "Musical crewmates solving mysteries with songs",
 			year: 4,
 			category: "among us",
-			keywords: ["among us", "musical", "crew", "mystery", "song"]
+			keywords: ["among us", "musical", "crew", "mystery", "song"],
 		},
 		{
 			name: "💨 Speedrun Masters",
 			description: "Racing to beat games in record time",
 			year: 4,
 			category: "gaming",
-			keywords: ["speedrun", "fast", "record", "race", "gaming"]
+			keywords: ["speedrun", "fast", "record", "race", "gaming"],
 		},
 		{
 			name: "🦄 Unicorn Magic",
 			description: "Rainbow adventures with magical unicorn friends",
 			year: 4,
 			category: "fantasy",
-			keywords: ["unicorn", "magic", "rainbow", "fantasy", "friendship"]
+			keywords: [
+				"unicorn",
+				"magic",
+				"rainbow",
+				"fantasy",
+				"friendship",
+			],
 		},
 		{
 			name: "🔬 Science Lab",
 			description: "Amazing experiments and cool inventions",
 			year: 4,
 			category: "science",
-			keywords: ["science", "experiment", "lab", "invention", "discovery"]
+			keywords: [
+				"science",
+				"experiment",
+				"lab",
+				"invention",
+				"discovery",
+			],
 		},
 		// Year 5 themes (Age 10) - Complex gaming, social media, creativity
 		{
@@ -318,70 +391,89 @@ const getAllThemes = () => {
 			description: "Multi-level adventures inspired by favorite games",
 			year: 5,
 			category: "gaming",
-			keywords: ["gaming", "quest", "adventure", "level", "epic"]
+			keywords: ["gaming", "quest", "adventure", "level", "epic"],
 		},
 		{
 			name: "🏴‍☠️ Pirate Legends",
 			description: "Searching for legendary treasure across the seas",
 			year: 5,
 			category: "adventure",
-			keywords: ["pirate", "treasure", "ship", "ocean", "legend"]
+			keywords: ["pirate", "treasure", "ship", "ocean", "legend"],
 		},
 		{
 			name: "🌍 Minecraft Modded",
 			description: "Exploring modded worlds with insane new features",
 			year: 5,
 			category: "minecraft",
-			keywords: ["minecraft", "mods", "modded", "features", "explore"]
+			keywords: ["minecraft", "mods", "modded", "features", "explore"],
 		},
 		{
 			name: "🏮 Roblox Horror",
 			description: "Surviving spooky games like Doors and Piggy",
 			year: 5,
 			category: "roblox",
-			keywords: ["roblox", "horror", "doors", "piggy", "scary", "survive"]
+			keywords: [
+				"roblox",
+				"horror",
+				"doors",
+				"piggy",
+				"scary",
+				"survive",
+			],
 		},
 		{
 			name: "🏆 Fortnite Pro",
 			description: "Competing in tournaments like a real esports star",
 			year: 5,
 			category: "fortnite",
-			keywords: ["fortnite", "tournament", "pro", "esports", "compete"]
+			keywords: [
+				"fortnite",
+				"tournament",
+				"pro",
+				"esports",
+				"compete",
+			],
 		},
 		{
 			name: "📱 TikTok Viral",
 			description: "Creating the next big dance or trend",
 			year: 5,
 			category: "social media",
-			keywords: ["tiktok", "viral", "dance", "trend", "famous"]
+			keywords: ["tiktok", "viral", "dance", "trend", "famous"],
 		},
 		{
 			name: "🌈 Preston Academy",
 			description: "Learning epic life hacks and gaming tricks",
 			year: 5,
 			category: "youtube",
-			keywords: ["preston", "life hack", "tricks", "gaming", "learn"]
+			keywords: ["preston", "life hack", "tricks", "gaming", "learn"],
 		},
 		{
 			name: "🎬 YouTube Creator",
 			description: "Making viral shorts and building a channel",
 			year: 5,
 			category: "youtube",
-			keywords: ["youtube", "shorts", "creator", "viral", "channel"]
+			keywords: ["youtube", "shorts", "creator", "viral", "channel"],
 		},
 		{
 			name: "🦸 Superhero Academy",
 			description: "Training to become the world's next superhero",
 			year: 5,
 			category: "superhero",
-			keywords: ["superhero", "powers", "academy", "training", "hero"]
+			keywords: ["superhero", "powers", "academy", "training", "hero"],
 		},
 		{
 			name: "📚 Time Travel",
 			description: "Adventures through different periods in history",
 			year: 5,
 			category: "adventure",
-			keywords: ["time travel", "history", "past", "future", "adventure"]
+			keywords: [
+				"time travel",
+				"history",
+				"past",
+				"future",
+				"adventure",
+			],
 		},
 		// Year 6 themes (Age 11) - Advanced concepts, leadership, complex stories
 		{
@@ -389,76 +481,100 @@ const getAllThemes = () => {
 			description: "Inventing AI, robots, and futuristic gadgets",
 			year: 6,
 			category: "technology",
-			keywords: ["technology", "AI", "robot", "future", "invention"]
+			keywords: ["technology", "AI", "robot", "future", "invention"],
 		},
 		{
 			name: "👑 Leadership Challenge",
 			description: "Leading teams through impossible missions",
 			year: 6,
 			category: "leadership",
-			keywords: ["leader", "team", "mission", "challenge", "responsibility"]
+			keywords: [
+				"leader",
+				"team",
+				"mission",
+				"challenge",
+				"responsibility",
+			],
 		},
 		{
 			name: "🗺️ Dream SMP Legacy",
 			description: "Epic server politics, wars, and alliances",
 			year: 6,
 			category: "minecraft",
-			keywords: ["dream smp", "server", "politics", "war", "alliance"]
+			keywords: ["dream smp", "server", "politics", "war", "alliance"],
 		},
 		{
 			name: "🏆 Esports Champion",
 			description: "Competing in world championship tournaments",
 			year: 6,
 			category: "gaming",
-			keywords: ["esports", "champion", "tournament", "competition", "pro"]
+			keywords: [
+				"esports",
+				"champion",
+				"tournament",
+				"competition",
+				"pro",
+			],
 		},
 		{
 			name: "💰 Philanthropy Hero",
 			description: "Like MrBeast, changing the world through giving",
 			year: 6,
 			category: "social impact",
-			keywords: ["mrbeast", "charity", "help", "world", "giving"]
+			keywords: ["mrbeast", "charity", "help", "world", "giving"],
 		},
 		{
 			name: "🎬 Content Empire",
 			description: "Building a multimedia entertainment business",
 			year: 6,
 			category: "business",
-			keywords: ["content", "business", "empire", "entertainment", "creator"]
+			keywords: [
+				"content",
+				"business",
+				"empire",
+				"entertainment",
+				"creator",
+			],
 		},
 		{
 			name: "🐾 Aphmau Universe",
 			description: "Complex storylines with werewolves and magic",
 			year: 6,
 			category: "minecraft",
-			keywords: ["aphmau", "werewolf", "magic", "story", "roleplay"]
+			keywords: ["aphmau", "werewolf", "magic", "story", "roleplay"],
 		},
 		{
 			name: "🌍 Global Impact",
 			description: "Solving real-world problems like climate change",
 			year: 6,
 			category: "social impact",
-			keywords: ["global", "climate", "environment", "solve", "world"]
+			keywords: ["global", "climate", "environment", "solve", "world"],
 		},
 		{
 			name: "📺 Viral Phenomenon",
 			description: "Creating content that breaks the internet",
 			year: 6,
 			category: "social media",
-			keywords: ["viral", "internet", "famous", "content", "phenomenon"]
+			keywords: [
+				"viral",
+				"internet",
+				"famous",
+				"content",
+				"phenomenon",
+			],
 		},
 		{
 			name: "🌌 Space Colonist",
 			description: "Building the first cities on Mars and beyond",
 			year: 6,
 			category: "space",
-			keywords: ["space", "mars", "colony", "city", "planet"]
-		}
+			keywords: ["space", "mars", "colony", "city", "planet"],
+		},
 	];
 };
 
 const getThemesForYear = (year: number) => {
-	return getAllThemes().filter(theme => theme.year === year);
+	return getAllThemes().filter((theme) => theme.year === year);
 };
 
 const STORY_PROMPTS = [
@@ -534,6 +650,18 @@ export default function CreatePage() {
 			correct: string;
 		}>;
 	} | null>(null);
+	const [generatedImages, setGeneratedImages] = useState<
+		Array<{
+			segmentId: string;
+			imageUrl: string; // signed URL for immediate display
+			thumbnailUrl?: string; // signed URL for preview
+			storagePath?: string; // private storage path
+			thumbnailStoragePath?: string; // private storage path for thumb
+			prompt?: string;
+			revisedPrompt?: string;
+			type?: "cover" | "segment";
+		}>
+	>([]);
 	const [, setIsGenerating] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
 	const [saved, setSaved] = useState(false);
@@ -549,6 +677,92 @@ export default function CreatePage() {
 		if (!generatedStory) return;
 
 		setIsSaving(true);
+		// Prepare images and segments
+		const coverImage =
+			generatedImages.find((i) => i.type === "cover") ||
+			generatedImages[0];
+		const coverImageUrl = coverImage?.storagePath || coverImage?.imageUrl;
+		const coverThumbUrl =
+			coverImage?.thumbnailStoragePath || coverImage?.thumbnailUrl;
+		const imageMap = new Map<string, string>(
+			generatedImages.map((i) => [
+				i.segmentId,
+				i.storagePath || i.imageUrl,
+			])
+		);
+		const thumbMap = new Map<string, string | undefined>(
+			generatedImages.map((i) => [
+				i.segmentId,
+				i.thumbnailStoragePath || i.thumbnailUrl,
+			])
+		);
+		const promptMap = new Map<string, string | undefined>(
+			generatedImages.map((i) => [i.segmentId, i.prompt])
+		);
+
+		const parseSegmentsForSave = (raw: string) => {
+			let parts = raw.split(/#### Segment \d+:/);
+			if (parts.length === 1)
+				parts = raw.split(/### \*\*Segment \d+:/);
+			if (parts.length === 1)
+				parts = raw.split(/\*\*Segment \d+:\*\*/);
+			const clean = (t: string) =>
+				t
+					.replace(/^#{1,6}\s+/gm, "")
+					.replace(/\*\*(.*?)\*\*/g, "$1")
+					.replace(/\*(.*?)\*/g, "$1")
+					.replace(/\*\*\[Image Prompt:.*?\]\*\*/g, "")
+					.replace(/\[Image Prompt:.*?\]/g, "")
+					.replace(/Image Prompt:.*$/gm, "")
+					.replace(/Suggested Image Prompt:.*$/gm, "")
+					.trim();
+
+			if (parts.length > 1) {
+				return parts.slice(1).map((part, idx) => {
+					const lines = part.trim().split("\n");
+					const title = clean(
+						(lines[0] || "").replace(/\*\*$/, "")
+					);
+					const contentLines = lines.slice(1).filter((ln) => {
+						const x = ln.trim();
+						return (
+							x &&
+							!x.startsWith("####") &&
+							!x.startsWith("###") &&
+							!x.startsWith("**[Image") &&
+							!x.startsWith("[Image") &&
+							!x.startsWith("*Image Prompt:") &&
+							!x.includes("Suggested Comprehension")
+						);
+					});
+					const content = clean(contentLines.join("\n"));
+					const order = idx + 1;
+					return {
+						segment_order: order,
+						title,
+						content,
+						image_url: imageMap.get(`segment_${order}`),
+						thumbnail_url: thumbMap.get(`segment_${order}`),
+						image_prompt: promptMap.get(`segment_${order}`),
+					};
+				});
+			}
+			// Fallback single segment
+			return [
+				{
+					segment_order: 1,
+					title: generatedStory.title,
+					content: clean(raw),
+					image_url: imageMap.get("segment_1") || coverImageUrl,
+					thumbnail_url:
+						thumbMap.get("segment_1") || coverThumbUrl,
+					image_prompt: promptMap.get("segment_1"),
+				},
+			];
+		};
+
+		const segmentsToSave = parseSegmentsForSave(generatedStory.content);
+
 		try {
 			const response = await fetch("/api/save-story", {
 				method: "POST",
@@ -583,6 +797,9 @@ export default function CreatePage() {
 						generatedStory.difficulty_rating ||
 						getGradeLevelConfig(settings.yearLevel)
 							.questionComplexity,
+					cover_image_url: coverImageUrl,
+					cover_thumbnail_url: coverThumbUrl,
+					segments: segmentsToSave,
 				}),
 			});
 
@@ -622,13 +839,43 @@ export default function CreatePage() {
 					customTopic: settings.customPrompt || undefined,
 					gradeLevel: settings.yearLevel,
 					storyType: settings.storyType,
+					generateImages: settings.includeImages,
+					imageStyle: "illustration",
 				}),
 			});
 
 			const data = await response.json();
 
 			if (data.success) {
-				setGeneratedStory(data.story);
+				const storyObj =
+					typeof data.story === "string"
+						? data.storyData
+							? {
+									title: data.storyData.title,
+									content: data.storyData.content,
+									description:
+										data.storyData.description,
+									reading_level:
+										data.storyData.reading_level,
+									word_count:
+										data.storyData.word_count,
+									estimated_reading_time:
+										data.storyData
+											.estimated_reading_time,
+									difficulty_rating:
+										data.storyData
+											.difficulty_rating,
+							  }
+							: {
+									title: "Untitled Story",
+									content: data.story,
+							  }
+						: data.story;
+
+				setGeneratedStory(storyObj);
+				if (Array.isArray(data.images) && data.images.length) {
+					setGeneratedImages(data.images);
+				}
 				setCurrentStep("preview");
 			} else {
 				console.error("Story generation failed:", data.error);
@@ -640,7 +887,7 @@ export default function CreatePage() {
 
 Every night, when the Thompson family was asleep, Pixel would sneak downstairs to their home office. With her tiny paws, she would tap away at the keyboard, writing code that could solve problems no human programmer had ever tackled.
 
-One morning, young Emma Thompson woke up to find something incredible on the computer screen. Her math homework had been completed overnight – and not just completed, but transformed into a fun, interactive game! 
+One morning, young Emma Thompson woke up to find something incredible on the computer screen. Her math homework had been completed overnight – and not just completed, but transformed into a fun, interactive game!
 
 "Mom, Dad!" Emma called excitedly. "Someone turned my boring math problems into an amazing puzzle adventure!"
 
@@ -800,8 +1047,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 												<div className='text-xs text-muted'>
 													Age{" "}
 													{`${
-														config.age -
-														1
+														year + 4
 													}+`}{" "}
 													•{" "}
 													{
@@ -1242,6 +1488,49 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 									<div className='flex items-center justify-center space-x-2'>
 										<Wand2 className='h-4 w-4' />
 										<span>
+											{generatedImages.length >
+												0 && (
+												<div className='space-y-2'>
+													<h4 className='font-medium'>
+														Generated
+														Images
+													</h4>
+													<div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
+														{generatedImages.map(
+															(
+																img,
+																idx
+															) => (
+																<div
+																	key={
+																		idx
+																	}
+																	className='flex flex-col items-center'
+																>
+																	{/* eslint-disable-next-line @next/next/no-img-element */}
+																	<img
+																		src={
+																			img.thumbnailUrl ||
+																			img.imageUrl
+																		}
+																		alt={`Story image ${
+																			idx +
+																			1
+																		}`}
+																		className='w-full h-32 object-cover rounded border'
+																	/>
+																	<div className='text-xs text-muted mt-1 truncate w-full'>
+																		{img.type ===
+																		"cover"
+																			? "Cover"
+																			: img.segmentId}
+																	</div>
+																</div>
+															)
+														)}
+													</div>
+												</div>
+											)}
 											Writing your personalized
 											story...
 										</span>

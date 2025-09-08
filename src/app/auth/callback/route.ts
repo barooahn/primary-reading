@@ -1,28 +1,47 @@
-import { createClient } from '@/utils/supabase/server'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url)
-  const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/dashboard'
+	try {
+		let urlObj: URL;
+		try {
+			urlObj = new URL(request.url);
+		} catch {
+			return NextResponse.redirect(
+				`http://localhost:3000/auth/auth-error`
+			);
+		}
+		const { searchParams, origin } = urlObj;
+		const code = searchParams.get("code");
+		const originParam = searchParams.get("origin") || "/";
 
-  if (code) {
-    const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
-      const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
-      const isLocalEnv = process.env.NODE_ENV === 'development'
-      if (isLocalEnv) {
-        // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-        return NextResponse.redirect(`${origin}${next}`)
-      } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`)
-      } else {
-        return NextResponse.redirect(`${origin}${next}`)
-      }
-    }
-  }
+		if (!code) {
+			return NextResponse.redirect(`${origin}/auth/auth-error`);
+		}
 
-  // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+		const { createClient } = await import("@/utils/supabase/server");
+		const supabase = await createClient();
+		try {
+			const { error } = await supabase.auth.exchangeCodeForSession(
+				code
+			);
+			if (error) {
+				return NextResponse.redirect(`${origin}/auth/auth-error`);
+			}
+
+			let targetPath = "/";
+			try {
+				if (originParam && originParam.startsWith("/")) {
+					targetPath = decodeURIComponent(originParam);
+				}
+			} catch {
+				targetPath = "/";
+			}
+
+			return NextResponse.redirect(`${origin}${targetPath}`);
+		} catch {
+			return NextResponse.redirect(`${origin}/auth/auth-error`);
+		}
+	} catch {
+		return NextResponse.redirect(`http://localhost:3000/auth/auth-error`);
+	}
 }

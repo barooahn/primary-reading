@@ -10,7 +10,7 @@ test.describe('Navbar Layout Investigation', () => {
     
     // Take a screenshot of the navbar area
     await page.screenshot({ 
-      path: 'navbar-full.png',
+      path: 'tests/screenshots/navbar-full.png',
       fullPage: false
     });
     
@@ -23,7 +23,7 @@ test.describe('Navbar Layout Investigation', () => {
       console.log('Header dimensions:', headerBox);
       
       // Take focused screenshot of navbar
-      await header.screenshot({ path: 'navbar-focused.png' });
+      await header.screenshot({ path: 'tests/screenshots/navbar-focused.png' });
       
       // Check for navigation elements
       const navElements = await page.locator('nav, [role="navigation"]').count();
@@ -84,7 +84,7 @@ test.describe('Navbar Layout Investigation', () => {
     
     // Test on mobile viewport too
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.screenshot({ path: 'navbar-mobile.png' });
+    await page.screenshot({ path: 'tests/screenshots/navbar-mobile.png' });
     
     if (await header.isVisible()) {
       const mobileHeaderBox = await header.boundingBox();
@@ -107,7 +107,7 @@ test.describe('Navbar Layout Investigation', () => {
         const headerBox = await header.boundingBox();
         console.log(`${pagePath} header dimensions:`, headerBox);
         
-        await page.screenshot({ path: `navbar-${pagePath.replace('/', 'home')}.png` });
+        await page.screenshot({ path: `tests/screenshots/navbar-${pagePath.replace('/', 'home')}.png` });
       } else {
         console.log(`No header found on ${pagePath}`);
       }

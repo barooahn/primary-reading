@@ -1,179 +1,244 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/utils/supabase/server";
+import { getSignedUrl } from "@/utils/images/storage";
 
 interface StoriesQuery {
-  genre?: string;
-  reading_level?: string;
-  grade_level?: number;
-  limit?: number;
-  offset?: number;
-  featured_only?: boolean;
-  user_created_only?: boolean;
+	genre?: string;
+	reading_level?: string;
+	grade_level?: number;
+	limit?: number;
+	offset?: number;
+	featured_only?: boolean;
+	user_created_only?: boolean;
 }
 
 export async function GET(request: NextRequest) {
-  try {
-    const supabase = await createClient();
-    const { searchParams } = new URL(request.url);
-    
-    // Parse query parameters
-    const query: StoriesQuery = {
-      genre: searchParams.get('genre') || undefined,
-      reading_level: searchParams.get('reading_level') || undefined,
-      grade_level: searchParams.get('grade_level') ? parseInt(searchParams.get('grade_level')!) : undefined,
-      limit: searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 50,
-      offset: searchParams.get('offset') ? parseInt(searchParams.get('offset')!) : 0,
-      featured_only: searchParams.get('featured_only') === 'true',
-      user_created_only: searchParams.get('user_created_only') === 'true',
-    };
+	try {
+		const { createClient } = await import("@/utils/supabase/server");
+		const supabase = await createClient();
+		const { searchParams } = new URL(request.url);
 
-    // Build the query
-    let storiesQuery = supabase
-      .from('stories')
-      .select(`
+		// Parse query parameters safely with defaults
+		const rawGrade = searchParams.get("grade_level");
+		const parsedGrade =
+			rawGrade !== null ? parseInt(rawGrade, 10) : undefined;
+		const rawLimit = searchParams.get("limit");
+		const rawOffset = searchParams.get("offset");
+		const parsedLimit = rawLimit !== null ? parseInt(rawLimit, 10) : NaN;
+		const parsedOffset =
+			rawOffset !== null ? parseInt(rawOffset, 10) : NaN;
+
+		const query: StoriesQuery = {
+			genre: searchParams.get("genre") || undefined,
+			reading_level: searchParams.get("reading_level") || undefined,
+			grade_level: Number.isFinite(parsedGrade as number)
+				? (parsedGrade as number)
+				: undefined,
+			limit:
+				Number.isFinite(parsedLimit) && (parsedLimit as number) > 0
+					? (parsedLimit as number)
+					: 50,
+			offset:
+				Number.isFinite(parsedOffset) &&
+				(parsedOffset as number) >= 0
+					? (parsedOffset as number)
+					: 0,
+			featured_only: searchParams.get("featured_only") === "true",
+			user_created_only:
+				searchParams.get("user_created_only") === "true",
+		};
+
+		// Build the query
+		let storiesQuery = supabase
+			.from("stories")
+			.select(
+				`
         *,
-        profiles:created_by(display_name, username),
-        story_ratings(rating),
-        user_progress(user_id)
-      `)
-      .eq('is_published', true);
+        story_segments(*),
+        questions(*)
+      `
+			)
+			.eq("is_published", true);
 
-    // Apply filters
-    if (query.genre) {
-      storiesQuery = storiesQuery.eq('genre', query.genre);
-    }
-    
-    if (query.reading_level) {
-      storiesQuery = storiesQuery.eq('reading_level', query.reading_level);
-    }
-    
-    if (query.grade_level) {
-      storiesQuery = storiesQuery.eq('grade_level', query.grade_level);
-    }
-    
-    if (query.featured_only) {
-      storiesQuery = storiesQuery.eq('is_featured', true);
-    }
-    
-    if (query.user_created_only) {
-      storiesQuery = storiesQuery.not('created_by', 'is', null);
-    }
+		// Apply filters
+		if (query.genre) {
+			storiesQuery = storiesQuery.eq("genre", query.genre);
+		}
 
-    // Apply pagination
-    storiesQuery = storiesQuery
-      .range(query.offset!, query.offset! + query.limit! - 1)
-      .order('created_at', { ascending: false });
+		if (query.reading_level) {
+			storiesQuery = storiesQuery.eq(
+				"reading_level",
+				query.reading_level
+			);
+		}
 
-    const { data: stories, error } = await storiesQuery;
+		if (query.grade_level) {
+			storiesQuery = storiesQuery.eq("grade_level", query.grade_level);
+		}
 
-    if (error) {
-      console.error('Stories fetch error:', error);
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch stories' },
-        { status: 500 }
-      );
-    }
+		if (query.featured_only) {
+			storiesQuery = storiesQuery.eq("is_featured", true);
+		}
 
-    // Process stories to add computed fields
-    const processedStories = stories?.map(story => {
-      // Calculate average rating
-      const ratings = story.story_ratings || [];
-      const averageRating = ratings.length > 0 
-        ? ratings.reduce((sum: number, r: { rating: number }) => sum + r.rating, 0) / ratings.length 
-        : 0;
-      
-      // Count total reads (unique users who have progress)
-      const totalReads = story.user_progress ? story.user_progress.length : 0;
-      
-      return {
-        ...story,
-        average_rating: Math.round(averageRating * 10) / 10,
-        total_reads: totalReads,
-        author_name: story.profiles?.display_name || story.profiles?.username || 'Anonymous',
-        is_user_created: !!story.created_by,
-      };
-    }) || [];
+		if (query.user_created_only) {
+			// Require authentication for user-created filter
+			const {
+				data: { user },
+				error: authError,
+			} = await supabase.auth.getUser();
+			if (authError || !user) {
+				return NextResponse.json(
+					{
+						success: false,
+						error: "Authentication required for user-created stories",
+					},
+					{ status: 401 }
+				);
+			}
+			storiesQuery = storiesQuery.eq("created_by", user.id);
+		}
 
-    return NextResponse.json({
-      success: true,
-      stories: processedStories,
-      total: processedStories.length,
-      query: query,
-    });
+		// Apply sorting and pagination (order before range to match test mocks)
+		storiesQuery = storiesQuery
+			.order("created_at", { ascending: false })
+			.range(query.offset!, query.offset! + query.limit! - 1);
 
-  } catch (error) {
-    console.error('Get stories error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
+		const { data: stories, error } = await storiesQuery;
+
+		if (error) {
+			console.error("Stories fetch error:", error);
+			return NextResponse.json(
+				{ success: false, error: "Database error" },
+				{ status: 500 }
+			);
+		}
+
+		// Sign cover image and thumbnail if stored as private paths
+		const signIfPrivate = async (
+			maybePath: string | null | undefined
+		): Promise<string | null> => {
+			if (!maybePath) return null;
+			if (
+				maybePath.startsWith("http://") ||
+				maybePath.startsWith("https://")
+			)
+				return maybePath;
+			const signed = await getSignedUrl(maybePath);
+			return signed || null;
+		};
+
+		const signedStories = await Promise.all(
+			(stories || []).map(async (s: any) => {
+				const coverBase = s?.cover_image_path || s?.cover_image_url;
+				const coverThumbBase =
+					s?.cover_thumbnail_path || s?.cover_thumbnail_url;
+				const signedCover = await signIfPrivate(coverBase);
+				const signedCoverThumb = await signIfPrivate(
+					coverThumbBase
+				);
+				return {
+					...s,
+					cover_image_url:
+						signedCover ?? s?.cover_image_url ?? null,
+					cover_thumbnail_url:
+						signedCoverThumb ??
+						s?.cover_thumbnail_url ??
+						null,
+				};
+			})
+		);
+
+		// Process stories to add computed fields
+		const processedStories =
+			signedStories?.map((story) => {
+				return {
+					...story,
+					average_rating: 0, // Ratings not implemented yet
+					total_reads: 0, // Progress tracking not implemented yet
+					author_name: "Anonymous", // User profiles don't contain display names
+					is_user_created: !!story.created_by,
+					segments_count: story.story_segments?.length || 0,
+					questions_count: story.questions?.length || 0,
+				};
+			}) || [];
+
+		return NextResponse.json({
+			success: true,
+			stories: processedStories,
+			total: processedStories.length,
+			query: query,
+		});
+	} catch (error) {
+		console.error("Get stories error:", error);
+		return NextResponse.json(
+			{ success: false, error: "Internal server error" },
+			{ status: 500 }
+		);
+	}
 }
 
 // Get a specific story by ID
 export async function POST(request: NextRequest) {
-  try {
-    const supabase = await createClient();
-    const { storyId } = await request.json();
+	try {
+		const { createClient } = await import("@/utils/supabase/server");
+		const supabase = await createClient();
+		const { storyId } = await request.json();
 
-    if (!storyId) {
-      return NextResponse.json(
-        { success: false, error: 'Story ID is required' },
-        { status: 400 }
-      );
-    }
+		if (!storyId) {
+			return NextResponse.json(
+				{ success: false, error: "Story ID is required" },
+				{ status: 400 }
+			);
+		}
 
-    const { data: story, error } = await supabase
-      .from('stories')
-      .select(`
+		const { data: story, error } = await supabase
+			.from("stories")
+			.select(
+				`
         *,
-        profiles:created_by(display_name, username),
         story_segments(*),
-        questions(*),
-        story_ratings(rating, review),
-        user_progress(user_id, progress_percentage, is_completed)
-      `)
-      .eq('id', storyId)
-      .eq('is_published', true)
-      .single();
+        questions(*)
+      `
+			)
+			.eq("id", storyId)
+			.eq("is_published", true)
+			.single();
 
-    if (error) {
-      console.error('Story fetch error:', error);
-      return NextResponse.json(
-        { success: false, error: 'Story not found' },
-        { status: 404 }
-      );
-    }
+		if (error) {
+			console.error("Story fetch error:", error);
+			return NextResponse.json(
+				{ success: false, error: "Story not found" },
+				{ status: 404 }
+			);
+		}
 
-    // Process the story data
-    const ratings = story.story_ratings || [];
-    const averageRating = ratings.length > 0 
-      ? ratings.reduce((sum: number, r: { rating: number }) => sum + r.rating, 0) / ratings.length 
-      : 0;
-    
-    const totalReads = story.user_progress ? story.user_progress.length : 0;
+		// Process the story data
+		const processedStory = {
+			...story,
+			average_rating: 0, // Ratings not implemented yet
+			total_reads: 0, // Progress tracking not implemented yet
+			author_name: "Anonymous", // User profiles don't contain display names
+			is_user_created: !!story.created_by,
+			segments:
+				story.story_segments?.sort(
+					(
+						a: { segment_order: number },
+						b: { segment_order: number }
+					) => a.segment_order - b.segment_order
+				) || [],
+			questions: story.questions || [],
+			reviews: [], // Reviews not implemented yet
+		};
 
-    const processedStory = {
-      ...story,
-      average_rating: Math.round(averageRating * 10) / 10,
-      total_reads: totalReads,
-      author_name: story.profiles?.display_name || story.profiles?.username || 'Anonymous',
-      is_user_created: !!story.created_by,
-      segments: story.story_segments?.sort((a: { segment_order: number }, b: { segment_order: number }) => a.segment_order - b.segment_order) || [],
-      questions: story.questions || [],
-      reviews: ratings.filter((r: { review?: string }) => r.review && r.review.trim().length > 0),
-    };
-
-    return NextResponse.json({
-      success: true,
-      story: processedStory,
-    });
-
-  } catch (error) {
-    console.error('Get story error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
+		return NextResponse.json({
+			success: true,
+			story: processedStory,
+		});
+	} catch (error) {
+		console.error("Get story error:", error);
+		return NextResponse.json(
+			{ success: false, error: "Internal server error" },
+			{ status: 500 }
+		);
+	}
 }

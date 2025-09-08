@@ -4,7 +4,11 @@
       "Bash(yarn lint)",
       "Bash(yarn build)",
       "Bash(git check-ignore:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh:*)",
+      "Bash(vercel:*)"
     ],
     "deny": [],
     "ask": []
