@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { ensureStorageBucket, getSignedUrl } from "@/utils/images/storage";
 import { createAdminClient } from "@/utils/supabase/admin";
 
 const STORIES_BUCKET = "story-images";
 
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     // 1) Ensure bucket exists / is accessible
     const bucketReady = await ensureStorageBucket();

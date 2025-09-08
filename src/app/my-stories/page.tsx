@@ -1,5 +1,5 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -45,7 +45,7 @@ export default function MyStoriesPage() {
 					setMessage("Failed to load your stories.");
 					setStories([]);
 				}
-			} catch (e) {
+			} catch {
 				setMessage("Failed to load your stories.");
 				setStories([]);
 			} finally {

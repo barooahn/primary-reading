@@ -1,8 +1,7 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { useState, useEffect } from "react";
-import { Header } from "@/components/navigation/header";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -243,7 +242,7 @@ export default function ReadStoryPage() {
 	});
 
 	// Auto-advance reading with reading speed calculation
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+	 
 	useEffect(() => {
 		if (
 			isPlaying &&
@@ -708,7 +707,6 @@ export default function ReadStoryPage() {
 			  100
 			: 0;
 
-	const isEmpty = totalSegments === 0;
 	const displayPage = totalSegments > 0 ? currentSegment + 1 : 0;
 
 	return (

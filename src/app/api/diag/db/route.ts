@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { createAdminClient } from "@/utils/supabase/admin";
 
 async function checkColumnExists(
@@ -28,7 +28,7 @@ async function checkColumnExists(
   }
 }
 
-export async function GET(_req: NextRequest) {
+export async function GET() {
   try {
     const results = {
       stories: {

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { researchTopicForStory } from "@/utils/search/client";
 
 interface GenerateStoryRequest {
 	theme: string;
