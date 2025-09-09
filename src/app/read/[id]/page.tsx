@@ -1,7 +1,6 @@
 "use client";
- 
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -32,6 +31,51 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { DeleteStoryButton } from "@/components/stories/delete-story-button";
 
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+// Separate component for text input that manages its own state until submission
+const TextAnswerInput = ({ 
+	questionId, 
+	initialValue, 
+	isAnswered, 
+	placeholder, 
+	rows = 4,
+	valueRef
+}: {
+	questionId: number;
+	initialValue: string;
+	isAnswered: boolean;
+	placeholder: string;
+	rows?: number;
+	valueRef: React.MutableRefObject<string>;
+}) => {
+	const [localValue, setLocalValue] = useState(initialValue);
+	
+	// Update local value when question changes
+	useEffect(() => {
+		setLocalValue(initialValue);
+		valueRef.current = initialValue;
+	}, [questionId, initialValue, valueRef]);
+	
+	const handleChange = (newValue: string) => {
+		if (!isAnswered) {
+			setLocalValue(newValue);
+			valueRef.current = newValue; // Keep ref in sync
+		}
+	};
+	
+	return (
+		<textarea
+			className='w-full p-4 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
+			rows={rows}
+			placeholder={placeholder}
+			disabled={isAnswered}
+			value={localValue}
+			onChange={(e) => handleChange(e.target.value)}
+		/>
+	);
+};
 // Mock story data - in real app this would come from Supabase
 const defaultMockStory = {
 	id: "1",
@@ -204,7 +248,12 @@ export default function ReadStoryPage() {
 				const data = await res.json();
 				if (!active) return;
 				if (data?.success && data?.story) {
+					console.log("=== READ PAGE API RESPONSE ===");
+					console.log("Raw questions from API:", data.story.questions);
+					console.log("Questions count:", data.story.questions?.length || 0);
 					const mappedStory = mapApiStory(data.story);
+					console.log("Mapped questions in read page:", mappedStory.questions);
+					console.log("Mapped questions count:", mappedStory.questions?.length || 0);
 					setStory(mappedStory);
 				}
 			} catch (e) {
@@ -230,6 +279,10 @@ export default function ReadStoryPage() {
 		{}
 	);
 	const [showResults, setShowResults] = useState(false);
+	
+	// Refs to get current text input values
+	const shortAnswerValueRef = useRef<string>("");
+	const creativeAnswerValueRef = useRef<string>("");
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [isMuted, setIsMuted] = useState(false);
 	const [readingStartTime] = useState(Date.now());
@@ -242,7 +295,7 @@ export default function ReadStoryPage() {
 	});
 
 	// Auto-advance reading with reading speed calculation
-	 
+
 	useEffect(() => {
 		if (
 			isPlaying &&
@@ -261,7 +314,7 @@ export default function ReadStoryPage() {
 
 			return () => clearTimeout(timer);
 		}
-	}, [isPlaying, currentSegment]);
+	}, [isPlaying, currentSegment, mockStory?.content]);
 
 	const handlePrevious = () => {
 		if (currentSegment > 0) {
@@ -276,10 +329,16 @@ export default function ReadStoryPage() {
 		} else if (!showQuestions) {
 			setIsReading(false);
 			const qLen = mockStory?.questions?.length ?? 0;
+			console.log("=== QUESTIONS BUTTON DEBUG ===");
+			console.log("Questions array:", mockStory?.questions);
+			console.log("Questions length:", qLen);
+			console.log("Full story object:", mockStory);
 			if (qLen === 0) {
+				console.log("No questions found - showing results page");
 				calculateResults();
 				setShowResults(true);
 			} else {
+				console.log("Questions found - showing questions page");
 				setShowQuestions(true);
 			}
 		}
@@ -297,12 +356,49 @@ export default function ReadStoryPage() {
 		}, 1500);
 	};
 
+
+	// Function to check if a free text answer is correct
+	const checkFreeTextAnswer = (userAnswer: string, correctAnswer: string, questionType: string) => {
+		if (!userAnswer || !correctAnswer) return false;
+		
+		const userLower = userAnswer.toLowerCase().trim();
+		const correctLower = correctAnswer.toLowerCase().trim();
+		
+		// For creative questions, always mark as correct (participation credit)
+		if (questionType === "creative") {
+			return userAnswer.trim().length > 0;
+		}
+		
+		// For short answer questions, use fuzzy matching
+		if (questionType === "short_answer") {
+			// Exact match
+			if (userLower === correctLower) return true;
+			
+			// Check if user answer contains key words from correct answer
+			const correctWords = correctLower.split(/\s+/).filter(word => word.length > 2);
+			const userWords = userLower.split(/\s+/);
+			
+			// If at least 60% of key words are present, consider it correct
+			const matchedWords = correctWords.filter(word => 
+				userWords.some(userWord => 
+					userWord.includes(word) || word.includes(userWord)
+				)
+			);
+			
+			const matchPercentage = matchedWords.length / correctWords.length;
+			return matchPercentage >= 0.6;
+		}
+		
+		// For multiple choice, use exact match
+		return userLower === correctLower;
+	};
+
 	const calculateResults = () => {
 		const correctCount = (mockStory?.questions ?? []).reduce(
 			(count, question, index) => {
-				return userAnswers[index] === question.correctAnswer
-					? count + 1
-					: count;
+				const userAnswer = userAnswers[index];
+				const isCorrect = checkFreeTextAnswer(userAnswer, question.correctAnswer, question.type);
+				return isCorrect ? count + 1 : count;
 			},
 			0
 		);
@@ -608,29 +704,19 @@ export default function ReadStoryPage() {
 
 							{question?.type === "short_answer" && (
 								<div className='space-y-4'>
-									<textarea
-										className='w-full p-4 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
+									<TextAnswerInput
+										questionId={currentQuestion}
+										initialValue={userAnswers[currentQuestion] || ""}
+										valueRef={shortAnswerValueRef}
+										isAnswered={isAnswered}
+										placeholder="Type your answer here..."
 										rows={4}
-										placeholder='Type your answer here...'
-										disabled={isAnswered}
-										onChange={(e) =>
-											!isAnswered &&
-											setUserAnswers({
-												...userAnswers,
-												[currentQuestion]:
-													e.target
-														?.value ??
-													"",
-											})
-										}
 									/>
 									{!isAnswered && (
 										<Button
 											onClick={() =>
 												handleAnswerQuestion(
-													userAnswers[
-														currentQuestion
-													] || ""
+													shortAnswerValueRef.current || ""
 												)
 											}
 										>
@@ -642,30 +728,19 @@ export default function ReadStoryPage() {
 
 							{question?.type === "creative" && (
 								<div className='space-y-4'>
-									<textarea
-										className='w-full p-4 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
+									<TextAnswerInput
+										questionId={currentQuestion}
+										initialValue={userAnswers[currentQuestion] || ""}
+										valueRef={creativeAnswerValueRef}
+										isAnswered={isAnswered}
+										placeholder="Draw with words or describe your ideas here..."
 										rows={6}
-										placeholder='Draw with words or describe your ideas here...'
-										disabled={isAnswered}
-										onChange={(e) =>
-											!isAnswered &&
-											setUserAnswers({
-												...userAnswers,
-												[currentQuestion]:
-													e.target
-														?.value ??
-													"",
-											})
-										}
 									/>
 									{!isAnswered && (
 										<Button
 											onClick={() =>
 												handleAnswerQuestion(
-													userAnswers[
-														currentQuestion
-													] ||
-														"Creative response given"
+													creativeAnswerValueRef.current || "Creative response given"
 												)
 											}
 										>
@@ -677,17 +752,76 @@ export default function ReadStoryPage() {
 
 							{isAnswered && (
 								<div className='mt-6 p-4 bg-primary/10 rounded-lg border border-primary/20'>
-									<div className='flex items-start space-x-2'>
-										<Lightbulb className='h-5 w-5 text-primary mt-0.5 flex-shrink-0' />
-										<div>
-											<h4 className='font-medium text-primary mb-1'>
-												Explanation:
-											</h4>
-											<p className='text-sm leading-relaxed'>
-												{question?.explanation ??
-													""}
+									{/* Show user's answer for text questions */}
+									{(question?.type === "short_answer" || question?.type === "creative") && (
+										<div className='mb-4 p-3 bg-background/50 rounded border'>
+											<h5 className='font-medium text-sm mb-2'>Your Answer:</h5>
+											<p className='text-sm text-muted-foreground italic'>
+												&ldquo;{userAnswers[currentQuestion] || ""}&rdquo;
 											</p>
 										</div>
+									)}
+									
+									{/* Feedback based on question type */}
+									<div className='flex items-start space-x-2'>
+										{question?.type === "creative" ? (
+											<>
+												<Trophy className='h-5 w-5 text-yellow-500 mt-0.5 flex-shrink-0' />
+												<div>
+													<h4 className='font-medium text-yellow-600 mb-1'>
+														Great Creativity! 🌟
+													</h4>
+													<p className='text-sm leading-relaxed'>
+														{question?.explanation ?? "Amazing creativity! Every reader might have a different favorite part, and that's what makes reading special."}
+													</p>
+												</div>
+											</>
+										) : question?.type === "short_answer" ? (
+											<>
+												{checkFreeTextAnswer(userAnswers[currentQuestion], question?.correctAnswer, question?.type) ? (
+													<>
+														<CheckCircle className='h-5 w-5 text-green-500 mt-0.5 flex-shrink-0' />
+														<div>
+															<h4 className='font-medium text-green-600 mb-1'>
+																Excellent Answer! ✓
+															</h4>
+															<p className='text-sm leading-relaxed'>
+																{question?.explanation ?? "Great job! Your answer shows good understanding."}
+															</p>
+														</div>
+													</>
+												) : (
+													<>
+														<Lightbulb className='h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0' />
+														<div>
+															<h4 className='font-medium text-blue-600 mb-1'>
+																Good Try! Here&apos;s more info:
+															</h4>
+															<p className='text-sm leading-relaxed mb-2'>
+																{question?.explanation ?? ""}
+															</p>
+															{question?.correctAnswer && (
+																<p className='text-sm text-muted-foreground'>
+																	<strong>Expected answer:</strong> {question.correctAnswer}
+																</p>
+															)}
+														</div>
+													</>
+												)}
+											</>
+										) : (
+											<>
+												<Lightbulb className='h-5 w-5 text-primary mt-0.5 flex-shrink-0' />
+												<div>
+													<h4 className='font-medium text-primary mb-1'>
+														Explanation:
+													</h4>
+													<p className='text-sm leading-relaxed'>
+														{question?.explanation ?? ""}
+													</p>
+												</div>
+											</>
+										)}
 									</div>
 								</div>
 							)}
@@ -861,7 +995,7 @@ export default function ReadStoryPage() {
 							>
 								{currentContent?.text ? (
 									<div
-										className={`leading-relaxed whitespace-pre-line ${
+										className={`${
 											currentContent?.isTitle
 												? "text-xl font-semibold text-primary"
 												: currentContent?.isEnding
@@ -869,7 +1003,76 @@ export default function ReadStoryPage() {
 												: "text-base"
 										}`}
 									>
-										{currentContent.text}
+										<ReactMarkdown
+											remarkPlugins={[
+												remarkGfm,
+											]}
+											components={{
+												h1: (props) => (
+													<h1
+														className='text-3xl md:text-4xl font-bold mb-4'
+														{...props}
+													/>
+												),
+												h2: (props) => (
+													<h2
+														className='text-2xl md:text-3xl font-semibold mb-3'
+														{...props}
+													/>
+												),
+												h3: (props) => (
+													<h3
+														className='text-xl md:text-2xl font-semibold mb-2'
+														{...props}
+													/>
+												),
+												p: (props) => (
+													<p
+														className='text-base leading-relaxed mb-4'
+														{...props}
+													/>
+												),
+												ul: (props) => (
+													<ul
+														className='list-disc pl-6 my-4 space-y-1'
+														{...props}
+													/>
+												),
+												ol: (props) => (
+													<ol
+														className='list-decimal pl-6 my-4 space-y-1'
+														{...props}
+													/>
+												),
+												li: (props) => (
+													<li
+														{...props}
+													/>
+												),
+												strong: (props) => (
+													<strong
+														className='font-semibold'
+														{...props}
+													/>
+												),
+												em: (props) => (
+													<em
+														className='italic'
+														{...props}
+													/>
+												),
+												a: (props) => (
+													<a
+														className='underline text-primary hover:text-primary/80'
+														target='_blank'
+														rel='noopener noreferrer'
+														{...props}
+													/>
+												),
+											}}
+										>
+											{currentContent.text}
+										</ReactMarkdown>
 									</div>
 								) : (
 									<span className='block text-center text-muted'>

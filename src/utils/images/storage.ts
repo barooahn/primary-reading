@@ -3,6 +3,7 @@ import sharp from "sharp";
 
 // Storage bucket name for story images
 const STORIES_BUCKET = "story-images";
+const AVATARS_BUCKET = "avatars";
 
 interface ImageUploadOptions {
 	quality?: number;
@@ -46,13 +47,29 @@ export async function uploadImageFromUrl(
 			format = "webp",
 		} = options;
 
-		// Download the image from OpenAI's temporary URL
-		const response = await fetch(imageUrl);
-		if (!response.ok) {
-			throw new Error(`Failed to fetch image: ${response.statusText}`);
-		}
+		let imageBuffer: ArrayBuffer;
 
-		const imageBuffer = await response.arrayBuffer();
+		// Handle both regular URLs and base64 data URLs
+		if (imageUrl.startsWith('data:')) {
+			console.log("Processing base64 data URL for storage");
+			// Extract base64 data from data URL
+			const base64Data = imageUrl.split(',')[1];
+			if (!base64Data) {
+				throw new Error("Invalid base64 data URL");
+			}
+			
+			// Convert base64 to buffer
+			const buffer = Buffer.from(base64Data, 'base64');
+			imageBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+		} else {
+			console.log("Fetching image from URL for storage");
+			// Download the image from OpenAI's temporary URL
+			const response = await fetch(imageUrl);
+			if (!response.ok) {
+				throw new Error(`Failed to fetch image: ${response.statusText}`);
+			}
+			imageBuffer = await response.arrayBuffer();
+		}
 
 		// Optimize the image using Sharp
 		const optimizedBuffer = await sharp(Buffer.from(imageBuffer))
@@ -122,7 +139,7 @@ export async function createImageVariants(
 /**
  * Ensures the storage bucket exists and has proper policies
  */
-export async function ensureStorageBucket(): Promise<boolean> {
+export async function ensureStorageBucket(bucketName: string = STORIES_BUCKET): Promise<boolean> {
 	try {
 		const supabase = await createAdminClient();
 
@@ -136,14 +153,14 @@ export async function ensureStorageBucket(): Promise<boolean> {
 		}
 
 		const bucketExists = buckets?.some(
-			(bucket) => bucket.name === STORIES_BUCKET
+			(bucket) => bucket.name === bucketName
 		);
 
 		if (!bucketExists) {
 			// Create the bucket
 			const { error: createError } =
-				await supabase.storage.createBucket(STORIES_BUCKET, {
-					public: false,
+				await supabase.storage.createBucket(bucketName, {
+					public: bucketName === AVATARS_BUCKET,
 					allowedMimeTypes: [
 						"image/webp",
 						"image/jpeg",
@@ -166,6 +183,13 @@ export async function ensureStorageBucket(): Promise<boolean> {
 		console.error("Storage bucket setup error:", error);
 		return false;
 	}
+}
+
+/**
+ * Ensures the avatars bucket exists and has proper policies
+ */
+export async function ensureAvatarsBucket(): Promise<boolean> {
+	return ensureStorageBucket(AVATARS_BUCKET);
 }
 
 /**

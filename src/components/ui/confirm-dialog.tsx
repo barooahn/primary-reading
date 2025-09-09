@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
 	Dialog,
 	DialogContent,
@@ -17,7 +17,7 @@ interface ConfirmDialogProps {
 	onClose: () => void;
 	onConfirm: () => void | Promise<void>;
 	title?: string;
-	description?: string;
+	description?: ReactNode;
 	confirmText?: string;
 	cancelText?: string;
 	variant?: "destructive" | "warning" | "default";
@@ -70,8 +70,11 @@ export function ConfirmDialog({
 						{getIcon()}
 						{title}
 					</DialogTitle>
-					<DialogDescription className='text-base leading-relaxed'>
-						{description}
+					<DialogDescription
+						asChild
+						className='text-base leading-relaxed'
+					>
+						<div className='text-muted-foreground'>{description}</div>
 					</DialogDescription>
 				</DialogHeader>
 

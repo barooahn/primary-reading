@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
 			is_featured: false,
 			is_published: true,
 			created_by: user.id,
-		});
+		}).select();
 
 		if (insertResult.error) {
 			console.error("Story save error:", insertResult.error);
@@ -161,7 +161,13 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
+		console.log("=== INSERT RESULT DEBUG ===");
+		console.log("Insert result:", insertResult);
+		console.log("Insert result data:", insertResult.data);
+		console.log("Insert result data[0]:", insertResult.data?.[0]);
+		
 		const storyId = insertResult.data?.[0]?.id;
+		console.log("Extracted story ID:", storyId);
 
 		// Save story segments if provided
 		if (body.segments && body.segments.length > 0) {
@@ -196,6 +202,7 @@ export async function POST(request: NextRequest) {
 
 		// Save questions if provided
 		if (body.questions && body.questions.length > 0) {
+			console.log("Saving questions:", body.questions);
 			const questionsToInsert = body.questions.map((question) => ({
 				story_id: storyId,
 				question_text: question.question_text,
@@ -207,14 +214,20 @@ export async function POST(request: NextRequest) {
 				difficulty: question.difficulty,
 			}));
 
+			console.log("Questions to insert:", questionsToInsert);
+
 			const { error: questionsError } = await supabase
-				.from("comprehension_questions")
+				.from("questions")
 				.insert(questionsToInsert);
 
 			if (questionsError) {
 				console.error("Questions save error:", questionsError);
 				// Don't fail the whole operation, just log the error
+			} else {
+				console.log("Questions saved successfully!");
 			}
+		} else {
+			console.log("No questions to save - questions array is empty or undefined");
 		}
 
 		// Update user's story count (for achievements/progress)

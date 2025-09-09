@@ -17,12 +17,10 @@ import {
 	Wand2,
 	BookOpen,
 	Clock,
-	Star,
 	ChevronRight,
 	Lightbulb,
 	RefreshCw,
 	Play,
-	Search,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -653,18 +651,28 @@ export default function CreatePage() {
 	const [generatedImages, setGeneratedImages] = useState<
 		Array<{
 			segmentId: string;
-			imageUrl: string; // signed URL for immediate display
-			thumbnailUrl?: string; // signed URL for preview
-			storagePath?: string; // private storage path
-			thumbnailStoragePath?: string; // private storage path for thumb
+			imageUrl: string;
+			thumbnailUrl?: string;
+			storagePath?: string;
+			thumbnailStoragePath?: string;
 			prompt?: string;
 			revisedPrompt?: string;
 			type?: "cover" | "segment";
+			title?: string;
+			canRegenerate?: boolean;
+			regenerationCount?: number;
 		}>
 	>([]);
 	const [, setIsGenerating] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
 	const [saved, setSaved] = useState(false);
+	const [generationProgress, setGenerationProgress] = useState({
+		step: "",
+		progress: 0,
+		message: "",
+		isGenerating: false,
+	});
+	const [regeneratingImages, setRegeneratingImages] = useState<Set<string>>(new Set());
 
 	const handleThemeSelect = (theme: string) => {
 		setSettings({ ...settings, theme });
@@ -673,8 +681,8 @@ export default function CreatePage() {
 		}
 	};
 
-	const saveStoryToDatabase = async () => {
-		if (!generatedStory) return;
+	const saveStoryToDatabase = async (): Promise<string | null> => {
+		if (!generatedStory) return null;
 
 		setIsSaving(true);
 		// Prepare images and segments
@@ -761,7 +769,57 @@ export default function CreatePage() {
 			];
 		};
 
-		const segmentsToSave = parseSegmentsForSave(generatedStory.content);
+		// Handle both old format (string) and new format (object with raw/structured)
+		const contentString = typeof generatedStory.content === 'string' 
+			? generatedStory.content 
+			: generatedStory.content?.raw || generatedStory.content;
+		const segmentsToSave = parseSegmentsForSave(contentString);
+
+		// Parse questions from story content if questions are enabled
+		let questionsToSave: any[] = [];
+		console.log("=== STORY SAVE DEBUG ===");
+		console.log("Include questions setting:", settings.includeQuestions);
+		console.log("Generated story content preview:", contentString.substring(0, 1000));
+		if (settings.includeQuestions) {
+			try {
+				// Check if we already have structured questions from the API
+				if (generatedStory.content && typeof generatedStory.content === 'object' && generatedStory.content.structured?.questions) {
+					console.log("Using structured questions from API response...");
+					const structuredQuestions = generatedStory.content.structured.questions;
+					questionsToSave = structuredQuestions.map((q: any) => ({
+						question_text: q.question_text,
+						question_type: q.question_type,
+						options: q.options || [],
+						correct_answer: q.correct_answer,
+						explanation: q.explanation || '',
+						points: 1, // Default points per question
+						difficulty: settings.yearLevel // Use grade level as difficulty indicator
+					}));
+					console.log("=== SAVE STORY RESULTS (STRUCTURED) ===");
+					console.log("Structured questions:", structuredQuestions);
+					console.log("Formatted questions for save:", questionsToSave);
+					console.log("Questions count to save:", questionsToSave.length);
+				} else {
+					// Fallback to parsing from raw content
+					console.log("Parsing questions from raw content...");
+					const { parseQuestionsFromStoryContent, formatQuestionsForSave } = await import("@/utils/story/question-parser");
+					const parsedQuestions = parseQuestionsFromStoryContent(contentString);
+					questionsToSave = formatQuestionsForSave(parsedQuestions);
+					console.log("=== SAVE STORY RESULTS (PARSED) ===");
+					console.log("Raw parsed questions:", parsedQuestions);
+					console.log("Formatted questions for save:", questionsToSave);
+					console.log("Questions count to save:", questionsToSave.length);
+				}
+			} catch (error) {
+				console.error("Error parsing questions:", error);
+			}
+		} else {
+			console.log("Questions disabled in settings - not parsing questions");
+		}
+
+		console.log("=== ABOUT TO SAVE STORY ===");
+		console.log("Final questionsToSave before API call:", questionsToSave);
+		console.log("questionsToSave length:", questionsToSave.length);
 
 		try {
 			const response = await fetch("/api/save-story", {
@@ -774,7 +832,7 @@ export default function CreatePage() {
 					description:
 						generatedStory.description ||
 						`A ${settings.storyType} story about ${settings.theme}`,
-					content: generatedStory.content,
+					content: contentString,
 					genre: settings.theme,
 					theme: settings.customPrompt || settings.theme,
 					reading_level:
@@ -800,6 +858,7 @@ export default function CreatePage() {
 					cover_image_url: coverImageUrl,
 					cover_thumbnail_url: coverThumbUrl,
 					segments: segmentsToSave,
+					questions: questionsToSave,
 				}),
 			});
 
@@ -807,18 +866,26 @@ export default function CreatePage() {
 
 			if (data.success) {
 				setSaved(true);
+				console.log("=== STORY SAVE SUCCESS ===");
+				console.log("Response data:", data);
+				console.log("Story ID from response:", data.story?.id);
 				// Update the story with the database ID
-				setGeneratedStory({
+				const updatedStory = {
 					...generatedStory,
 					id: data.story.id,
-				});
+				};
+				console.log("Updated story object:", updatedStory);
+				setGeneratedStory(updatedStory);
+				return data.story.id;
 			} else {
 				console.error("Failed to save story:", data.error);
 				alert("Failed to save story to library. Please try again.");
+				return null;
 			}
 		} catch (error) {
 			console.error("Error saving story:", error);
 			alert("Failed to save story to library. Please try again.");
+			return null;
 		} finally {
 			setIsSaving(false);
 		}
@@ -827,9 +894,16 @@ export default function CreatePage() {
 	const generateStory = async () => {
 		setIsGenerating(true);
 		setCurrentStep("generating");
+		setGenerationProgress({
+			step: "starting",
+			progress: 0,
+			message: "Preparing to generate your story...",
+			isGenerating: true,
+		});
+		setGeneratedImages([]); // Clear previous images
 
 		try {
-			const response = await fetch("/api/generate-story", {
+			const response = await fetch("/api/generate-story-stream", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -844,46 +918,70 @@ export default function CreatePage() {
 				}),
 			});
 
-			const data = await response.json();
+			if (!response.ok) {
+				throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+			}
 
-			if (data.success) {
-				const storyObj =
-					typeof data.story === "string"
-						? data.storyData
-							? {
-									title: data.storyData.title,
-									content: data.storyData.content,
-									description:
-										data.storyData.description,
-									reading_level:
-										data.storyData.reading_level,
-									word_count:
-										data.storyData.word_count,
-									estimated_reading_time:
-										data.storyData
-											.estimated_reading_time,
-									difficulty_rating:
-										data.storyData
-											.difficulty_rating,
-							  }
-							: {
-									title: "Untitled Story",
-									content: data.story,
-							  }
-						: data.story;
+			const reader = response.body?.getReader();
+			if (!reader) {
+				throw new Error("No response body reader available");
+			}
 
-				setGeneratedStory(storyObj);
-				if (Array.isArray(data.images) && data.images.length) {
-					setGeneratedImages(data.images);
+			const decoder = new TextDecoder();
+			let buffer = "";
+
+			while (true) {
+				const { done, value } = await reader.read();
+				
+				if (done) break;
+
+				buffer += decoder.decode(value, { stream: true });
+				const lines = buffer.split("\n");
+				
+				// Keep the last incomplete line in buffer
+				buffer = lines.pop() || "";
+
+				for (const line of lines) {
+					if (line.startsWith("data: ")) {
+						try {
+							const data = JSON.parse(line.slice(6));
+							setGenerationProgress({
+								step: data.step,
+								progress: data.progress,
+								message: data.message,
+								isGenerating: data.step !== "complete" && data.step !== "error",
+							});
+
+							// Handle different types of updates
+							if (data.step === "story" && data.data?.story) {
+								console.log("=== FRONTEND RECEIVED STORY FROM STREAMING API ===");
+								console.log("Story data:", data.data.story);
+								console.log("Story content structure:", typeof data.data.story.content);
+								console.log("Story questions:", data.data.story.questions);
+								console.log("Story structured content:", data.data.story.content?.structured);
+								setGeneratedStory(data.data.story);
+							} else if (data.step === "images" && data.data?.newImage) {
+								setGeneratedImages(prev => [...prev, data.data.newImage]);
+							} else if (data.step === "complete") {
+								setCurrentStep("preview");
+							} else if (data.step === "error") {
+								throw new Error(data.message);
+							}
+						} catch (e) {
+							console.error("Error parsing SSE data:", e);
+						}
+					}
 				}
-				setCurrentStep("preview");
-			} else {
-				console.error("Story generation failed:", data.error);
-				// Fallback to mock data for demo
-				setGeneratedStory({
-					id: "generated-1",
-					title: "The Mystery of the Coding Cat",
-					content: `Once upon a time, in a small town called Bitburg, there lived a very unusual cat named Pixel. Unlike other cats who spent their days napping and chasing mice, Pixel had a secret passion – computer programming!
+			}
+
+		} catch (error) {
+			console.error("Error generating story:", error);
+			
+			// Fallback for demo
+			setGeneratedStory({
+				id: "generated-fallback",
+				title: "The Mystery of the Coding Cat",
+				content: `Once upon a time, in a small town called Bitburg, there lived a very unusual cat named Pixel. Unlike other cats who spent their days napping and chasing mice, Pixel had a secret passion – computer programming!
 
 Every night, when the Thompson family was asleep, Pixel would sneak downstairs to their home office. With her tiny paws, she would tap away at the keyboard, writing code that could solve problems no human programmer had ever tackled.
 
@@ -904,34 +1002,88 @@ The cat turned around, expecting to be in trouble. But instead, Emma's face lit 
 "This is the coolest thing ever! Can you teach me how to code too?"
 
 And that's how Emma and Pixel became the best programming team in Bitburg, creating games and apps that helped kids all over town learn and have fun at the same time.`,
-					estimatedReadingTime: 8,
-					questions: [
-						{
-							question: "What was Pixel's secret talent?",
-							type: "multiple_choice",
-							options: [
-								"Singing",
-								"Computer Programming",
-								"Painting",
-								"Dancing",
-							],
-							correct: "Computer Programming",
-						},
-					],
-				});
-				setCurrentStep("preview");
-			}
-		} catch (error) {
-			console.error("Error generating story:", error);
-			// Fallback for demo
-			setGeneratedStory({
-				title: "Demo Story",
-				content: "Story generation failed. Please check your API keys and try again.",
-				estimatedReadingTime: 1,
+				estimatedReadingTime: 8,
+				questions: [
+					{
+						question: "What was Pixel's secret talent?",
+						type: "multiple_choice",
+						options: [
+							"Singing",
+							"Computer Programming",
+							"Painting",
+							"Dancing",
+						],
+						correct: "Computer Programming",
+					},
+				],
+			});
+			setGenerationProgress({
+				step: "error",
+				progress: 0,
+				message: "Generation failed, showing demo story",
+				isGenerating: false,
 			});
 			setCurrentStep("preview");
 		} finally {
 			setIsGenerating(false);
+		}
+	};
+
+	const regenerateImage = async (segmentId: string, prompt: string, currentRegenerationCount: number = 0) => {
+		if (currentRegenerationCount >= 1) {
+			alert("Maximum regeneration limit reached (1 per image)");
+			return;
+		}
+
+		setRegeneratingImages(prev => new Set(prev).add(segmentId));
+
+		try {
+			const response = await fetch("/api/regenerate-image", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					segmentId,
+					prompt,
+					storyTitle: generatedStory?.title || "Story",
+					style: "illustration",
+					regenerationCount: currentRegenerationCount,
+				}),
+			});
+
+			const data = await response.json();
+
+			if (data.success) {
+				// Update the specific image in the array
+				setGeneratedImages(prev => 
+					prev.map(img => 
+						img.segmentId === segmentId 
+							? {
+								...img,
+								imageUrl: data.imageUrl,
+								thumbnailUrl: data.thumbnailUrl,
+								storagePath: data.storagePath,
+								thumbnailStoragePath: data.thumbnailStoragePath,
+								revisedPrompt: data.revisedPrompt,
+								regenerationCount: data.regenerationCount,
+								canRegenerate: data.canRegenerate,
+							}
+							: img
+					)
+				);
+			} else {
+				alert(`Failed to regenerate image: ${data.error}`);
+			}
+		} catch (error) {
+			console.error("Error regenerating image:", error);
+			alert("Failed to regenerate image. Please try again.");
+		} finally {
+			setRegeneratingImages(prev => {
+				const newSet = new Set(prev);
+				newSet.delete(segmentId);
+				return newSet;
+			});
 		}
 	};
 
@@ -1018,7 +1170,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 								</CardDescription>
 							</CardHeader>
 							<CardContent>
-								<div className='grid grid-cols-6 gap-3'>
+								<div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3'>
 									{[1, 2, 3, 4, 5, 6].map((year) => {
 										const config =
 											getGradeLevelConfig(
@@ -1121,7 +1273,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 								</div>
 
 								{!customPromptMode ? (
-									<div className='grid md:grid-cols-2 lg:grid-cols-3 gap-4'>
+									<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
 										{getThemesForYear(
 											settings.yearLevel
 										).map((theme, index) => (
@@ -1468,89 +1620,105 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 				{/* Step 3: Generating */}
 				{currentStep === "generating" && (
 					<div className='text-center py-12'>
-						<Card className='max-w-md mx-auto'>
+						<Card className='max-w-2xl mx-auto'>
 							<CardContent className='p-8'>
 								<div className='animate-spin w-12 h-12 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4'></div>
+								
+								{/* Progress Bar */}
+								<div className='mb-6'>
+									<div className='flex justify-between text-sm mb-2'>
+										<span>Progress</span>
+										<span>{generationProgress.progress}%</span>
+									</div>
+									<div className='w-full bg-gray-200 rounded-full h-2'>
+										<div 
+											className='bg-primary h-2 rounded-full transition-all duration-500'
+											style={{ width: `${generationProgress.progress}%` }}
+										></div>
+									</div>
+								</div>
+
+								{/* Current Status */}
 								<h2 className='text-xl font-semibold mb-2'>
-									Creating your story...
+									{generationProgress.step === "story" && "✍️ Writing your story..."}
+									{generationProgress.step === "images" && "🎨 Creating illustrations..."}
+									{generationProgress.step === "starting" && "🚀 Getting started..."}
+									{generationProgress.step === "complete" && "✅ All done!"}
+									{generationProgress.step === "error" && "❌ Something went wrong"}
 								</h2>
-								<p className='text-muted mb-4'>
-									Our AI is crafting an amazing
-									adventure just for you!
+								
+								<p className='text-muted mb-6'>
+									{generationProgress.message}
 								</p>
-								<div className='space-y-2 text-sm text-muted'>
-									<div className='flex items-center justify-center space-x-2'>
-										<Search className='h-4 w-4' />
-										<span>
-											Researching your topic...
-										</span>
-									</div>
-									<div className='flex items-center justify-center space-x-2'>
-										<Wand2 className='h-4 w-4' />
-										<span>
-											{generatedImages.length >
-												0 && (
-												<div className='space-y-2'>
-													<h4 className='font-medium'>
-														Generated
-														Images
-													</h4>
-													<div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
-														{generatedImages.map(
-															(
-																img,
-																idx
-															) => (
-																<div
-																	key={
-																		idx
-																	}
-																	className='flex flex-col items-center'
-																>
-																	{/* eslint-disable-next-line @next/next/no-img-element */}
-																	<img
-																		src={
-																			img.thumbnailUrl ||
-																			img.imageUrl
-																		}
-																		alt={`Story image ${
-																			idx +
-																			1
-																		}`}
-																		className='w-full h-32 object-cover rounded border'
-																	/>
-																	<div className='text-xs text-muted mt-1 truncate w-full'>
-																		{img.type ===
-																		"cover"
-																			? "Cover"
-																			: img.segmentId}
-																	</div>
-																</div>
-															)
-														)}
+
+								{/* Generated Images Display */}
+								{generatedImages.length > 0 && (
+									<div className='space-y-4 mb-6'>
+										<h4 className='font-medium text-left'>
+											Generated Images ({generatedImages.length}/5)
+										</h4>
+										<div className='grid grid-cols-2 md:grid-cols-3 gap-4'>
+											{generatedImages.map((img, idx) => (
+												<div
+													key={img.segmentId}
+													className='relative flex flex-col items-center'
+												>
+													{/* eslint-disable-next-line @next/next/no-img-element */}
+													<img
+														src={img.thumbnailUrl || img.imageUrl}
+														alt={img.title || `Story image ${idx + 1}`}
+														className='w-full h-32 object-cover rounded-lg border shadow-sm'
+													/>
+													<div className='text-xs text-muted mt-2 text-center'>
+														{img.type === "cover" ? "📖 Cover" : `📄 ${img.title || img.segmentId}`}
 													</div>
+													{img.canRegenerate && (
+														<Button
+															size="sm"
+															variant="outline"
+															className='mt-2 text-xs'
+															onClick={() => regenerateImage(
+																img.segmentId, 
+																img.prompt || "", 
+																img.regenerationCount || 0
+															)}
+															disabled={regeneratingImages.has(img.segmentId)}
+														>
+															{regeneratingImages.has(img.segmentId) ? (
+																<div className="flex items-center gap-1">
+																	<div className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
+																	<span>Regenerating...</span>
+																</div>
+															) : (
+																<div className="flex items-center gap-1">
+																	<RefreshCw className="w-3 h-3" />
+																	<span>Regenerate</span>
+																</div>
+															)}
+														</Button>
+													)}
 												</div>
-											)}
-											Writing your personalized
-											story...
-										</span>
-									</div>
-									{settings.includeQuestions && (
-										<div className='flex items-center justify-center space-x-2'>
-											<Star className='h-4 w-4' />
-											<span>
-												Creating fun
-												questions...
-											</span>
+											))}
 										</div>
-									)}
+									</div>
+								)}
+
+								{/* Step Indicators */}
+								<div className='flex justify-center space-x-8 text-sm'>
+									<div className={`flex items-center space-x-2 ${
+										generationProgress.step === "story" ? "text-primary font-medium" : 
+										generationProgress.progress >= 30 ? "text-green-600" : "text-muted"
+									}`}>
+										<BookOpen className='h-4 w-4' />
+										<span>Story</span>
+									</div>
 									{settings.includeImages && (
-										<div className='flex items-center justify-center space-x-2'>
+										<div className={`flex items-center space-x-2 ${
+											generationProgress.step === "images" ? "text-primary font-medium" : 
+											generationProgress.progress >= 95 ? "text-green-600" : "text-muted"
+										}`}>
 											<Sparkles className='h-4 w-4' />
-											<span>
-												Generating colorful
-												illustrations...
-											</span>
+											<span>Images ({generatedImages.length}/5)</span>
 										</div>
 									)}
 								</div>
@@ -1579,7 +1747,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 								<div className='space-y-4'>
 									<div className='text-center p-6 bg-gradient-to-br from-success/10 to-primary/10 rounded-lg border border-success/20'>
 										<h2 className='text-2xl font-bold text-foreground mb-2'>
-											{generatedStory.title}
+											{generatedStory.title.replace(/\*\*/g, '')}
 										</h2>
 										<div className='flex items-center justify-center space-x-4 text-sm text-muted'>
 											<span className='flex items-center space-x-1'>
@@ -1600,111 +1768,238 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 										</div>
 									</div>
 
-									<div className='max-h-64 overflow-y-auto p-4 bg-muted/10 rounded-lg border'>
-										<div className='reading-text text-sm leading-relaxed'>
-											{generatedStory.content}
-										</div>
-									</div>
-
-									{/* Save to Library */}
-									{!saved && (
-										<div className='p-4 bg-blue-50 rounded-lg border border-blue-200'>
-											<div className='flex items-center justify-between'>
-												<div>
-													<h3 className='font-medium text-blue-900'>
-														Save to
-														Story
-														Library
-													</h3>
-													<p className='text-sm text-blue-700'>
-														Add this
-														story to
-														the
-														library so
-														other
-														students
-														can read
-														it too!
-													</p>
+									{/* Story Image Display with Read Overlay */}
+									{generatedImages.length > 0 ? (
+										<div className='relative w-full max-w-md mx-auto rounded-lg overflow-hidden border shadow-lg group cursor-pointer'>
+											<img
+												src={generatedImages[0]?.imageUrl || generatedImages[0]?.thumbnailUrl}
+												alt={`Illustration for ${generatedStory.title}`}
+												className='w-full h-auto object-cover transition-transform group-hover:scale-105'
+												onError={(e) => {
+													console.error('Failed to load story image');
+													e.currentTarget.style.display = 'none';
+												}}
+											/>
+											{/* Click to Read Overlay */}
+											<div className='absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center'>
+												<div className='bg-white/95 px-6 py-3 rounded-full shadow-lg'>
+													<div className='flex items-center gap-2 text-gray-800 font-semibold'>
+														<BookOpen className='w-5 h-5' />
+														<span>Click to Read Story</span>
+													</div>
 												</div>
+											</div>
+											{/* Clickable link */}
+											<Link 
+												href={generatedStory.id ? `/read/${generatedStory.id}` : "#"} 
+												className='absolute inset-0'
+												onClick={(e) => {
+													console.log("=== READ STORY LINK CLICKED ===");
+													console.log("Generated story ID:", generatedStory.id);
+													console.log("Saved status:", saved);
+													console.log("Target href:", generatedStory.id ? `/read/${generatedStory.id}` : "#");
+													if (!generatedStory.id && !saved) {
+														e.preventDefault();
+														alert("Please save the story first to read it.");
+													}
+												}}
+											/>
+										</div>
+									) : generatedStory.imageUrl ? (
+										<div className='relative w-full max-w-md mx-auto rounded-lg overflow-hidden border shadow-lg group cursor-pointer'>
+											<img
+												src={generatedStory.imageUrl}
+												alt={`Illustration for ${generatedStory.title}`}
+												className='w-full h-auto object-cover transition-transform group-hover:scale-105'
+												onError={(e) => {
+													console.error('Failed to load story image');
+													e.currentTarget.style.display = 'none';
+												}}
+											/>
+											{/* Click to Read Overlay */}
+											<div className='absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center'>
+												<div className='bg-white/95 px-6 py-3 rounded-full shadow-lg'>
+													<div className='flex items-center gap-2 text-gray-800 font-semibold'>
+														<BookOpen className='w-5 h-5' />
+														<span>Click to Read Story</span>
+													</div>
+												</div>
+											</div>
+											{/* Clickable link */}
+											<Link 
+												href={generatedStory.id ? `/read/${generatedStory.id}` : "#"} 
+												className='absolute inset-0'
+												onClick={(e) => {
+													console.log("=== READ STORY LINK CLICKED ===");
+													console.log("Generated story ID:", generatedStory.id);
+													console.log("Saved status:", saved);
+													console.log("Target href:", generatedStory.id ? `/read/${generatedStory.id}` : "#");
+													if (!generatedStory.id && !saved) {
+														e.preventDefault();
+														alert("Please save the story first to read it.");
+													}
+												}}
+											/>
+										</div>
+									) : (
+										<div className='w-full max-w-md mx-auto p-8 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border-2 border-dashed border-blue-200'>
+											<div className='text-center text-muted-foreground'>
+												<div className='w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center'>
+													<span className='text-2xl'>📚</span>
+												</div>
+												<p className='text-sm'>Story illustration will appear here</p>
+											</div>
+										</div>
+									)}
+
+									{/* Action Buttons */}
+									{!saved ? (
+										<div className='space-y-4'>
+											<Button
+												onClick={async () => {
+													const storyId = await saveStoryToDatabase();
+													if (storyId) {
+														window.location.href = `/read/${storyId}`;
+													}
+												}}
+												disabled={isSaving}
+												className='w-full h-12 text-lg font-semibold bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600'
+											>
+												{isSaving ? (
+													<>
+														<div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2'></div>
+														Saving...
+													</>
+												) : (
+													<>
+														<Play className='h-5 w-5 mr-2' />
+														Save and Read Now!
+													</>
+												)}
+											</Button>
+											<Button
+												variant='outline'
+												onClick={() => setCurrentStep("details")}
+												className='w-full'
+											>
+												<RefreshCw className='h-4 w-4 mr-2' />
+												Create Different Story
+											</Button>
+										</div>
+									) : (
+										<div className='space-y-4'>
+											<div className='p-4 bg-green-50 rounded-lg border border-green-200'>
+												<div className='flex items-center space-x-2'>
+													<div className='w-6 h-6 bg-green-500 rounded-full flex items-center justify-center'>
+														<span className='text-white text-sm'>✓</span>
+													</div>
+													<div>
+														<h3 className='font-medium text-green-900'>Story Saved!</h3>
+														<p className='text-sm text-green-700'>Your story is now available in the library.</p>
+													</div>
+												</div>
+											</div>
+											<div className='flex space-x-4'>
 												<Button
-													onClick={
-														saveStoryToDatabase
-													}
-													disabled={
-														isSaving
-													}
+													variant='outline'
+													onClick={() => setCurrentStep("details")}
+													className='flex-1'
 												>
-													{isSaving
-														? "Saving..."
-														: "Save to Library"}
+													<RefreshCw className='h-4 w-4 mr-2' />
+													Create Another Story
+												</Button>
+												<Button
+													className='flex-1'
+													asChild
+												>
+													<Link href={generatedStory.id ? `/read/${generatedStory.id}` : "/stories"}>
+														<Play className='h-4 w-4 mr-2' />
+														{generatedStory.id ? "Start Reading!" : "Browse Stories"}
+													</Link>
 												</Button>
 											</div>
 										</div>
 									)}
-
-									{saved && (
-										<div className='p-4 bg-green-50 rounded-lg border border-green-200'>
-											<div className='flex items-center space-x-2'>
-												<div className='w-6 h-6 bg-green-500 rounded-full flex items-center justify-center'>
-													<span className='text-white text-sm'>
-														✓
-													</span>
-												</div>
-												<div>
-													<h3 className='font-medium text-green-900'>
-														Story
-														Saved!
-													</h3>
-													<p className='text-sm text-green-700'>
-														Your story
-														is now
-														available
-														in the
-														library
-														for
-														everyone
-														to enjoy.
-													</p>
-												</div>
-											</div>
-										</div>
-									)}
-
-									<div className='flex space-x-4'>
-										<Button
-											variant='outline'
-											onClick={() =>
-												setCurrentStep(
-													"details"
-												)
-											}
-											className='flex-1'
-										>
-											<RefreshCw className='h-4 w-4 mr-2' />
-											Create Different Story
-										</Button>
-										<Button
-											className='flex-1'
-											asChild
-										>
-											<Link
-												href={
-													generatedStory.id
-														? `/read/${generatedStory.id}`
-														: "/stories"
-												}
-											>
-												<Play className='h-4 w-4 mr-2' />
-												{generatedStory.id
-													? "Start Reading!"
-													: "Browse Stories"}
-											</Link>
-										</Button>
-									</div>
 								</div>
 							</CardContent>
 						</Card>
+
+						{/* Generated Images Gallery */}
+						{generatedImages.length > 0 && (
+							<Card>
+								<CardHeader>
+									<CardTitle className='flex items-center gap-2'>
+										<Sparkles className='h-5 w-5' />
+										Generated Images ({generatedImages.length}/5)
+									</CardTitle>
+									<CardDescription>
+										All the illustrations created for your story. You can regenerate each image once if you&apos;d like a different style.
+									</CardDescription>
+								</CardHeader>
+								<CardContent>
+									<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+										{generatedImages.map((img, idx) => (
+											<div key={img.segmentId} className='space-y-3'>
+												<div className='relative group'>
+													{/* eslint-disable-next-line @next/next/no-img-element */}
+													<img
+														src={img.thumbnailUrl || img.imageUrl}
+														alt={img.title || `Story image ${idx + 1}`}
+														className='w-full h-48 object-cover rounded-lg border shadow-sm transition-transform group-hover:scale-105'
+													/>
+													{/* Image Type Badge */}
+													<div className='absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs'>
+														{img.type === "cover" ? "📖 Cover" : "📄 Segment"}
+													</div>
+												</div>
+												
+												<div className='space-y-2'>
+													<h4 className='font-medium text-sm'>
+														{img.title || img.segmentId}
+													</h4>
+													{img.prompt && (
+														<p className='text-xs text-muted line-clamp-2'>
+															{img.prompt}
+														</p>
+													)}
+													
+													{/* Regeneration Button */}
+													{img.canRegenerate ? (
+														<Button
+															size="sm"
+															variant="outline"
+															className='w-full'
+															onClick={() => regenerateImage(
+																img.segmentId, 
+																img.prompt || "", 
+																img.regenerationCount || 0
+															)}
+															disabled={regeneratingImages.has(img.segmentId)}
+														>
+															{regeneratingImages.has(img.segmentId) ? (
+																<div className="flex items-center gap-2">
+																	<div className="w-4 h-4 border border-current border-t-transparent rounded-full animate-spin" />
+																	<span>Regenerating...</span>
+																</div>
+															) : (
+																<div className="flex items-center gap-2">
+																	<RefreshCw className="w-4 h-4" />
+																	<span>Regenerate Image</span>
+																</div>
+															)}
+														</Button>
+													) : (
+														<div className='text-xs text-muted text-center py-2'>
+															Maximum regenerations used
+														</div>
+													)}
+												</div>
+											</div>
+										))}
+									</div>
+								</CardContent>
+							</Card>
+						)}
 
 						{/* Social Sharing */}
 						{generatedStory.id && (

@@ -65,23 +65,84 @@ Technical requirements: High quality, detailed, suitable for web display, optimi
 			}
 		}
 
-		// Generate image using DALL-E 3
-		const { default: openai } = await import("@/utils/openai/client");
-		const response = await openai.images.generate({
-			model: "dall-e-3",
-			prompt: enhancedPrompt,
-			n: 1,
-			size: "1024x1024",
-			quality: "hd", // Use HD quality for better results
-			style: "vivid", // Vivid style for more engaging images
+		// Try GPT-image-1 first, fallback to DALL-E 3 if organization not verified
+		const { openai } = await import("@/lib/openai");
+		let response;
+		let modelUsed = "gpt-image-1";
+		
+		try {
+			// Attempt GPT-image-1 first (more cost-effective)
+			response = await openai.images.generate({
+				model: "gpt-image-1",
+				prompt: enhancedPrompt,
+				n: 1,
+				size: "1024x1024",
+				quality: "low", // Use low quality for cost efficiency (~$0.02 per image)
+				// Note: GPT-image-1 doesn't support 'style' parameter like DALL-E 3
+			});
+		} catch (error: any) {
+			console.log("GPT-image-1 error:", {
+				status: error?.status,
+				message: error?.message,
+				code: error?.code,
+				type: error?.type
+			});
+			
+			// Check if it's an organization verification error
+			if (error?.status === 403 && (error?.message?.includes('organization must be verified') || error?.message?.includes('organization'))) {
+				console.log("GPT-image-1 requires organization verification, falling back to DALL-E 3");
+				modelUsed = "dall-e-3";
+				
+				try {
+					// Fallback to DALL-E 3
+					response = await openai.images.generate({
+						model: "dall-e-3",
+						prompt: enhancedPrompt,
+						n: 1,
+						size: "1024x1024",
+						quality: "hd", // Use HD quality for better results
+						style: "vivid", // Vivid style for more engaging images
+					});
+					console.log("Successfully fell back to DALL-E 3");
+				} catch (dalleError: any) {
+					console.error("DALL-E 3 fallback also failed:", dalleError);
+					throw dalleError;
+				}
+			} else {
+				// Re-throw other errors
+				console.error("Non-403 error with GPT-image-1:", error);
+				throw error;
+			}
+		}
+
+		console.log("Image generation response:", {
+			success: !!response,
+			dataLength: response?.data?.length || 0,
+			firstItem: response?.data?.[0] ? Object.keys(response.data[0]) : [],
+			modelUsed
 		});
 
-		const temporaryImageUrl = response.data?.[0]?.url;
-		const revisedPrompt = response.data?.[0]?.revised_prompt;
+		// Handle both URL and base64 responses
+		const responseData = response.data?.[0];
+		let temporaryImageUrl = responseData?.url;
+		const revisedPrompt = responseData?.revised_prompt;
+
+		// If no URL but has base64 data (GPT-image-1 format), convert to data URL
+		if (!temporaryImageUrl && responseData?.b64_json) {
+			console.log("Converting base64 image data to data URL");
+			temporaryImageUrl = `data:image/png;base64,${responseData.b64_json}`;
+		}
 
 		if (!temporaryImageUrl) {
-			throw new Error("Failed to generate image");
+			console.error("No image URL or base64 data in response:", responseData);
+			throw new Error(`Failed to generate image with ${modelUsed}. Response: ${JSON.stringify(responseData || {})}`);
 		}
+
+		console.log(`Successfully generated image using ${modelUsed}`, {
+			hasUrl: !!responseData?.url,
+			hasBase64: !!responseData?.b64_json,
+			finalUrlType: temporaryImageUrl.startsWith('data:') ? 'base64' : 'url'
+		});
 
 		let permanentImageUrl = temporaryImageUrl;
 		let thumbnailUrl = null as string | null;
@@ -148,6 +209,7 @@ Technical requirements: High quality, detailed, suitable for web display, optimi
 			savedToStorage: permanentImageUrl !== temporaryImageUrl,
 			storagePath,
 			thumbnailStoragePath: thumbStoragePath,
+			modelUsed, // Include which model was actually used
 		});
 	} catch (error: any) {
 		console.error("Image generation error:", error);

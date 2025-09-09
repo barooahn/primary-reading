@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProtectedRoute } from "@/components/auth/protected-route";
+import { useAuth } from "@/contexts/auth-context";
 import {
 	BookOpen,
 	Trophy,
@@ -15,115 +16,141 @@ import {
 	Sparkles,
 	ChevronRight,
 	Play,
-	Lock,
 } from "lucide-react";
 import Link from "next/link";
 
-// Mock data - in real app this would come from Supabase
-const mockUserProgress = {
-	level: 3,
-	experiencePoints: 1250,
-	readingStreak: 7,
-	storiesRead: 23,
-	questionsAnswered: 156,
-	correctAnswers: 142,
-	badges: [
-		{
-			id: "1",
-			name: "First Story",
-			icon: "📚",
-			color: "#4A90E2",
-			earned: true,
-		},
-		{
-			id: "2",
-			name: "Streak Starter",
-			icon: "🔥",
-			color: "#FF6B6B",
-			earned: true,
-		},
-		{
-			id: "3",
-			name: "Question Master",
-			icon: "🧠",
-			color: "#F5D547",
-			earned: true,
-		},
-		{
-			id: "4",
-			name: "Explorer",
-			icon: "🗺️",
-			color: "#87CEEB",
-			earned: false,
-		},
-	],
-};
+interface UserProgress {
+	level: number;
+	experiencePoints: number;
+	readingStreak: number;
+	storiesRead: number;
+	questionsAnswered: number;
+	correctAnswers: number;
+	badges: Array<{
+		id: string;
+		name: string;
+		icon: string;
+		color: string;
+		earned: boolean;
+	}>;
+}
 
-const recentStories = [
-	{
-		id: "1",
-		title: "The Mystery of the Missing Dragon Egg",
-		genre: "Mystery",
-		readingLevel: "intermediate",
-		progress: 100,
-		completed: true,
-		score: 95,
-	},
-	{
-		id: "2",
-		title: "Space Rescue Mission Alpha",
-		genre: "Science Fiction",
-		readingLevel: "intermediate",
-		progress: 60,
-		completed: false,
-		score: null,
-	},
-	{
-		id: "3",
-		title: "The Laughing Dinosaur Park",
-		genre: "Comedy",
-		readingLevel: "beginner",
-		progress: 100,
-		completed: true,
-		score: 88,
-	},
-];
-
-const suggestedStories = [
-	{
-		id: "4",
-		title: "Ninja Academy: First Day",
-		genre: "Action",
-		readingLevel: "intermediate",
-		isNew: true,
-		difficulty: 3,
-		estimatedTime: 8,
-	},
-	{
-		id: "5",
-		title: "The Robot Pet Inventor",
-		genre: "Science",
-		readingLevel: "intermediate",
-		isNew: false,
-		difficulty: 3,
-		estimatedTime: 10,
-	},
-	{
-		id: "6",
-		title: "Underwater Treasure Hunt",
-		genre: "Adventure",
-		readingLevel: "advanced",
-		isNew: true,
-		difficulty: 4,
-		estimatedTime: 12,
-		locked: true,
-	},
-];
+interface Story {
+	id: string;
+	title: string;
+	genre?: string;
+	reading_level?: string;
+	progress?: number;
+	completed?: boolean;
+	score?: number | null;
+	estimated_reading_time?: number;
+	difficulty_rating?: number;
+	created_at?: string;
+	is_featured?: boolean;
+}
 
 export default function Dashboard() {
-	const [selectedTab, setSelectedTab] = useState<
-		"continue" | "suggested" | "create"
-	>("continue");
+	const { user } = useAuth();
+	const [selectedTab, setSelectedTab] = useState<"continue" | "suggested" | "create">("continue");
+	const [loading, setLoading] = useState(true);
+	const [userProgress, setUserProgress] = useState<UserProgress>({
+		level: 1,
+		experiencePoints: 0,
+		readingStreak: 0,
+		storiesRead: 0,
+		questionsAnswered: 0,
+		correctAnswers: 0,
+		badges: []
+	});
+	const [recentStories, setRecentStories] = useState<Story[]>([]);
+	const [suggestedStories, setSuggestedStories] = useState<Story[]>([]);
+
+	// Load dashboard data
+	useEffect(() => {
+		if (user) {
+			loadDashboardData();
+		}
+	}, [user, loadDashboardData]);
+
+	const loadDashboardData = useCallback(async () => {
+		try {
+			setLoading(true);
+			
+			// Load user's stories (recent/continue reading)
+			const storiesResponse = await fetch('/api/stories?limit=5&user_created_only=true', {
+				credentials: 'include'
+			});
+			
+			if (storiesResponse.ok) {
+				const storiesData = await storiesResponse.json();
+				if (storiesData.success) {
+					setRecentStories(storiesData.stories || []);
+				}
+			}
+
+			// Load suggested stories (all stories, not user-created)
+			const suggestedResponse = await fetch('/api/stories?limit=10&user_created_only=false', {
+				credentials: 'include'
+			});
+			
+			if (suggestedResponse.ok) {
+				const suggestedData = await suggestedResponse.json();
+				if (suggestedData.success) {
+					// Filter out user's own stories from suggestions
+					const filtered = (suggestedData.stories || []).filter((story: Story) => 
+						!recentStories.some(recent => recent.id === story.id)
+					);
+					setSuggestedStories(filtered.slice(0, 6));
+				}
+			}
+
+			// For now, use basic calculated progress based on stories
+			const storiesCount = recentStories.length;
+			setUserProgress({
+				level: Math.floor(storiesCount / 5) + 1,
+				experiencePoints: storiesCount * 50,
+				readingStreak: Math.min(storiesCount, 7), // Simple streak calculation
+				storiesRead: storiesCount,
+				questionsAnswered: 0, // TODO: Implement question tracking
+				correctAnswers: 0, // TODO: Implement question tracking
+				badges: [
+					{
+						id: "1",
+						name: "First Story",
+						icon: "📚",
+						color: "#4A90E2",
+						earned: storiesCount >= 1,
+					},
+					{
+						id: "2",
+						name: "Story Creator",
+						icon: "✍️",
+						color: "#FF6B6B", 
+						earned: storiesCount >= 3,
+					},
+					{
+						id: "3",
+						name: "Prolific Writer",
+						icon: "🏆",
+						color: "#F5D547",
+						earned: storiesCount >= 10,
+					},
+					{
+						id: "4",
+						name: "Master Storyteller",
+						icon: "👑",
+						color: "#87CEEB",
+						earned: storiesCount >= 20,
+					},
+				]
+			});
+
+		} catch (error) {
+			console.error('Failed to load dashboard data:', error);
+		} finally {
+			setLoading(false);
+		}
+	}, [recentStories]);
 
 	return (
 		<ProtectedRoute>
@@ -133,7 +160,7 @@ export default function Dashboard() {
 					<div className='flex items-center justify-between mb-4'>
 						<div>
 							<h1 className='text-3xl font-bold text-foreground'>
-								Welcome back, Reader! 🌟
+								Welcome back{user?.name ? `, ${user.name}` : ', Reader'}! 🌟
 							</h1>
 							<p className='text-muted mt-2'>
 								Ready for your next reading adventure?
@@ -143,14 +170,13 @@ export default function Dashboard() {
 							<div className='flex items-center space-x-2 px-4 py-2 bg-primary/10 rounded-full'>
 								<Crown className='h-5 w-5 text-primary' />
 								<span className='font-semibold'>
-									Level {mockUserProgress.level}
+									Level {userProgress.level}
 								</span>
 							</div>
 							<div className='flex items-center space-x-2 px-4 py-2 bg-secondary/10 rounded-full'>
 								<Flame className='h-5 w-5 text-orange-500' />
 								<span className='font-semibold'>
-									{mockUserProgress.readingStreak}{" "}
-									day streak!
+									{userProgress.readingStreak} day streak!
 								</span>
 							</div>
 						</div>
@@ -170,9 +196,7 @@ export default function Dashboard() {
 												Stories Read
 											</p>
 											<p className='text-2xl font-bold'>
-												{
-													mockUserProgress.storiesRead
-												}
+												{userProgress.storiesRead}
 											</p>
 										</div>
 										<BookOpen className='h-8 w-8 text-primary' />
@@ -188,9 +212,7 @@ export default function Dashboard() {
 												Questions Correct
 											</p>
 											<p className='text-2xl font-bold'>
-												{
-													mockUserProgress.correctAnswers
-												}
+												{userProgress.correctAnswers}
 											</p>
 										</div>
 										<Target className='h-8 w-8 text-success' />
@@ -206,9 +228,7 @@ export default function Dashboard() {
 												Experience Points
 											</p>
 											<p className='text-2xl font-bold'>
-												{
-													mockUserProgress.experiencePoints
-												}
+												{userProgress.experiencePoints}
 											</p>
 										</div>
 										<Zap className='h-8 w-8 text-orange-600' />
@@ -268,87 +288,81 @@ export default function Dashboard() {
 							<CardContent>
 								{selectedTab === "continue" && (
 									<div className='space-y-4'>
-										{recentStories.map(
-											(story) => (
+										{loading ? (
+											<div className='space-y-4'>
+												{Array.from({ length: 3 }).map((_, i) => (
+													<div key={i} className='flex items-center space-x-4 p-4 rounded-lg border'>
+														<div className='flex-1 space-y-2'>
+															<div className='h-5 bg-gray-200 rounded animate-pulse' />
+															<div className='h-4 bg-gray-200 rounded w-2/3 animate-pulse' />
+														</div>
+														<div className='w-24 h-10 bg-gray-200 rounded animate-pulse' />
+													</div>
+												))}
+											</div>
+										) : recentStories.length > 0 ? (
+											recentStories.map((story) => (
 												<div
 													key={story.id}
 													className='flex items-center space-x-4 p-4 rounded-lg border hover:shadow-md transition-all'
 												>
 													<div className='flex-1'>
 														<h3 className='font-semibold text-lg'>
-															{
-																story.title
-															}
+															{story.title?.replace(/\*\*/g, '') || 'Untitled Story'}
 														</h3>
 														<div className='flex items-center space-x-4 mt-2 text-sm text-muted'>
-															<span>
-																{
-																	story.genre
-																}
-															</span>
-															<span className='capitalize'>
-																{
-																	story.readingLevel
-																}
-															</span>
-															{story.completed && (
-																<span className='text-success font-medium'>
-																	Score:{" "}
-																	{
-																		story.score
-																	}
-
-																	%
-																</span>
+															{story.genre && <span>{story.genre}</span>}
+															{story.reading_level && (
+																<span className='capitalize'>{story.reading_level}</span>
+															)}
+															{story.estimated_reading_time && (
+																<span>{story.estimated_reading_time} min read</span>
 															)}
 														</div>
-														{!story.completed && (
-															<div className='mt-3'>
-																<div className='flex items-center justify-between text-xs text-muted mb-1'>
-																	<span>
-																		Progress
-																	</span>
-																	<span>
-																		{
-																			story.progress
-																		}
-
-																		%
-																	</span>
-																</div>
-																<div className='w-full bg-muted/20 rounded-full h-2'>
-																	<div
-																		className='bg-primary h-2 rounded-full transition-all'
-																		style={{
-																			width: `${story.progress}%`,
-																		}}
-																	/>
-																</div>
-															</div>
-														)}
+														{/* For now, all stories are considered "completed" since we don't have progress tracking yet */}
 													</div>
-													<Button
-														asChild
-													>
-														<Link
-															href={`/read/${story.id}`}
-														>
+													<Button asChild>
+														<Link href={`/read/${story.id}`}>
 															<Play className='h-4 w-4 mr-2' />
-															{story.completed
-																? "Read Again"
-																: "Continue"}
+															Read Story
 														</Link>
 													</Button>
 												</div>
-											)
+											))
+										) : (
+											<div className='text-center py-12'>
+												<BookOpen className='h-16 w-16 text-muted mx-auto mb-4' />
+												<h3 className='text-xl font-semibold mb-2'>No stories yet</h3>
+												<p className='text-muted mb-6'>
+													Create your first story to get started!
+												</p>
+												<Button asChild>
+													<Link href='/create'>
+														<Sparkles className='h-5 w-5 mr-2' />
+														Create Story
+													</Link>
+												</Button>
+											</div>
 										)}
 									</div>
 								)}
 
 								{selectedTab === "suggested" && (
 									<div className='space-y-4'>
-										{suggestedStories.map(
-											(story) => (
+										{loading ? (
+											<div className='space-y-4'>
+												{Array.from({ length: 3 }).map((_, i) => (
+													<div key={i} className='flex items-center space-x-4 p-4 rounded-lg border'>
+														<div className='flex-1 space-y-2'>
+															<div className='h-5 bg-gray-200 rounded animate-pulse' />
+															<div className='h-4 bg-gray-200 rounded w-3/4 animate-pulse' />
+														</div>
+														<div className='w-24 h-10 bg-gray-200 rounded animate-pulse' />
+													</div>
+												))}
+											</div>
+										) : suggestedStories.length > 0 ? (
+											suggestedStories.map((story) => (
 												<div
 													key={story.id}
 													className='flex items-center space-x-4 p-4 rounded-lg border hover:shadow-md transition-all'
@@ -356,93 +370,60 @@ export default function Dashboard() {
 													<div className='flex-1'>
 														<div className='flex items-center space-x-2'>
 															<h3 className='font-semibold text-lg'>
-																{
-																	story.title
-																}
+																{story.title?.replace(/\*\*/g, '') || 'Untitled Story'}
 															</h3>
-															{story.isNew && (
+															{story.is_featured && (
 																<span className='px-2 py-1 bg-secondary/20 text-secondary text-xs rounded-full font-medium'>
-																	NEW
+																	FEATURED
 																</span>
-															)}
-															{story.locked && (
-																<Lock className='h-4 w-4 text-muted' />
 															)}
 														</div>
 														<div className='flex items-center space-x-4 mt-2 text-sm text-muted'>
-															<span>
-																{
-																	story.genre
-																}
-															</span>
-															<span className='capitalize'>
-																{
-																	story.readingLevel
-																}
-															</span>
-															<span>
-																{
-																	story.estimatedTime
-																}{" "}
-																min
-																read
-															</span>
-															<div className='flex items-center'>
-																{Array.from(
-																	{
-																		length: 5,
-																	}
-																).map(
-																	(
-																		_,
-																		i
-																	) => (
+															{story.genre && <span>{story.genre}</span>}
+															{story.reading_level && (
+																<span className='capitalize'>{story.reading_level}</span>
+															)}
+															{story.estimated_reading_time && (
+																<span>{story.estimated_reading_time} min read</span>
+															)}
+															{story.difficulty_rating && (
+																<div className='flex items-center'>
+																	{Array.from({ length: 5 }).map((_, i) => (
 																		<Star
-																			key={
-																				i
-																			}
+																			key={i}
 																			className={`h-3 w-3 ${
-																				i <
-																				story.difficulty
+																				i < story.difficulty_rating!
 																					? "text-secondary fill-secondary"
 																					: "text-muted/30"
 																			}`}
 																		/>
-																	)
-																)}
-															</div>
+																	))}
+																</div>
+															)}
 														</div>
 													</div>
-													<Button
-														disabled={
-															story.locked
-														}
-														variant={
-															story.locked
-																? "outline"
-																: "default"
-														}
-														asChild={
-															!story.locked
-														}
-													>
-														{story.locked ? (
-															<>
-																<Lock className='h-4 w-4 mr-2' />
-																Locked
-															</>
-														) : (
-															<Link
-																href={`/read/${story.id}`}
-															>
-																<Play className='h-4 w-4 mr-2' />
-																Start
-																Reading
-															</Link>
-														)}
+													<Button asChild>
+														<Link href={`/read/${story.id}`}>
+															<Play className='h-4 w-4 mr-2' />
+															Start Reading
+														</Link>
 													</Button>
 												</div>
-											)
+											))
+										) : (
+											<div className='text-center py-12'>
+												<BookOpen className='h-16 w-16 text-muted mx-auto mb-4' />
+												<h3 className='text-xl font-semibold mb-2'>No suggestions yet</h3>
+												<p className='text-muted mb-6'>
+													Suggestions will appear as more stories are added to the library.
+												</p>
+												<Button asChild variant='outline'>
+													<Link href='/stories'>
+														<BookOpen className='h-5 w-5 mr-2' />
+														Browse Library
+													</Link>
+												</Button>
+											</div>
 										)}
 									</div>
 								)}
@@ -486,7 +467,7 @@ export default function Dashboard() {
 							</CardHeader>
 							<CardContent>
 								<div className='grid grid-cols-2 gap-3'>
-									{mockUserProgress.badges.map(
+									{userProgress.badges.map(
 										(badge) => (
 											<div
 												key={badge.id}

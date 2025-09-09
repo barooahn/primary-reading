@@ -164,7 +164,7 @@ export function Header() {
 					{/* Right Actions */}
 					<div className='flex items-center gap-2 flex-shrink-0 xl:justify-self-end'>
 						{user && showStats && (
-							<div className='hidden xl:flex items-center gap-3 order-3'>
+							<div className='hidden xl:flex items-center gap-3'>
 								{/* Combined Stats */}
 								<div className='group relative'>
 									<div
@@ -212,12 +212,15 @@ export function Header() {
 							</div>
 						)}
 
+						{/* Divider between stats and user menu on desktop */}
+						{user && showStats && (
+							<div className='hidden xl:block h-6 w-px bg-gray-200/70 mx-2' />
+						)}
+
 						{/* User Menu */}
-						<div className='flex items-center justify-center order-1'>
+						<div className='flex items-center justify-center'>
 							<UserMenu />
 						</div>
-						{/* Divider between user and stats on desktop */}
-						<div className='hidden xl:block h-6 w-px bg-gray-200/70 mx-2 order-2' />
 					</div>
 
 					{/* Mobile/Tablet Menu Button */}

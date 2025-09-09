@@ -151,11 +151,45 @@ Please provide:
 4. Suggested image prompts for each segment
 5. Suggested comprehension questions (${questionTypes.join(", ")} types)
 
+⚠️ CRITICAL: You MUST include comprehension questions! The response will be incomplete without them.
+
+REQUIRED FORMAT - Return ONLY valid JSON in this exact structure:
+
+{
+  "title": "[Your story title]",
+  "description": "[Brief description]",
+  "segments": [
+    {
+      "title": "[Segment title]",
+      "content": "[Story content for this segment]",
+      "imagePrompt": "[Description for AI image generation]"
+    }
+  ],
+  "questions": [
+    {
+      "question_text": "[Question text]",
+      "question_type": "multiple_choice",
+      "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+      "correct_answer": "Option 2",
+      "explanation": "[Why this is the correct answer]"
+    },
+    {
+      "question_text": "[True/False question text]",
+      "question_type": "multiple_choice",
+      "options": ["True", "False"],
+      "correct_answer": "True",
+      "explanation": "[Explanation]"
+    }
+  ]
+}
+
+⚠️ CRITICAL: Return ONLY valid JSON. Do not include any markdown, explanatory text, or formatting outside the JSON structure.
+
 RESEARCH CONTEXT (use this for factual accuracy):
 ${research}`;
 
 		// Generate story using GPT-4.1 nano (gpt-4o-mini is the model name for GPT-4.1 nano)
-		const { default: openai } = await import("@/utils/openai/client");
+		const { openai } = await import("@/lib/openai");
 		const completion = await (openai as any).chat.completions.create({
 			model: "gpt-4o-mini",
 			messages: [
@@ -165,11 +199,11 @@ ${research}`;
 				},
 				{
 					role: "system",
-					content: `You are a creative children's story writer who specializes in making reading fun and engaging for primary school students. Write a ${storyType} story for Year ${gradeLevel} children. Avoid boring, overly educational content.`,
+					content: `You are a creative children's story writer who specializes in making reading fun and engaging for primary school students. Write a ${storyType} story for Year ${gradeLevel} children. Avoid boring, overly educational content. IMPORTANT: You MUST return ONLY valid JSON in the exact format specified. Do not include any markdown, explanatory text, or additional formatting.`,
 				},
 			],
 			temperature: 0.8,
-			max_tokens: 2000,
+			max_tokens: 8000,
 		});
 
 		const storyContent = completion.choices[0]?.message?.content;
@@ -178,30 +212,50 @@ ${research}`;
 			throw new Error("Failed to generate story content");
 		}
 
-		// Parse the generated content (you might want to make this more robust)
-		const lines = storyContent.split("\n").filter((line) => line.trim());
-
-		// Extract title (assuming it's in the first few lines)
-		const titleLine = lines.find(
-			(line) =>
+		// Parse the generated JSON content
+		let parsedStory;
+		try {
+			// Clean the response in case there's any extra content
+			const cleanContent = storyContent.trim();
+			const jsonStart = cleanContent.indexOf('{');
+			const jsonEnd = cleanContent.lastIndexOf('}') + 1;
+			
+			if (jsonStart === -1 || jsonEnd <= jsonStart) {
+				throw new Error('No valid JSON structure found');
+			}
+			
+			const jsonContent = cleanContent.slice(jsonStart, jsonEnd);
+			parsedStory = JSON.parse(jsonContent);
+		} catch (error) {
+			console.error('Failed to parse JSON response:', error);
+			// Fallback to old parsing method if JSON fails
+			const lines = storyContent.split("\n").filter((line) => line.trim());
+			const titleLine = lines.find((line) =>
 				line.toLowerCase().includes("title:") ||
 				line.toLowerCase().includes("story title:")
-		);
-		const title = titleLine
-			? titleLine.split(":")[1]?.trim().replace(/"/g, "") ||
-			  "Untitled Story"
-			: "Untitled Story";
+			);
+			const title = titleLine
+				? titleLine.split(":")[1]?.trim().replace(/"/g, "") || "Untitled Story"
+				: "Untitled Story";
 
-		// Extract description
-		const descriptionLine = lines.find(
-			(line) =>
+			const descriptionLine = lines.find((line) =>
 				line.toLowerCase().includes("description:") ||
 				line.toLowerCase().includes("brief description:")
-		);
-		const description = descriptionLine
-			? descriptionLine.split(":")[1]?.trim() ||
-			  "An exciting adventure story!"
-			: "An exciting adventure story!";
+			);
+			const description = descriptionLine
+				? descriptionLine.split(":")[1]?.trim() || "An exciting adventure story!"
+				: "An exciting adventure story!";
+				
+			parsedStory = {
+				title,
+				description,
+				segments: [],
+				questions: []
+			};
+		}
+
+		const title = parsedStory.title || "Untitled Story";
+		const description = parsedStory.description || "An exciting adventure story!";
 
 		// Generate images if requested
 		let generatedImages: any[] = [];
@@ -219,11 +273,16 @@ ${research}`;
 			}
 		}
 
-		// For now, return the raw content - in production you'd want better parsing
+		// Create structured story data with parsed JSON
 		const storyData = {
 			title,
 			description,
-			content: storyContent,
+			content: {
+				raw: storyContent, // Keep raw content for backward compatibility
+				structured: parsedStory // Add structured data
+			},
+			segments: parsedStory.segments || [],
+			questions: parsedStory.questions || [],
 			genre: theme,
 			theme: topic,
 			reading_level: gradeConfig.readingLevel,

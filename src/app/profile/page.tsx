@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useMemo, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
+import { Upload, Camera } from "lucide-react";
 
 export default function ProfilePage() {
 	const { user, updateUserMetadata } = useAuth();
@@ -130,27 +131,36 @@ export default function ProfilePage() {
 							</div>
 						</label>
 
-						<label className='block'>
-							<div className='text-sm font-medium mb-1'>
+						<div className='block'>
+							<div className='text-sm font-medium mb-2'>
 								Upload avatar
 							</div>
-							<input
-								type='file'
-								accept='image/*'
-								onChange={(e) =>
-									setFile(
-										e.target.files?.[0] || null
-									)
-								}
-								className='text-sm'
-							/>
-							<div className='text-xs text-gray-500 mt-1'>
-								Uploads use the Supabase storage bucket
-								&quot;avatars&quot;. If you see an error, please
-								ensure the bucket exists and is public
-								or has appropriate policies.
+							<div className='flex items-center gap-3'>
+								<label className='inline-flex items-center justify-center h-9 px-4 rounded-md bg-gray-100 border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-50 cursor-pointer transition-colors'>
+									<Upload className='h-4 w-4 mr-2' />
+									Choose Image
+									<input
+										type='file'
+										accept='image/*'
+										onChange={(e) =>
+											setFile(
+												e.target.files?.[0] || null
+											)
+										}
+										className='sr-only'
+									/>
+								</label>
+								{file && (
+									<div className='flex items-center text-sm text-green-600'>
+										<Camera className='h-4 w-4 mr-1' />
+										{file.name}
+									</div>
+								)}
 							</div>
-						</label>
+							<div className='text-xs text-gray-500 mt-1'>
+								Supported formats: JPG, PNG, WebP (max 10MB). The avatar bucket will be created automatically if needed.
+							</div>
+						</div>
 					</div>
 
 					<div className='pt-2 flex items-center gap-3'>

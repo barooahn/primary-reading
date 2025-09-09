@@ -56,20 +56,54 @@ export async function GET(
 					) => (a?.segment_order ?? 0) - (b?.segment_order ?? 0)
 				);
 		}
-		// Otherwise, parse the raw content field
-		else if (story.content?.raw) {
-			const rawContent = story.content.raw;
+		// Check for JSON content with segments (new format) or structured format
+		else if (story.content?.raw || story.content?.structured?.segments) {
+			console.log("Attempting to parse segments from stored content...");
+			
+			// Try to parse JSON content first (new format)
+			if (story.content?.raw && typeof story.content.raw === 'string') {
+				try {
+					console.log("Attempting to parse segments from JSON content.raw...");
+					const parsedContent = JSON.parse(story.content.raw);
+					
+					if (parsedContent.segments && Array.isArray(parsedContent.segments)) {
+						console.log("Found segments in JSON content:", parsedContent.segments.length);
+						segments = parsedContent.segments.map((seg: any, idx: number) => ({
+							id: idx + 1,
+							segment_order: idx + 1,
+							title: seg.title || `Segment ${idx + 1}`,
+							content: seg.content || "",
+							image_url: null,
+							image_prompt: seg.imagePrompt || null
+						}));
+					}
+				} catch (error) {
+					console.log("Content is not JSON, will try text parsing...");
+				}
+			}
+			
+			// If we didn't get segments from JSON, try structured format
+			if (segments.length === 0 && story.content?.structured?.segments && story.content.structured.segments.length > 0) {
+				console.log("Found structured segments in content:", story.content.structured.segments.length);
+				segments = story.content.structured.segments.map((seg: any, idx: number) => ({
+					id: idx + 1,
+					segment_order: idx + 1,
+					title: seg.title || `Segment ${idx + 1}`,
+					content: seg.content || "",
+					image_url: null,
+					image_prompt: seg.imagePrompt || null
+				}));
+			}
+			
+			// If still no segments, try parsing raw content as text  
+			if (segments.length === 0 && story.content?.raw) {
+				console.log("No JSON/structured segments found, parsing raw text content...");
+				const rawContent = story.content.raw;
 
 			// Function to clean markdown formatting
 			const cleanMarkdown = (text: string) => {
 				return (
 					text
-						// Remove markdown headers (###, ####)
-						.replace(/^#{1,6}\s+/gm, "")
-						// Remove bold formatting (**text**)
-						.replace(/\*\*(.*?)\*\*/g, "$1")
-						// Remove italic formatting (*text*)
-						.replace(/\*(.*?)\*/g, "$1")
 						// Remove image prompts and suggestions
 						.replace(/#### Suggested Image Prompt:.*$/gm, "")
 						.replace(/\*\*\[Image Prompt:.*?\]\*\*/g, "")
@@ -77,7 +111,7 @@ export async function GET(
 						.replace(/\*Image Prompt:.*$/gm, "")
 						// Remove suggestion lines
 						.replace(/.*Suggested.*:/gi, "")
-						// Remove horizontal rules
+						// Remove horizontal rules that act as separators
 						.replace(/^---+$/gm, "")
 						// Remove question sections that might leak in
 						.replace(
@@ -129,21 +163,37 @@ export async function GET(
 									!trimmed.startsWith("###") &&
 									!trimmed.startsWith("**[Image") &&
 									!trimmed.startsWith("[Image") &&
-									!trimmed.startsWith("*Image Prompt:") &&
-									!trimmed.includes("Suggested Image Prompt") &&
-									!trimmed.includes("Suggested Comprehension") &&
-									!trimmed.includes("Multiple Choice:") &&
+									!trimmed.startsWith(
+										"*Image Prompt:"
+									) &&
+									!trimmed.includes(
+										"Suggested Image Prompt"
+									) &&
+									!trimmed.includes(
+										"Suggested Comprehension"
+									) &&
+									!trimmed.includes(
+										"Multiple Choice:"
+									) &&
 									!trimmed.includes("True/False:") &&
-									!trimmed.includes("Short Answer:") &&
-									!trimmed.includes("Sequence Type:") &&
+									!trimmed.includes(
+										"Short Answer:"
+									) &&
+									!trimmed.includes(
+										"Sequence Type:"
+									) &&
 									!trimmed.startsWith("---") &&
 									!trimmed.match(/^\d+\.\s+\*\*/) &&
 									!trimmed.match(/^[a-d]\)/i) &&
-									!trimmed.match(/\(Correct answer:/) &&
+									!trimmed.match(
+										/\(Correct answer:/
+									) &&
 									!trimmed.match(/^- [A-D]\)/)
 								);
 							});
-						const content = cleanMarkdown(contentLines.join("\n"));
+						const content = cleanMarkdown(
+							contentLines.join("\n")
+						);
 						return {
 							id: idx + 1,
 							segment_order: idx + 1,
@@ -155,7 +205,8 @@ export async function GET(
 			}
 			// If not, try to parse "**Segment X: Title**" blocks explicitly
 			else {
-				const segRegex = /\*\*Segment\s+(\d+):\s*([^*\n]+)\*\*\s*([\s\S]*?)(?=\n\*\*Segment\s+\d+:|\n### Suggested Comprehension|\n\*\*Suggested Comprehension|$)/g;
+				const segRegex =
+					/\*\*Segment\s+(\d+):\s*([^*\n]+)\*\*\s*([\s\S]*?)(?=\n\*\*Segment\s+\d+:|\n### Suggested Comprehension|\n\*\*Suggested Comprehension|$)/g;
 				const matches = Array.from(rawContent.matchAll(segRegex));
 				if (matches.length > 0) {
 					segments = matches.map((m, idx) => {
@@ -172,21 +223,37 @@ export async function GET(
 									!trimmed.startsWith("###") &&
 									!trimmed.startsWith("**[Image") &&
 									!trimmed.startsWith("[Image") &&
-									!trimmed.startsWith("*Image Prompt:") &&
-									!trimmed.includes("Suggested Image Prompt") &&
-									!trimmed.includes("Suggested Comprehension") &&
-									!trimmed.includes("Multiple Choice:") &&
+									!trimmed.startsWith(
+										"*Image Prompt:"
+									) &&
+									!trimmed.includes(
+										"Suggested Image Prompt"
+									) &&
+									!trimmed.includes(
+										"Suggested Comprehension"
+									) &&
+									!trimmed.includes(
+										"Multiple Choice:"
+									) &&
 									!trimmed.includes("True/False:") &&
-									!trimmed.includes("Short Answer:") &&
-									!trimmed.includes("Sequence Type:") &&
+									!trimmed.includes(
+										"Short Answer:"
+									) &&
+									!trimmed.includes(
+										"Sequence Type:"
+									) &&
 									!trimmed.startsWith("---") &&
 									!trimmed.match(/^\d+\.\s+\*\*/) &&
 									!trimmed.match(/^[a-d]\)/i) &&
-									!trimmed.match(/\(Correct answer:/) &&
+									!trimmed.match(
+										/\(Correct answer:/
+									) &&
 									!trimmed.match(/^- [A-D]\)/)
 								);
 							});
-						const content = cleanMarkdown(contentLines.join("\n"));
+						const content = cleanMarkdown(
+							contentLines.join("\n")
+						);
 						return {
 							id: idx + 1,
 							segment_order: idx + 1,
@@ -196,288 +263,378 @@ export async function GET(
 						};
 					});
 				}
-				// Fallback: try to extract content between story description and questions
-				else {
-				let mainContent = rawContent;
 
-				// Remove everything from questions onward
-				const questionsIndex = mainContent.indexOf(
-					"### Suggested Comprehension Questions"
+				// Fallbacks when explicit "Segment X" patterns are not found
+				else {
+					// 1) Try splitting by general markdown headings (##, ###, ####) as sections
+					const headingMatches = Array.from(
+						rawContent.matchAll(/^#{2,4}\s+(.+)$/gm)
+					).filter(
+						(m) =>
+							!/Suggested Comprehension/i.test(m[1] || "")
+					);
+					if (headingMatches.length > 0) {
+						segments = headingMatches.map((m, idx) => {
+							const title = cleanMarkdown(m[1] || "");
+							const start =
+								(m.index ?? 0) + (m[0]?.length ?? 0);
+							const end =
+								headingMatches[idx + 1]?.index ??
+								rawContent.length;
+							const block = rawContent.slice(start, end);
+							const contentLines = block
+								.split("\n")
+								.filter((line) => {
+									const trimmed = line.trim();
+									return (
+										trimmed &&
+										!trimmed.startsWith(
+											"#### Suggested"
+										) &&
+										!trimmed.includes(
+											"Suggested Comprehension"
+										) &&
+										!trimmed.includes(
+											"Multiple Choice"
+										) &&
+										!trimmed.includes(
+											"True/False"
+										) &&
+										!trimmed.includes(
+											"Short Answer"
+										) &&
+										!trimmed.startsWith(
+											"**[Image"
+										) &&
+										!trimmed.startsWith(
+											"[Image"
+										) &&
+										!trimmed.startsWith(
+											"*Image Prompt:"
+										) &&
+										!trimmed.startsWith("---") &&
+										!trimmed.match(
+											/^\d+\.\s+\*\*/
+										)
+									);
+								});
+							const content = cleanMarkdown(
+								contentLines.join("\n")
+							);
+							return {
+								id: idx + 1,
+								segment_order: idx + 1,
+								title,
+								content,
+								image_url: null,
+							};
+						});
+					} else {
+						// 2) Last resort: single segment from main content between metadata and questions
+						let mainContent = rawContent;
+						const questionsIndex = mainContent.indexOf(
+							"### Suggested Comprehension Questions"
+						);
+						if (questionsIndex !== -1) {
+							mainContent = mainContent.substring(
+								0,
+								questionsIndex
+							);
+						}
+						const storyStartIndex =
+							mainContent.indexOf("---");
+						if (storyStartIndex !== -1) {
+							const afterDash = mainContent.substring(
+								storyStartIndex + 3
+							);
+							const nextSectionStart =
+								afterDash.indexOf("---");
+							mainContent =
+								nextSectionStart !== -1
+									? afterDash.substring(
+											nextSectionStart + 3
+									  )
+									: afterDash;
+						}
+						const contentLines = mainContent
+							.split("\n")
+							.filter((line) => {
+								const trimmed = line.trim();
+								return (
+									trimmed &&
+									!trimmed.startsWith("####") &&
+									!trimmed.startsWith("###") &&
+									!trimmed.startsWith("**[") &&
+									!trimmed.startsWith("[Image") &&
+									!trimmed.includes("Suggested") &&
+									!trimmed.includes(
+										"Multiple Choice"
+									) &&
+									!trimmed.includes("True/False") &&
+									!trimmed.includes(
+										"Short Answer"
+									) &&
+									!trimmed.startsWith("---") &&
+									!trimmed.match(/^\d+\.\s+\*\*/)
+								);
+							});
+						const cleanedContent = cleanMarkdown(
+							contentLines.join("\n")
+						);
+						segments = [
+							{
+								id: 1,
+								segment_order: 1,
+								title:
+									story.title?.replace(
+										/\*\*/g,
+										""
+									) || "Story",
+								content: cleanedContent,
+								image_url: null,
+							},
+						];
+					}
+				}
+			}
+		}
+
+		// Parse questions from structured content or raw content if no structured questions exist
+			let questions = story.questions || [];
+
+			console.log("=== QUESTIONS DEBUG IN API ===");
+			console.log("Initial questions from DB:", questions);
+			console.log("Questions count from DB:", questions.length);
+			
+			// First check if we have structured content with questions (new JSON format)
+			if (questions.length === 0) {
+				console.log("Attempting to parse from stored content...");
+				
+				// Try to parse JSON content first (new format)
+				if (story.content?.raw && typeof story.content.raw === 'string') {
+					try {
+						console.log("Attempting to parse JSON from content.raw...");
+						const parsedContent = JSON.parse(story.content.raw);
+						
+						if (parsedContent.questions && Array.isArray(parsedContent.questions)) {
+							console.log("Found questions in JSON content:", parsedContent.questions.length);
+							questions = parsedContent.questions.map((q: any, idx: number) => ({
+								id: idx + 1,
+								question_text: q.question_text || q.question || "",
+								question_type: q.question_type || q.type || "multiple_choice", 
+								options: q.options || [],
+								correct_answer: q.correct_answer || q.answer || "",
+								explanation: q.explanation || "Great job!"
+							}));
+						}
+					} catch (error) {
+						console.log("Content is not JSON, checking structured format...");
+						
+						// Fallback to old structured format
+						if (story.content?.structured?.questions) {
+							console.log("Found structured questions in content:", story.content.structured.questions.length);
+							questions = story.content.structured.questions.map((q: any, idx: number) => ({
+								id: idx + 1,
+								question_text: q.question_text || q.question || "",
+								question_type: q.question_type || q.type || "multiple_choice", 
+								options: q.options || [],
+								correct_answer: q.correct_answer || q.answer || "",
+								explanation: q.explanation || "Great job!"
+							}));
+						}
+					}
+				} else if (story.content?.structured?.questions) {
+					console.log("Found structured questions in content:", story.content.structured.questions.length);
+					questions = story.content.structured.questions.map((q: any, idx: number) => ({
+						id: idx + 1,
+						question_text: q.question_text || q.question || "",
+						question_type: q.question_type || q.type || "multiple_choice", 
+						options: q.options || [],
+						correct_answer: q.correct_answer || q.answer || "",
+						explanation: q.explanation || "Great job!"
+					}));
+				}
+			}
+
+			if (questions.length === 0 && story.content?.raw) {
+				console.log("No structured questions found, attempting to parse from raw content...");
+				const rawContent = story.content.raw;
+				// Try both question section formats
+				let questionsSection = rawContent.match(
+					/### Suggested Comprehension Questions:([\s\S]*?)(?:\n\n#{1,3}|$)/
 				);
-				if (questionsIndex !== -1) {
-					mainContent = mainContent.substring(0, questionsIndex);
+
+				if (!questionsSection) {
+					questionsSection = rawContent.match(
+						/\*\*Suggested Comprehension Questions:\*\*([\s\S]*?)$/
+					);
 				}
 
-				// Remove title and description section - find first segment content
-				const storyStartIndex = mainContent.indexOf("---");
-				if (storyStartIndex !== -1) {
-					const afterDash = mainContent.substring(
-						storyStartIndex + 3
-					);
-					// Sign private storage paths for images (segments + cover)
-					const signIfPrivate = async (
-						maybePath: string | null | undefined
-					) => {
-						if (!maybePath) return null;
-						if (
-							maybePath.startsWith("http://") ||
-							maybePath.startsWith("https://")
-						)
-							return maybePath;
-						const signed = await getSignedUrl(maybePath);
-						return signed || null;
-					};
+				if (questionsSection) {
+					const questionsText = questionsSection[1];
 
-					// Sign segment images
-					segments = await Promise.all(
-						segments.map(async (seg: any) => {
-							const base =
-								seg?.image_path || seg?.image_url;
-							const thumbBase =
-								seg?.thumbnail_path ||
-								seg?.thumbnail_url;
+					// Parse individual questions from this specific format
+					// Match pattern: 1. **Type:** Question text followed by options and answer
+					const questionBlocks =
+						questionsText.split(/(?=\d+\.\s+\*\*)/);
+
+					questions = questionBlocks
+						.filter((block) => block.trim())
+						.map((block, idx) => {
+							const lines = block.trim().split("\n");
+
+							// Extract question header: "1. **Multiple Choice:** Question text"
+							const headerMatch = lines[0]?.match(
+								/\d+\.\s+\*\*(.*?)\*\*\s*(.*)/
+							);
+							if (!headerMatch) return null;
+
+							const questionType = headerMatch[1].trim();
+							const questionText = headerMatch[2].trim();
+
+							let type = "multiple_choice";
+							let options: string[] = [];
+							let correctAnswer = "";
+
+							if (
+								questionType.includes("Multiple Choice")
+							) {
+								type = "multiple_choice";
+
+								// Extract options: "a) Blue", "b) Red", etc.
+								const optionLines = lines.filter(
+									(line) =>
+										line.trim().match(/^[a-d]\)/i)
+								);
+								options = optionLines.map((line) =>
+									line
+										.trim()
+										.replace(/^[a-d]\)\s*/i, "")
+								);
+
+								// Extract correct answer: "(Correct answer: b)"
+								const answerMatch = block.match(
+									/\(Correct answer:\s*([^)]+)\)/i
+								);
+								if (answerMatch) {
+									const answerKey = answerMatch[1]
+										.trim()
+										.toLowerCase();
+									const answerIndex =
+										answerKey.charCodeAt(0) - 97; // Convert 'a' to 0, 'b' to 1, etc.
+									if (
+										answerIndex >= 0 &&
+										answerIndex < options.length
+									) {
+										correctAnswer =
+											options[answerIndex];
+									}
+								}
+							} else if (
+								questionType.includes("True/False")
+							) {
+								type = "multiple_choice";
+								options = ["True", "False"];
+
+								// Extract correct answer: "(Correct answer: True)"
+								const answerMatch = block.match(
+									/\(Correct answer:\s*(True|False)\)/i
+								);
+								correctAnswer = answerMatch
+									? answerMatch[1]
+									: "True";
+							}
+
 							return {
-								...seg,
-								image_url: await signIfPrivate(base),
-								thumbnail_url: await signIfPrivate(
-									thumbBase
-								),
+								id: idx + 1,
+								question_text: questionText,
+								question_type: type,
+								options: options,
+								correct_answer: correctAnswer,
+								explanation: `Great job! ${
+									type === "multiple_choice" &&
+									questionType.includes("True/False")
+										? "You got the right answer."
+										: "You selected the correct option."
+								}`,
 							};
 						})
-					);
-
-					// Sign cover image if needed (prefer path)
-					const coverBase =
-						(story as any)?.cover_image_path ||
-						(story as any)?.cover_image_url;
-					const signedCover = await signIfPrivate(coverBase);
-					if (signedCover) {
-						(story as any).cover_image_url = signedCover;
-					}
-
-					// Sign cover thumbnail if present
-					const coverThumbBase =
-						(story as any)?.cover_thumbnail_path ||
-						(story as any)?.cover_thumbnail_url;
-					const signedCoverThumb = await signIfPrivate(
-						coverThumbBase
-					);
-					if (signedCoverThumb) {
-						(story as any).cover_thumbnail_url =
-							signedCoverThumb;
-					}
-
-					// Skip the first section which is usually metadata/description
-					const nextSectionStart = afterDash.indexOf("---");
-					if (nextSectionStart !== -1) {
-						mainContent = afterDash.substring(
-							nextSectionStart + 3
-						);
-					} else {
-						mainContent = afterDash;
-					}
+						.filter(Boolean);
 				}
-
-				// Split content into paragraphs and filter out unwanted content
-				const contentLines = mainContent
-					.split("\n")
-					.filter((line) => {
-						const trimmed = line.trim();
-						return (
-							trimmed &&
-							!trimmed.startsWith("####") &&
-							!trimmed.startsWith("###") &&
-							!trimmed.startsWith("**[") &&
-							!trimmed.startsWith("[Image") &&
-							!trimmed.includes("Suggested") &&
-							!trimmed.includes("Multiple Choice") &&
-							!trimmed.includes("True/False") &&
-							!trimmed.includes("Short Answer") &&
-							!trimmed.startsWith("---") &&
-							!trimmed.match(/^\d+\.\s+\*\*/)
-						);
-					});
-
-				const cleanedContent = cleanMarkdown(
-					contentLines.join("\n")
-				);
-
-				segments = [
-					{
-						id: 1,
-						segment_order: 1,
-						title:
-							story.title?.replace(/\*\*/g, "") || "Story",
-						content: cleanedContent,
-						image_url: null,
-					},
-				];
-			}
-		}
-	}
-
-		// Parse questions from raw content if no structured questions exist
-		let questions = story.questions || [];
-
-		if (questions.length === 0 && story.content?.raw) {
-			const rawContent = story.content.raw;
-			// Try both question section formats
-			let questionsSection = rawContent.match(
-				/### Suggested Comprehension Questions:([\s\S]*?)(?:\n\n#{1,3}|$)/
-			);
-
-			if (!questionsSection) {
-				questionsSection = rawContent.match(
-					/\*\*Suggested Comprehension Questions:\*\*([\s\S]*?)$/
-				);
 			}
 
-			if (questionsSection) {
-				const questionsText = questionsSection[1];
+			// Ensure image URLs are signed when referencing private storage paths
+			const finalizeSignedUrls = async () => {
+				const signIfPrivate = async (
+					maybePath: string | null | undefined
+				) => {
+					if (!maybePath) return null;
+					if (
+						maybePath.startsWith("http://") ||
+						maybePath.startsWith("https://")
+					)
+						return maybePath;
+					const signed = await getSignedUrl(maybePath);
+					return signed || null;
+				};
 
-				// Parse individual questions from this specific format
-				// Match pattern: 1. **Type:** Question text followed by options and answer
-				const questionBlocks =
-					questionsText.split(/(?=\d+\.\s+\*\*)/);
-
-				questions = questionBlocks
-					.filter((block) => block.trim())
-					.map((block, idx) => {
-						const lines = block.trim().split("\n");
-
-						// Extract question header: "1. **Multiple Choice:** Question text"
-						const headerMatch = lines[0]?.match(
-							/\d+\.\s+\*\*(.*?)\*\*\s*(.*)/
-						);
-						if (!headerMatch) return null;
-
-						const questionType = headerMatch[1].trim();
-						const questionText = headerMatch[2].trim();
-
-						let type = "multiple_choice";
-						let options: string[] = [];
-						let correctAnswer = "";
-
-						if (questionType.includes("Multiple Choice")) {
-							type = "multiple_choice";
-
-							// Extract options: "a) Blue", "b) Red", etc.
-							const optionLines = lines.filter((line) =>
-								line.trim().match(/^[a-d]\)/i)
-							);
-							options = optionLines.map((line) =>
-								line.trim().replace(/^[a-d]\)\s*/i, "")
-							);
-
-							// Extract correct answer: "(Correct answer: b)"
-							const answerMatch = block.match(
-								/\(Correct answer:\s*([^)]+)\)/i
-							);
-							if (answerMatch) {
-								const answerKey = answerMatch[1]
-									.trim()
-									.toLowerCase();
-								const answerIndex =
-									answerKey.charCodeAt(0) - 97; // Convert 'a' to 0, 'b' to 1, etc.
-								if (
-									answerIndex >= 0 &&
-									answerIndex < options.length
-								) {
-									correctAnswer =
-										options[answerIndex];
-								}
-							}
-						} else if (questionType.includes("True/False")) {
-							type = "multiple_choice";
-							options = ["True", "False"];
-
-							// Extract correct answer: "(Correct answer: True)"
-							const answerMatch = block.match(
-								/\(Correct answer:\s*(True|False)\)/i
-							);
-							correctAnswer = answerMatch
-								? answerMatch[1]
-								: "True";
-						}
-
+				segments = await Promise.all(
+					segments.map(async (seg: any) => {
+						const base = seg?.image_path || seg?.image_url;
+						const thumbBase =
+							seg?.thumbnail_path || seg?.thumbnail_url;
 						return {
-							id: idx + 1,
-							question_text: questionText,
-							question_type: type,
-							options: options,
-							correct_answer: correctAnswer,
-							explanation: `Great job! ${
-								type === "multiple_choice" &&
-								questionType.includes("True/False")
-									? "You got the right answer."
-									: "You selected the correct option."
-							}`,
+							...seg,
+							image_url: await signIfPrivate(base),
+							thumbnail_url: await signIfPrivate(
+								thumbBase
+							),
 						};
 					})
-					.filter(Boolean);
-			}
-		}
+				);
 
-		// Ensure image URLs are signed when referencing private storage paths
-		const finalizeSignedUrls = async () => {
-			const signIfPrivate = async (
-				maybePath: string | null | undefined
-			) => {
-				if (!maybePath) return null;
-				if (
-					maybePath.startsWith("http://") ||
-					maybePath.startsWith("https://")
-				)
-					return maybePath;
-				const signed = await getSignedUrl(maybePath);
-				return signed || null;
+				const coverBase =
+					(story as any)?.cover_image_path ||
+					(story as any)?.cover_image_url;
+				const signedCover = await signIfPrivate(coverBase);
+				if (signedCover) {
+					(story as any).cover_image_url = signedCover;
+				}
+
+				const coverThumbBase =
+					(story as any)?.cover_thumbnail_path ||
+					(story as any)?.cover_thumbnail_url;
+				const signedCoverThumb = await signIfPrivate(
+					coverThumbBase
+				);
+				if (signedCoverThumb) {
+					(story as any).cover_thumbnail_url = signedCoverThumb;
+				}
 			};
 
-			segments = await Promise.all(
-				segments.map(async (seg: any) => {
-					const base = seg?.image_path || seg?.image_url;
-					const thumbBase =
-						seg?.thumbnail_path || seg?.thumbnail_url;
-					return {
-						...seg,
-						image_url: await signIfPrivate(base),
-						thumbnail_url: await signIfPrivate(thumbBase),
-					};
-				})
-			);
+			await finalizeSignedUrls();
 
-			const coverBase =
-				(story as any)?.cover_image_path ||
-				(story as any)?.cover_image_url;
-			const signedCover = await signIfPrivate(coverBase);
-			if (signedCover) {
-				(story as any).cover_image_url = signedCover;
-			}
+			// Process and normalize the story data for the frontend
+			const processedStory = {
+				...story,
+				average_rating: 0,
+				total_reads: 0,
+				author_name: "Anonymous",
+				is_user_created: !!story.created_by,
+				segments: segments,
+				questions: questions,
+				reviews: [],
+			} as const;
 
-			const coverThumbBase =
-				(story as any)?.cover_thumbnail_path ||
-				(story as any)?.cover_thumbnail_url;
-			const signedCoverThumb = await signIfPrivate(coverThumbBase);
-			if (signedCoverThumb) {
-				(story as any).cover_thumbnail_url = signedCoverThumb;
-			}
-		};
+			console.log("=== FINAL API RESPONSE ===");
+			console.log("Final questions being sent to frontend:", processedStory.questions);
+			console.log("Questions count in response:", processedStory.questions?.length || 0);
 
-		await finalizeSignedUrls();
-
-		// Process and normalize the story data for the frontend
-		const processedStory = {
-			...story,
-			average_rating: 0,
-			total_reads: 0,
-			author_name: "Anonymous",
-			is_user_created: !!story.created_by,
-			segments: segments,
-			questions: questions,
-			reviews: [],
-		} as const;
-
-		return NextResponse.json({ success: true, story: processedStory });
+			return NextResponse.json({
+				success: true,
+				story: processedStory,
+			});
+		}
 	} catch (e) {
 		console.error("Get story by id error:", e);
 		return NextResponse.json(

@@ -19,6 +19,9 @@ interface GeneratedImage {
 	prompt: string;
 	revisedPrompt?: string;
 	type?: "cover" | "segment";
+	title?: string;
+	canRegenerate?: boolean;
+	regenerationCount?: number;
 }
 
 /**
@@ -32,68 +35,88 @@ export function extractImagePrompts(
 
 	// Look for image prompts in various formats
 	const imagePromptPatterns = [
-		/\*\*\[Image Prompt: (.*?)\]\*\*/gi,
 		/\[Image Prompt: (.*?)\]/gi,
 		/Image Prompt: (.*?)(?:\n|$)/gi,
+		/\*\*\[Image Prompt: (.*?)\]\*\*/gi,
 		/Suggested Image: (.*?)(?:\n|$)/gi,
 		/\*\*Image Suggestion:\*\* (.*?)(?:\n|$)/gi,
 	];
 
-	// Split content into segments
-	const segments = storyContent.split(
-		/(?:#{1,4}|###)\s*(?:\*\*)?Segment\s*\d+/i
-	);
+	// Debug: log the story content to see its structure
+	console.log("Story content for image extraction:", storyContent.substring(0, 500));
+
+	// Split content into segments - handle **Segment X:** format
+	const segments = storyContent.split(/\*\*Segment \d+:/);
+
+	console.log(`Found ${segments.length} segments after splitting`);
 
 	segments.forEach((segment, index) => {
 		if (!segment.trim()) return;
+		
+		console.log(`Processing segment ${index + 1}: ${segment.substring(0, 200)}...`);
 
-		// Extract segment title
-		const titleMatch = segment.match(
-			/(?:#{1,4}|###)?\s*(?:\*\*)?([^:\n]+?)(?:\*\*)?(?::|$)/
-		);
-		const segmentTitle =
-			titleMatch?.[1]?.trim() || `Segment ${index + 1}`;
-		const segmentId = `segment_${index + 1}`;
-
-		// Look for image prompts in this segment (take first match only)
-		let foundPrompt = false;
-		for (const pattern of imagePromptPatterns) {
-			const match = segment.match(pattern);
-			if (match?.[1]?.trim()) {
-				prompts.push({
-					segmentId,
-					title: segmentTitle,
-					prompt: match[1].trim(),
-					type: index === 0 ? "cover" : "segment",
-				});
-				foundPrompt = true;
-				break;
-			}
+		// Add cover image from title/description if this is the first part (before first segment)
+		if (index === 0) {
+			// This is the intro/title part, create a cover image
+			prompts.push({
+				segmentId: "cover",
+				title: "Story Cover",
+				prompt: `Book cover illustration for a children's story titled "${storyTitle}". Show the main characters and setting in a welcoming, colorful style perfect for primary school children.`,
+				type: "cover",
+			});
 		}
 
-		// If no explicit image prompt found, create one from content
-		if (!foundPrompt && segment.length > 50) {
-			// Extract key elements from the story segment for auto-generated prompt
-			const cleanContent = segment
-				.replace(/#{1,6}\s*/g, "")
-				.replace(/\*\*(.*?)\*\*/g, "$1")
-				.replace(/\[Image.*?\]/gi, "")
-				.replace(/Image Prompt:.*$/gm, "")
-				.trim();
+		// For segments after index 0, create segment prompts
+		if (index > 0) {
+			// Extract segment title from the beginning of the segment content
+			const titleMatch = segment.match(/^\s*([^*\n]+?)(?:\*\*)?(?:\n|$)/);
+			const segmentTitle = titleMatch?.[1]?.trim() || `Segment ${index}`;
+			const segmentId = `segment_${index}`;
 
-			const firstSentence = cleanContent.split(/[.!?]/)[0]?.trim();
-			if (firstSentence && firstSentence.length > 10) {
-				const autoPrompt = generateAutoPrompt(
-					firstSentence,
-					segmentTitle,
-					storyTitle
-				);
-				prompts.push({
-					segmentId,
-					title: segmentTitle,
-					prompt: autoPrompt,
-					type: index === 0 ? "cover" : "segment",
-				});
+			console.log(`Processing segment ${index}: "${segmentTitle}"`);
+
+			// Look for image prompts in this segment (take first match only)
+			let foundPrompt = false;
+			for (const pattern of imagePromptPatterns) {
+				const match = segment.match(pattern);
+				if (match?.[1]?.trim()) {
+					console.log(`Found explicit prompt: ${match[1].trim()}`);
+					prompts.push({
+						segmentId,
+						title: segmentTitle,
+						prompt: match[1].trim(),
+						type: "segment",
+					});
+					foundPrompt = true;
+					break;
+				}
+			}
+
+			// If no explicit image prompt found, create one from content
+			if (!foundPrompt && segment.length > 50) {
+				// Extract key elements from the story segment for auto-generated prompt
+				const cleanContent = segment
+					.replace(/#{1,6}\s*/g, "")
+					.replace(/\*\*(.*?)\*\*/g, "$1")
+					.replace(/\[Image.*?\]/gi, "")
+					.replace(/Image Prompt:.*$/gm, "")
+					.trim();
+
+				const firstSentence = cleanContent.split(/[.!?]/)[0]?.trim();
+				if (firstSentence && firstSentence.length > 10) {
+					const autoPrompt = generateAutoPrompt(
+						firstSentence,
+						segmentTitle,
+						storyTitle
+					);
+					console.log(`Generated auto prompt: ${autoPrompt}`);
+					prompts.push({
+						segmentId,
+						title: segmentTitle,
+						prompt: autoPrompt,
+						type: "segment",
+					});
+				}
 			}
 		}
 	});
@@ -107,6 +130,8 @@ export function extractImagePrompts(
 			type: "cover",
 		});
 	}
+
+	console.log(`Total prompts generated: ${prompts.length}`, prompts.map(p => ({id: p.segmentId, title: p.title, type: p.type})));
 
 	return prompts;
 }
@@ -223,7 +248,7 @@ export async function generateStoryImages(
 ): Promise<GeneratedImage[]> {
 	const {
 		generateAll = true,
-		maxImages = 6,
+		maxImages = 5, // Limit to exactly 5 images including cover
 		style = "illustration",
 	} = options;
 
@@ -267,6 +292,9 @@ export async function generateStoryImages(
 					prompt: prompt.prompt,
 					revisedPrompt: result.revisedPrompt,
 					type: prompt.type,
+					title: prompt.title,
+					canRegenerate: true, // Allow one regeneration per image
+					regenerationCount: 0,
 				});
 			} else {
 				console.error(

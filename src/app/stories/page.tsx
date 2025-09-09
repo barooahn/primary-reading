@@ -1,7 +1,7 @@
 "use client";
  
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -12,6 +12,9 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
+import { DeleteStoryButton } from "@/components/stories/delete-story-button";
+import { useAuth } from "@/contexts/auth-context";
+import { ProtectedRoute } from "@/components/auth/protected-route";
 
 // Tiny base64 placeholder for blur-up effect
 const BLUR_DATA_URL =
@@ -57,6 +60,7 @@ const MOCK_STORIES_DATA = [
 ];
 
 export default function StoriesPage() {
+	const { user } = useAuth();
 	const [selectedGenre, setSelectedGenre] = useState("All");
 	const [selectedLevel, setSelectedLevel] = useState("All");
 	const [searchQuery, setSearchQuery] = useState("");
@@ -68,9 +72,9 @@ export default function StoriesPage() {
 	// Load stories from database
 	useEffect(() => {
 		loadStoriesFromDatabase();
-	}, [ownerFilter]);
+	}, [ownerFilter, loadStoriesFromDatabase]);
 
-	const loadStoriesFromDatabase = async () => {
+	const loadStoriesFromDatabase = useCallback(async () => {
 		try {
 			setLoading(true);
 			const url = `/api/stories?limit=20${
@@ -98,7 +102,7 @@ export default function StoriesPage() {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, [ownerFilter]);
 
 	// Build display list: prefer DB stories; for "All", fallback to mock data
 	const mapDb = (arr: any[]) =>
@@ -125,6 +129,8 @@ export default function StoriesPage() {
 			isPopular: !!s.is_featured,
 			rating: s.average_rating ?? 0,
 			totalReads: s.total_reads ?? 0,
+			createdBy: s.created_by,
+			hasImages: !!(s.cover_image_url || s.cover_thumbnail_url),
 		}));
 
 	const displayStories =
@@ -153,7 +159,7 @@ export default function StoriesPage() {
 	});
 
 	return (
-		<>
+		<ProtectedRoute allowGuests={true}>
 			<div className='container mx-auto px-4 py-8 max-w-7xl'>
 				{/* Header Section */}
 				<div className='mb-8'>
@@ -287,6 +293,24 @@ export default function StoriesPage() {
 												POPULAR
 											</div>
 										)}
+										{/* Delete button for user-owned stories */}
+										{user && story.createdBy === user.id && (
+											<div className='absolute bottom-2 right-2'>
+												<DeleteStoryButton
+													storyId={story.id}
+													storyTitle={story.title}
+													hasImages={story.hasImages}
+													variant='ghost'
+													size='sm'
+													showText={false}
+													onDeleted={() => {
+														// Refresh stories after deletion
+														loadStoriesFromDatabase();
+													}}
+													className='bg-red-500/80 hover:bg-red-600 text-white backdrop-blur-sm'
+												/>
+											</div>
+										)}
 									</div>
 									<CardHeader>
 										<CardTitle className='text-lg font-semibold text-foreground line-clamp-2'>
@@ -387,6 +411,6 @@ export default function StoriesPage() {
 					</>
 				)}
 			</div>
-		</>
+		</ProtectedRoute>
 	);
 }
