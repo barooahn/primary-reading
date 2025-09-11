@@ -99,9 +99,7 @@ Story Context: ${params.story_content}
 Research Context: ${params.research_context || 'General educational content'}
 
 Question Requirements:
-- 2 multiple choice questions (4 options each)
-- 1 short answer question (1-2 sentence responses)  
-- 1 creative thinking question
+- ${params.question_count} multiple choice questions (4 options each)
 
 Ensure questions test different cognitive levels:
 - Basic comprehension (who, what, when, where)
@@ -118,8 +116,8 @@ Format as JSON with this structure:
   "questions": [
     {
       "question_text": "question here",
-      "question_type": "multiple_choice|short_answer|creative",
-      "options": ["option1", "option2", "option3", "option4"], // only for multiple choice
+      "question_type": "multiple_choice",
+      "options": ["option1", "option2", "option3", "option4"],
       "correct_answer": "answer here",
       "explanation": "encouraging explanation here",
       "difficulty_level": 1-3

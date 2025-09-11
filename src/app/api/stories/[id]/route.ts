@@ -1030,3 +1030,139 @@ export async function GET(
 		);
 	}
 }
+
+// DELETE /api/stories/[id]
+export async function DELETE(
+	request: NextRequest,
+	context: { params: Promise<{ id: string }> }
+) {
+	try {
+		const { createClient } = await import("@/utils/supabase/server");
+		const supabase = await createClient();
+		
+		const params = await context.params;
+		const storyId = params?.id;
+		
+		if (!storyId) {
+			return NextResponse.json(
+				{ success: false, error: "Story ID is required" },
+				{ status: 400 }
+			);
+		}
+
+		// Get current user for authorization
+		const {
+			data: { user },
+			error: authError,
+		} = await supabase.auth.getUser();
+
+		if (authError || !user) {
+			return NextResponse.json(
+				{ success: false, error: "Authentication required" },
+				{ status: 401 }
+			);
+		}
+
+		// First, get the story to verify ownership and collect image URLs
+		console.log(`Delete request: storyId=${storyId}, userId=${user.id}`);
+		
+		const { data: story, error: fetchError } = await supabase
+			.from("stories")
+			.select(`
+				*,
+				story_segments (
+					id,
+					image_url,
+					image_path,
+					thumbnail_path
+				)
+			`)
+			.eq("id", storyId)
+			.eq("created_by", user.id) // Ensure user owns the story
+			.single();
+
+		if (fetchError || !story) {
+			console.log(`Story fetch failed: fetchError=${JSON.stringify(fetchError)}, story=${!!story}`);
+			
+			// Also try to fetch the story without the created_by filter to see if it exists
+			const { data: storyExists } = await supabase
+				.from("stories")
+				.select("id, created_by")
+				.eq("id", storyId)
+				.single();
+			
+			if (storyExists) {
+				console.log(`Story exists but owned by different user: story.created_by=${storyExists.created_by}, user.id=${user.id}`);
+			} else {
+				console.log(`Story does not exist: storyId=${storyId}`);
+			}
+			
+			return NextResponse.json(
+				{ success: false, error: "Story not found or access denied" },
+				{ status: 404 }
+			);
+		}
+
+		// Delete related records first (foreign key constraints)
+		console.log(`Starting deletion of story ${storyId} and all related data...`);
+
+		// Delete user answers for this story's questions
+		await supabase
+			.from("user_answers")
+			.delete()
+			.eq("story_id", storyId);
+
+		// Delete story ratings
+		await supabase
+			.from("story_ratings")
+			.delete()
+			.eq("story_id", storyId);
+
+		// Delete questions (will cascade to user_answers if any remain)
+		await supabase
+			.from("questions")
+			.delete()
+			.eq("story_id", storyId);
+
+		// Delete story segments (will cascade to questions if any remain)
+		await supabase
+			.from("story_segments")
+			.delete()
+			.eq("story_id", storyId);
+
+		// Delete story images (legacy table)
+		await supabase
+			.from("story_images")
+			.delete()
+			.eq("story_id", storyId);
+
+		// Delete the main story record
+		const { error: storyDeleteError } = await supabase
+			.from("stories")
+			.delete()
+			.eq("id", storyId)
+			.eq("created_by", user.id);
+
+		if (storyDeleteError) {
+			console.error("Story deletion error:", storyDeleteError);
+			return NextResponse.json(
+				{ success: false, error: "Failed to delete story" },
+				{ status: 500 }
+			);
+		}
+
+		console.log(`✓ Story ${storyId} and all related data deleted successfully`);
+
+		return NextResponse.json({
+			success: true,
+			message: "Story and all related data deleted successfully",
+		});
+
+	} catch (error) {
+		console.error("Delete story error:", error);
+		return NextResponse.json(
+			{ success: false, error: "Internal server error" },
+			{ status: 500 }
+		);
+	}
+}

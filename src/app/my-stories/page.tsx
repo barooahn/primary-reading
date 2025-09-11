@@ -12,6 +12,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { DeleteStoryButton } from "@/components/stories/delete-story-button";
 // Tiny base64 placeholder for blur-up effect
 const BLUR_DATA_URL =
 	"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
@@ -77,8 +78,7 @@ export default function MyStoriesPage() {
 	const [message, setMessage] = useState<string | null>(null);
 	const [storyImages, setStoryImages] = useState<Map<string, string | null>>(new Map());
 
-	useEffect(() => {
-		const load = async () => {
+	const loadStories = async () => {
 			try {
 				setLoading(true);
 				const res = await fetch(
@@ -93,6 +93,7 @@ export default function MyStoriesPage() {
 				const data = await res.json();
 				if (data.success) {
 					const storiesList = data.stories || [];
+					console.log('Loaded stories:', storiesList.map(s => ({ id: s.id, title: s.title, created_by: s.created_by })));
 					setStories(storiesList);
 					setMessage(null);
 					
@@ -116,8 +117,14 @@ export default function MyStoriesPage() {
 				setLoading(false);
 			}
 		};
-		load();
+
+	useEffect(() => {
+		loadStories();
 	}, []);
+
+	const handleStoryDeleted = () => {
+		loadStories(); // Refresh the stories list after deletion
+	};
 
 	const displayStories = (stories || []).map((s: any) => ({
 		id: s.id,
@@ -208,6 +215,19 @@ export default function MyStoriesPage() {
 											</div>
 										</div>
 									)}
+									<div className='absolute top-2 right-2'>
+										<DeleteStoryButton
+											storyId={story.id}
+											storyTitle={story.title}
+											hasImages={!!story.image}
+											variant="ghost"
+											size="sm"
+											showText={false}
+											onDeleted={handleStoryDeleted}
+											redirectAfterDelete="/my-stories"
+											className="bg-white/80 hover:bg-white shadow-sm"
+										/>
+									</div>
 								</div>
 								<CardHeader>
 									<CardTitle className='text-lg font-semibold line-clamp-2'>

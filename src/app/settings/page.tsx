@@ -11,21 +11,21 @@ export default function SettingsPage() {
 	const existing = (user?.user_metadata?.settings as Record<string, unknown>) || {};
 
 	const [showStats, setShowStats] = useState<boolean>(
-		existing.show_stats ?? true
+		Boolean(existing.show_stats ?? true)
 	);
 	const [compactNav, setCompactNav] = useState<boolean>(
-		existing.compact_nav ?? false
+		Boolean(existing.compact_nav ?? false)
 	);
-	const [theme, setTheme] = useState<string>(existing.theme || "system");
+	const [theme, setTheme] = useState<string>(String(existing.theme || "system"));
 	const [saving, setSaving] = useState(false);
 	const [message, setMessage] = useState<string | null>(null);
 
 	useEffect(() => {
 		// keep in sync if user changes
 		const ex = (user?.user_metadata?.settings as Record<string, unknown>) || {};
-		setShowStats(ex.show_stats ?? true);
-		setCompactNav(ex.compact_nav ?? false);
-		setTheme(ex.theme || "system");
+		setShowStats(Boolean(ex.show_stats ?? true));
+		setCompactNav(Boolean(ex.compact_nav ?? false));
+		setTheme(String(ex.theme || "system"));
 	}, [user?.id, user?.user_metadata?.settings]);
 
 	// Apply current selection immediately for live preview

@@ -24,7 +24,7 @@ export function useDeleteStory(options: DeleteStoryOptions = {}) {
     setError(null);
 
     try {
-      const response = await fetch(`/api/stories/${storyId}/delete`, {
+      const response = await fetch(`/api/stories/${storyId}`, {
         method: "DELETE",
         credentials: "include",
       });

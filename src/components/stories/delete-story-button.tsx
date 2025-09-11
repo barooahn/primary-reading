@@ -11,7 +11,7 @@ interface DeleteStoryButtonProps {
   storyTitle: string;
   hasImages?: boolean;
   variant?: "ghost" | "outline" | "destructive" | "secondary";
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "lg";
   showText?: boolean;
   onDeleted?: () => void;
   redirectAfterDelete?: string;

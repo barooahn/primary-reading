@@ -1,6 +1,6 @@
 'use client';
 
-import { LoginForm } from '@/components/auth/login-form';
+import { SimpleLoginForm } from '@/components/auth/simple-login-form';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -38,7 +38,7 @@ export default function LoginPage() {
             Sign in to start your reading adventure
           </p>
         </div>
-        <LoginForm />
+        <SimpleLoginForm />
       </div>
     </div>
   );
