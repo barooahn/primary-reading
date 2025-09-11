@@ -69,11 +69,6 @@ export default function StoriesPage() {
 	const [ownerFilter, setOwnerFilter] = useState<"all" | "mine">("all");
 	const [message, setMessage] = useState<string | null>(null);
 
-	// Load stories from database
-	useEffect(() => {
-		loadStoriesFromDatabase();
-	}, [ownerFilter, loadStoriesFromDatabase]);
-
 	const loadStoriesFromDatabase = useCallback(async () => {
 		try {
 			setLoading(true);
@@ -103,6 +98,11 @@ export default function StoriesPage() {
 			setLoading(false);
 		}
 	}, [ownerFilter]);
+
+	// Load stories from database
+	useEffect(() => {
+		loadStoriesFromDatabase();
+	}, [loadStoriesFromDatabase]);
 
 	// Build display list: prefer DB stories; for "All", fallback to mock data
 	const mapDb = (arr: any[]) =>

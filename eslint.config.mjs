@@ -25,6 +25,8 @@ const eslintConfig = [
 			"jest.setup.js",
 			// One-off local script
 			"take-navigation-screenshots.js",
+			// Test scripts
+			"test-*.js",
 			// Temporarily ignore stories API file while we land parser-safe refactor
 			"src/app/api/stories/**",
 		],

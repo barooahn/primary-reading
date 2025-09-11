@@ -43,15 +43,17 @@ export default function UpdatePasswordPage() {
       if (error) {
         setError(error.message);
       } else {
+        // Refresh the session to ensure auth context gets updated
+        await supabase.auth.refreshSession();
+        
         setSuccess(true);
         // Redirect to dashboard after 2 seconds
         setTimeout(() => {
           router.push('/dashboard');
         }, 2000);
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred');
-      console.error('Password update error:', err);
     } finally {
       setLoading(false);
     }

@@ -41,7 +41,10 @@ export async function DELETE(
         *,
         story_segments (
           id,
-          image_url
+          image_url,
+          image_path,
+          thumbnail_url,
+          thumbnail_path
         )
       `)
       .eq("id", storyId)
@@ -55,42 +58,96 @@ export async function DELETE(
       );
     }
 
-    // Collect all image URLs that need to be deleted
+    // Collect all image files that need to be deleted from storage
     const imagesToDelete: string[] = [];
     
-    // Add cover image if it exists
+    // Add cover images if they exist
     if (story.cover_image_url) {
-      // Extract filename from Supabase Storage URL
       const coverFileName = extractFileNameFromUrl(story.cover_image_url);
       if (coverFileName) {
         imagesToDelete.push(coverFileName);
       }
     }
+    if (story.cover_image_path) {
+      imagesToDelete.push(story.cover_image_path);
+    }
+    if (story.cover_thumbnail_url) {
+      const thumbFileName = extractFileNameFromUrl(story.cover_thumbnail_url);
+      if (thumbFileName) {
+        imagesToDelete.push(thumbFileName);
+      }
+    }
+    if (story.cover_thumbnail_path) {
+      imagesToDelete.push(story.cover_thumbnail_path);
+    }
 
     // Add segment images if they exist
     if (story.story_segments) {
       story.story_segments.forEach((segment: any) => {
+        // Main image
         if (segment.image_url) {
           const segmentFileName = extractFileNameFromUrl(segment.image_url);
           if (segmentFileName) {
             imagesToDelete.push(segmentFileName);
           }
         }
+        if (segment.image_path) {
+          imagesToDelete.push(segment.image_path);
+        }
+        
+        // Thumbnail image
+        if (segment.thumbnail_url) {
+          const thumbFileName = extractFileNameFromUrl(segment.thumbnail_url);
+          if (thumbFileName) {
+            imagesToDelete.push(thumbFileName);
+          }
+        }
+        if (segment.thumbnail_path) {
+          imagesToDelete.push(segment.thumbnail_path);
+        }
       });
     }
 
     // Delete related records first (foreign key constraints)
+    // Note: Most tables have CASCADE DELETE so they'll be automatically cleaned up,
+    // but we'll delete some manually for better control and logging
     const deleteOperations = [];
 
-    // Delete comprehension questions
+    console.log(`Starting deletion of story ${storyId} and all related data...`);
+
+    // Delete user answers for this story's questions
     deleteOperations.push(
       supabase
-        .from("comprehension_questions")
+        .from("user_answers")
         .delete()
         .eq("story_id", storyId)
     );
 
-    // Delete story segments  
+    // Delete user progress records
+    deleteOperations.push(
+      supabase
+        .from("user_progress") 
+        .delete()
+        .eq("story_id", storyId)
+    );
+
+    // Delete story ratings
+    deleteOperations.push(
+      supabase
+        .from("story_ratings")
+        .delete()
+        .eq("story_id", storyId)
+    );
+
+    // Delete questions (will cascade to user_answers if any remain)
+    deleteOperations.push(
+      supabase
+        .from("questions")
+        .delete()
+        .eq("story_id", storyId)
+    );
+
+    // Delete story segments (will cascade to questions if any remain)
     deleteOperations.push(
       supabase
         .from("story_segments")
@@ -98,14 +155,54 @@ export async function DELETE(
         .eq("story_id", storyId)
     );
 
+    // Legacy table cleanup (if they exist)
+    deleteOperations.push(
+      supabase
+        .from("comprehension_questions")
+        .delete()
+        .eq("story_id", storyId)
+    );
+
+    deleteOperations.push(
+      supabase
+        .from("story_images")
+        .delete()
+        .eq("story_id", storyId)
+    );
+
     // Execute deletions
     const results = await Promise.allSettled(deleteOperations);
+    
+    // Log results for each deletion operation
+    const operationNames = [
+      "user_answers",
+      "user_progress", 
+      "story_ratings",
+      "questions",
+      "story_segments",
+      "comprehension_questions (legacy)",
+      "story_images (legacy)"
+    ];
+
+    let deletedRecords = 0;
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        const count = (result.value as any)?.count || 0;
+        if (count > 0) {
+          console.log(`✓ Deleted ${count} records from ${operationNames[index]}`);
+          deletedRecords += count;
+        }
+      } else {
+        console.warn(`✗ Failed to delete from ${operationNames[index]}:`, result.reason);
+      }
+    });
+
+    console.log(`Total related records deleted: ${deletedRecords}`);
     
     // Check if any critical deletions failed
     const criticalFailures = results.filter((result) => result.status === 'rejected');
     if (criticalFailures.length > 0) {
-      console.error("Failed to delete related records:", criticalFailures);
-      // Continue anyway - we'll still try to delete the main story
+      console.error("Some related record deletions failed, but continuing with story deletion");
     }
 
     // Delete the main story record
@@ -137,13 +234,18 @@ export async function DELETE(
       // Don't fail the whole operation - the story is deleted, images are just cleanup
     }
 
+    console.log(`✓ Story ${storyId} and all related data deleted successfully`);
+
     return NextResponse.json({
       success: true,
-      message: "Story deleted successfully",
+      message: "Story and all related data deleted successfully",
       details: {
+        storyId: storyId,
+        relatedRecordsDeleted: deletedRecords,
         imagesDeleted: imagesToDelete.length - imageCleanupFailures.length,
         imagesFailed: imageCleanupFailures.length,
-        totalImages: imagesToDelete.length
+        totalImages: imagesToDelete.length,
+        cleanupComplete: imageCleanupFailures.length === 0
       }
     });
 

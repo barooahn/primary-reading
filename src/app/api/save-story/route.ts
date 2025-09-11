@@ -13,14 +13,22 @@ interface SaveStoryRequest {
 	estimated_reading_time: number;
 	difficulty_rating: number;
 	cover_image_url?: string;
-	cover_thumbnail_url?: string;
+	cover_image_path?: string;
+	cover_thumbnail_path?: string;
 	segments?: Array<{
 		segment_order: number;
 		title?: string;
 		content: string;
 		image_url?: string;
-		thumbnail_url?: string;
+		image_path?: string;
+		thumbnail_path?: string;
 		image_prompt?: string;
+	}>;
+	images?: Array<{
+		image_url: string;
+		alt_text?: string;
+		position_in_story?: number;
+		is_ai_generated?: boolean;
 	}>;
 	questions?: Array<{
 		question_text: string;
@@ -135,16 +143,8 @@ export async function POST(request: NextRequest) {
 			estimated_reading_time: body.estimated_reading_time,
 			difficulty_rating: body.difficulty_rating,
 			cover_image_url: body.cover_image_url,
-			cover_image_path:
-				body.cover_image_url &&
-				!body.cover_image_url.startsWith("http")
-					? body.cover_image_url
-					: null,
-			cover_thumbnail_path:
-				body.cover_thumbnail_url &&
-				!body.cover_thumbnail_url.startsWith("http")
-					? body.cover_thumbnail_url
-					: null,
+			cover_image_path: body.cover_image_path,
+			cover_thumbnail_path: body.cover_thumbnail_path,
 			is_featured: false,
 			is_published: true,
 			created_by: user.id,
@@ -161,34 +161,51 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		console.log("=== INSERT RESULT DEBUG ===");
-		console.log("Insert result:", insertResult);
-		console.log("Insert result data:", insertResult.data);
-		console.log("Insert result data[0]:", insertResult.data?.[0]);
-		
 		const storyId = insertResult.data?.[0]?.id;
-		console.log("Extracted story ID:", storyId);
 
 		// Save story segments if provided
 		if (body.segments && body.segments.length > 0) {
-			const segmentsToInsert = body.segments.map((segment) => ({
-				story_id: storyId,
-				segment_order: segment.segment_order,
-				title: segment.title,
-				content: segment.content,
-				image_url: segment.image_url,
-				image_path:
-					segment.image_url &&
-					!segment.image_url.startsWith("http")
-						? segment.image_url
-						: null,
-				thumbnail_path:
-					segment.thumbnail_url &&
-					!segment.thumbnail_url.startsWith("http")
-						? segment.thumbnail_url
-						: null,
-				image_prompt: segment.image_prompt,
-			}));
+			console.log("=== SAVE-STORY: Received", body.segments.length, "segments and", body.images?.length || 0, "images ===");
+			// Create a map of generated images by segmentId for quick lookup
+			const imageMap = new Map();
+			if (body.images && body.images.length > 0) {
+				body.images.forEach(img => {
+					// Handle both direct segmentId and position-based mapping
+					const segmentId = (img as any).segmentId || `segment_${(img.position_in_story || 0) + 1}`;
+					imageMap.set(segmentId, img.image_url);
+				});
+			}
+
+			const segmentsToInsert = body.segments.map((segment, index) => {
+				// Try to find matching image by different strategies:
+				// 1. Direct image_url from segment
+				// 2. Map by segment order (segment_1, segment_2, etc.)
+				// 3. Map by index position
+				let imageUrl = segment.image_url;
+				
+				if (!imageUrl) {
+					// Try mapping by segment_N pattern
+					const segmentKey = `segment_${segment.segment_order || index + 1}`;
+					imageUrl = imageMap.get(segmentKey);
+					
+					// If still no image, try by index
+					if (!imageUrl && body.images && body.images[index]) {
+						imageUrl = body.images[index].image_url;
+					}
+				}
+				
+				return {
+					story_id: storyId,
+					segment_order: segment.segment_order,
+					title: segment.title,
+					content: segment.content,
+					image_url: imageUrl || null,
+					image_prompt: segment.image_prompt,
+				};
+			});
+
+			const segmentsWithImages = segmentsToInsert.filter(s => s.image_url).length;
+			console.log("=== SAVE-STORY: Inserting", segmentsToInsert.length, "segments,", segmentsWithImages, "have images ===");
 
 			const { error: segmentsError } = await supabase
 				.from("story_segments")
@@ -200,9 +217,27 @@ export async function POST(request: NextRequest) {
 			}
 		}
 
+		// Save images if provided
+		if (body.images && body.images.length > 0) {
+			const imagesToInsert = body.images.map((img, index) => ({
+				story_id: storyId,
+				image_url: img.image_url,
+				alt_text: img.alt_text || null,
+				position_in_story: img.position_in_story ?? index,
+				is_ai_generated: img.is_ai_generated ?? true,
+			}));
+
+			const { error: imagesError } = await supabase
+				.from("story_images")
+				.insert(imagesToInsert);
+
+			if (imagesError) {
+				console.error("Images save error:", imagesError);
+			}
+		}
+
 		// Save questions if provided
 		if (body.questions && body.questions.length > 0) {
-			console.log("Saving questions:", body.questions);
 			const questionsToInsert = body.questions.map((question) => ({
 				story_id: storyId,
 				question_text: question.question_text,
@@ -214,8 +249,6 @@ export async function POST(request: NextRequest) {
 				difficulty: question.difficulty,
 			}));
 
-			console.log("Questions to insert:", questionsToInsert);
-
 			const { error: questionsError } = await supabase
 				.from("questions")
 				.insert(questionsToInsert);
@@ -223,11 +256,7 @@ export async function POST(request: NextRequest) {
 			if (questionsError) {
 				console.error("Questions save error:", questionsError);
 				// Don't fail the whole operation, just log the error
-			} else {
-				console.log("Questions saved successfully!");
 			}
-		} else {
-			console.log("No questions to save - questions array is empty or undefined");
 		}
 
 		// Update user's story count (for achievements/progress)
@@ -244,7 +273,6 @@ export async function POST(request: NextRequest) {
 			}
 		} catch {
 			// If the function doesn't exist, it's okay - we'll handle this in the future
-			console.log("Profile update function not available yet");
 		}
 
 		return NextResponse.json({

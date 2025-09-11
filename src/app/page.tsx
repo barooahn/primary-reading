@@ -8,10 +8,12 @@ import {
 } from "@/components/ui/card";
 import { BookOpen, Sparkles, Trophy, Users, Zap, Heart } from "lucide-react";
 import Link from "next/link";
+import { AuthRedirectHandler } from "@/components/auth/auth-redirect-handler";
 
 export default function Home() {
 	return (
 		<>
+			<AuthRedirectHandler />
 			{/* Hero Section */}
 			<section className='relative py-20 px-4 bg-gradient-to-br from-primary/10 via-secondary/5 to-success/10'>
 				<div className='container mx-auto max-w-6xl'>

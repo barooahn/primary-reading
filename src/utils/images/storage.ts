@@ -17,7 +17,7 @@ export async function getSignedUrl(
 	expiresInSeconds: number = 60 * 60 * 24 * 7 // 7 days
 ): Promise<string | null> {
 	try {
-		const supabase = await createAdminClient();
+		const supabase = createAdminClient();
 		const { data, error } = await supabase.storage
 			.from(STORIES_BUCKET)
 			.createSignedUrl(path, expiresInSeconds);
@@ -37,7 +37,7 @@ export async function uploadImageFromUrl(
 	options: ImageUploadOptions = {}
 ): Promise<{ path: string; signedUrl: string | null } | null> {
 	try {
-		const supabase = await createAdminClient();
+		const supabase = createAdminClient();
 
 		// Default optimization settings
 		const {
@@ -141,7 +141,7 @@ export async function createImageVariants(
  */
 export async function ensureStorageBucket(bucketName: string = STORIES_BUCKET): Promise<boolean> {
 	try {
-		const supabase = await createAdminClient();
+		const supabase = createAdminClient();
 
 		// Check if bucket exists
 		const { data: buckets, error: listError } =
@@ -197,7 +197,7 @@ export async function ensureAvatarsBucket(): Promise<boolean> {
  */
 export async function deleteImage(fileName: string): Promise<boolean> {
 	try {
-		const supabase = await createAdminClient();
+		const supabase = createAdminClient();
 		const { error } = await supabase.storage
 			.from(STORIES_BUCKET)
 			.remove([fileName]);

@@ -51,19 +51,10 @@ export function LoginForm() {
                 loading_button_label: 'Signing up...',
                 link_text: "Don't have an account? Sign up",
               },
-              forgotten_password: {
-                email_label: 'Email address',
-                button_label: 'Send reset instructions',
-                loading_button_label: 'Sending reset instructions...',
-                link_text: 'Forgot your password?',
-                confirmation_text: 'Check your email for the password reset link',
-              },
             },
           }}
           providers={['google']}
-          redirectTo={`${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/auth/callback`}
-          onlyThirdPartyProviders={false}
-          magicLink={false}
+          redirectTo="/dashboard"
         />
       </CardContent>
     </Card>

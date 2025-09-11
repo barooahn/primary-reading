@@ -12,17 +12,70 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-
 // Tiny base64 placeholder for blur-up effect
 const BLUR_DATA_URL =
 	"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
 
 export const dynamic = "force-dynamic";
 
+// Helper function to get proper image URL using API
+async function getImageUrl(story: any): Promise<string | null> {
+	// Check if we have a direct URL first
+	if (story.cover_thumbnail_url && isValidUrl(story.cover_thumbnail_url)) {
+		return story.cover_thumbnail_url;
+	}
+	if (story.cover_image_url && isValidUrl(story.cover_image_url)) {
+		return story.cover_image_url;
+	}
+	
+	// If we have storage paths, convert to signed URLs via API
+	if (story.cover_thumbnail_path) {
+		try {
+			const response = await fetch('/api/images/url', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ path: story.cover_thumbnail_path })
+			});
+			const data = await response.json();
+			if (data.success && data.url) return data.url;
+		} catch (error) {
+			console.error('Error getting thumbnail URL:', error);
+		}
+	}
+	
+	if (story.cover_image_path) {
+		try {
+			const response = await fetch('/api/images/url', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ path: story.cover_image_path })
+			});
+			const data = await response.json();
+			if (data.success && data.url) return data.url;
+		} catch (error) {
+			console.error('Error getting cover URL:', error);
+		}
+	}
+	
+	return null;
+}
+
+// Helper function to validate URLs
+function isValidUrl(str: string): boolean {
+	if (!str || typeof str !== 'string') return false;
+	try {
+		new URL(str);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
 export default function MyStoriesPage() {
 	const [stories, setStories] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [message, setMessage] = useState<string | null>(null);
+	const [storyImages, setStoryImages] = useState<Map<string, string | null>>(new Map());
 
 	useEffect(() => {
 		const load = async () => {
@@ -39,8 +92,19 @@ export default function MyStoriesPage() {
 				}
 				const data = await res.json();
 				if (data.success) {
-					setStories(data.stories || []);
+					const storiesList = data.stories || [];
+					setStories(storiesList);
 					setMessage(null);
+					
+					// Load image URLs for all stories
+					const imageMap = new Map<string, string | null>();
+					await Promise.all(
+						storiesList.map(async (story: any) => {
+							const imageUrl = await getImageUrl(story);
+							imageMap.set(story.id, imageUrl);
+						})
+					);
+					setStoryImages(imageMap);
 				} else {
 					setMessage("Failed to load your stories.");
 					setStories([]);
@@ -69,8 +133,7 @@ export default function MyStoriesPage() {
 			.trim(),
 		genre: s.genre ?? "",
 		estimatedTime: s.estimated_reading_time ?? 10,
-		image:
-			s.cover_thumbnail_url ?? s.cover_image_url ?? "/placeholder.svg",
+		image: storyImages.get(s.id) || null,
 		rating: s.average_rating ?? 0,
 		totalReads: s.total_reads ?? 0,
 	}));
@@ -127,15 +190,24 @@ export default function MyStoriesPage() {
 								className='overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105'
 							>
 								<div className='relative'>
-									<Image
-										src={story.image}
-										alt={story.title}
-										width={300}
-										height={200}
-										className='w-full h-48 object-cover'
-										placeholder='blur'
-										blurDataURL={BLUR_DATA_URL}
-									/>
+									{story.image ? (
+										<Image
+											src={story.image}
+											alt={story.title}
+											width={300}
+											height={200}
+											className='w-full h-48 object-cover'
+											placeholder='blur'
+											blurDataURL={BLUR_DATA_URL}
+										/>
+									) : (
+										<div className='w-full h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center'>
+											<div className='text-center'>
+												<div className='text-4xl mb-2'>📚</div>
+												<div className='text-sm text-gray-600'>No Image</div>
+											</div>
+										</div>
+									)}
 								</div>
 								<CardHeader>
 									<CardTitle className='text-lg font-semibold line-clamp-2'>

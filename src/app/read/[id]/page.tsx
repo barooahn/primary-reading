@@ -26,9 +26,11 @@ import {
 	Target,
 	Clock,
 	Award,
+	Maximize,
+	Minimize,
 } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { DeleteStoryButton } from "@/components/stories/delete-story-button";
 
 import ReactMarkdown from "react-markdown";
@@ -186,20 +188,35 @@ interface ReadingProgress {
 export default function ReadStoryPage() {
 	// Load actual story by ID and shadow mock data
 	const params = useParams<{ id: string }>();
+	const router = useRouter();
+	const searchParams = useSearchParams();
 	const [story, setStory] = useState<any | null>(null);
 	const [loading, setLoading] = useState(true);
 
 	function mapApiStory(api: any) {
 		// Server already processes segments, so just map them to the expected format
+		console.log("=== MAPPING API STORY ===");
+		console.log("API segments raw:", api?.segments);
 		const segs = Array.isArray(api?.segments) ? api.segments : [];
-		const segments = segs.map((seg: any, idx: number, arr: any[]) => ({
-			id: seg?.segment_order ?? seg?.id ?? idx + 1,
-			text: seg?.content ?? seg?.text ?? "",
-			image: seg?.image_url ?? seg?.image ?? null,
-			imagePrompt: seg?.image_prompt ?? undefined,
-			isTitle: idx === 0,
-			isEnding: idx === arr.length - 1,
-		}));
+		const segments = segs.map((seg: any, idx: number, arr: any[]) => {
+			const mappedSeg = {
+				id: seg?.segment_order ?? seg?.id ?? idx + 1,
+				text: seg?.content ?? seg?.text ?? "",
+				image: seg?.image_url ?? seg?.image ?? null,
+				imagePath: seg?.image_path ?? null,
+				thumbnailPath: seg?.thumbnail_path ?? null,
+				imagePrompt: seg?.image_prompt ?? seg?.imagePrompt ?? undefined,
+				thumbnailUrl: seg?.thumbnail_url ?? seg?.thumbnailUrl ?? null,
+				isTitle: idx === 0,
+				isEnding: idx === arr.length - 1,
+			};
+			console.log(`=== MAPPING SEGMENT ${idx} ===`);
+			console.log("Raw segment data:", seg);
+			console.log("Mapped segment data:", mappedSeg);
+			console.log(`Image sources - image_url: ${seg?.image_url}, image: ${seg?.image}`);
+			console.log(`Final image URL: ${mappedSeg.image}`);
+			return mappedSeg;
+		});
 
 		// Handle questions
 		const qs = Array.isArray(api?.questions) ? api.questions : [];
@@ -279,6 +296,12 @@ export default function ReadStoryPage() {
 		{}
 	);
 	const [showResults, setShowResults] = useState(false);
+	// Get fullscreen state from URL parameters
+	const [isFullscreenMode, setIsFullscreenMode] = useState(() => {
+		return searchParams.get('fullscreen') === 'true';
+	});
+	
+	// Removed on-demand image generation state - images are now pre-generated during story creation
 	
 	// Refs to get current text input values
 	const shortAnswerValueRef = useRef<string>("");
@@ -834,6 +857,13 @@ export default function ReadStoryPage() {
 
 	// Main reading interface
 	const currentContent = mockStory?.content?.[currentSegment];
+	
+	// Debug logging for current content and images
+	console.log("=== READING PAGE DEBUG ===");
+	console.log("Current segment:", currentSegment);
+	console.log("Current content:", currentContent);
+	console.log("All story content:", mockStory?.content);
+	console.log("Story has segments:", mockStory?.content?.length || 0);
 	const totalSegments = mockStory?.content?.length ?? 0;
 	const progress =
 		totalSegments > 0
@@ -843,17 +873,102 @@ export default function ReadStoryPage() {
 
 	const displayPage = totalSegments > 0 ? currentSegment + 1 : 0;
 
+	// Image generation is now handled during story creation for seamless reading experience
+
+	// Use pre-generated story images with smart fallbacks for seamless reading experience  
+	const getBackgroundImage = (segment: any, index: number) => {
+		// First priority: use the segment's own pre-generated image URL
+		if (segment?.image && segment.image !== null && segment.image !== "") {
+			return segment.image;
+		}
+		
+		// Second priority: if we have storage paths but no URLs, convert them
+		if (segment?.imagePath || segment?.thumbnailPath || segment?.image_path || segment?.thumbnail_path) {
+			const storagePath = segment.thumbnailPath || segment.imagePath || segment.thumbnail_path || segment.image_path;
+			return `/api/images/${encodeURIComponent(storagePath)}`;
+		}
+
+		// Third priority: look for images from other segments in the story (pre-generated)
+		const allSegments = mockStory?.content || [];
+		const preGeneratedImages = allSegments
+			.filter((seg: any) => seg?.image && seg.image !== null && seg.image !== "")
+			.map((seg: any) => seg.image);
+		
+		if (preGeneratedImages.length > 0) {
+			const selectedImage = preGeneratedImages[index % preGeneratedImages.length];
+			return selectedImage;
+		}
+		
+		// Fourth priority: choose themed images based on image prompt content
+		const imagePrompt = segment?.imagePrompt?.toLowerCase() || "";
+		const imagePromptAlt = segment?.image_prompt?.toLowerCase() || "";
+		const finalPrompt = imagePrompt || imagePromptAlt;
+		
+		// Match prompt keywords to appropriate themed background images
+		if (finalPrompt.includes("kitchen") || finalPrompt.includes("house") || finalPrompt.includes("home")) {
+			return "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"; // Cozy kitchen
+		}
+		if (finalPrompt.includes("backyard") || finalPrompt.includes("garden") || finalPrompt.includes("outdoor")) {
+			return "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"; // Beautiful backyard
+		}
+		if (finalPrompt.includes("tree") || finalPrompt.includes("nest") || finalPrompt.includes("squirrel")) {
+			return "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"; // Forest with trees
+		}
+		if (finalPrompt.includes("party") || finalPrompt.includes("celebration") || finalPrompt.includes("friends")) {
+			return "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"; // Party/celebration
+		}
+		if (finalPrompt.includes("morning") || finalPrompt.includes("sunny") || finalPrompt.includes("bright")) {
+			return "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2040&q=80"; // Sunny morning
+		}
+		if (finalPrompt.includes("mystery") || finalPrompt.includes("detective") || finalPrompt.includes("clue") || finalPrompt.includes("cat") || finalPrompt.includes("coding")) {
+			return "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"; // Mysterious path
+		}
+		if (finalPrompt.includes("birthday") || finalPrompt.includes("cake")) {
+			return "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80"; // Birthday/celebration
+		}
+		
+		// Final fallback: cycle through general story-appropriate images
+		const fallbackImages = [
+			"https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80", // Library/books
+			"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80", // Forest path
+			"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80", // Mountain landscape
+			"https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80", // Meadow
+		];
+		
+		const selectedFallback = fallbackImages[index % fallbackImages.length];
+		return selectedFallback;
+	};
+
 	return (
 		<>
-			<div className='container mx-auto px-4 py-8 max-w-4xl'>
-				{/* Story Header */}
-				<div className='mb-6'>
-					<div className='flex items-center justify-between mb-4'>
-						<div>
-							<h1 className='text-2xl font-bold'>
+			{/* Reading interface with proper navigation spacing */}
+			<div className={`netflix-reading-container bg-black overflow-hidden ${
+				isFullscreenMode ? 'fixed inset-0' : 'fixed top-[70px] left-0 right-0 bottom-0'
+			}`}>
+				{/* Background Image with Overlay */}
+				<div className='absolute inset-0'>
+					<div 
+						className='absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-in-out'
+						style={{
+							backgroundImage: `url(${getBackgroundImage(currentContent, currentSegment)})`,
+						}}
+						onError={(e) => {
+							console.error("Background image failed to load:", e);
+							console.log("Attempted image URL:", getBackgroundImage(currentContent, currentSegment));
+						}}
+					/>
+					{/* Gradient overlay for text readability */}
+					<div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20' />
+				</div>
+
+				{/* Story Header - Fixed at top */}
+				<div className='absolute top-0 left-0 right-0 z-20 p-4'>
+					<div className='flex items-center justify-between'>
+						<div className='text-white'>
+							<h1 className='text-2xl font-bold mb-1'>
 								{mockStory.title}
 							</h1>
-							<div className='flex items-center space-x-4 text-sm text-muted'>
+							<div className='flex items-center space-x-4 text-sm text-white/80'>
 								<span>{mockStory.genre}</span>
 								<span className='capitalize'>
 									{mockStory.readingLevel}
@@ -868,6 +983,37 @@ export default function ReadStoryPage() {
 						</div>
 
 						<div className='flex items-center space-x-2'>
+							{/* Fullscreen Mode Toggle */}
+							<Button
+								variant='ghost'
+								size='icon'
+								onClick={() => {
+									const newFullscreenState = !isFullscreenMode;
+									setIsFullscreenMode(newFullscreenState);
+									
+									// Update URL parameters
+									const currentParams = new URLSearchParams(searchParams.toString());
+									if (newFullscreenState) {
+										currentParams.set('fullscreen', 'true');
+									} else {
+										currentParams.delete('fullscreen');
+									}
+									
+									const newUrl = currentParams.toString() 
+										? `${window.location.pathname}?${currentParams.toString()}`
+										: window.location.pathname;
+									
+									router.replace(newUrl);
+								}}
+								className='text-white hover:bg-white/20'
+								title={isFullscreenMode ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+							>
+								{isFullscreenMode ? (
+									<Minimize className='h-4 w-4' />
+								) : (
+									<Maximize className='h-4 w-4' />
+								)}
+							</Button>
 							<PrintButton
 								story={{
 									id: mockStory.id,
@@ -884,11 +1030,13 @@ export default function ReadStoryPage() {
 								variant='ghost'
 								size='sm'
 								showText={false}
+								className='text-white hover:bg-white/20 border-white/30'
 							/>
 							<Button
 								variant='ghost'
 								size='icon'
 								onClick={() => setIsMuted(!isMuted)}
+								className='text-white hover:bg-white/20'
 							>
 								{isMuted ? (
 									<VolumeX className='h-4 w-4' />
@@ -900,6 +1048,7 @@ export default function ReadStoryPage() {
 								variant='ghost'
 								size='icon'
 								onClick={() => setIsPlaying(!isPlaying)}
+								className='text-white hover:bg-white/20'
 							>
 								{isPlaying ? (
 									<Pause className='h-4 w-4' />
@@ -919,88 +1068,60 @@ export default function ReadStoryPage() {
 									size='sm'
 									showText={false}
 									redirectAfterDelete='/dashboard'
+									className='text-white hover:bg-white/20'
 								/>
 							)}
 						</div>
 					</div>
+				</div>
 
-					{/* Progress Bar */}
+				{/* Progress Bar - Fixed below header */}
+				<div className={`${
+					isFullscreenMode ? 'absolute top-24' : 'absolute top-20'
+				} left-0 right-0 z-20 px-4`}>
 					<div className='space-y-2'>
-						<div className='flex justify-between text-sm text-muted'>
+						<div className='flex justify-between text-sm text-white/80'>
 							<span>Reading Progress</span>
 							<span>{Math.round(progress)}%</span>
 						</div>
-						<div className='w-full bg-muted/20 rounded-full h-3'>
+						<div className={`w-full rounded-full h-2 ${
+							isFullscreenMode ? 'bg-white/20' : 'bg-slate-300 dark:bg-slate-600'
+						}`}>
 							<div
-								className='bg-primary h-3 rounded-full transition-all duration-500 relative'
+								className={`h-2 rounded-full transition-all duration-500 relative shadow-lg ${
+									isFullscreenMode ? 'bg-white' : 'bg-blue-500 dark:bg-blue-400'
+								}`}
 								style={{ width: `${progress}%` }}
 							>
-								<div className='absolute right-0 top-0 w-6 h-3 bg-primary rounded-full shadow-lg'></div>
+								<div className={`absolute right-0 top-0 w-4 h-2 rounded-full shadow-xl ${
+									isFullscreenMode ? 'bg-white' : 'bg-blue-500 dark:bg-blue-400'
+								}`}></div>
 							</div>
 						</div>
 					</div>
 				</div>
 
-				{/* Reading Content */}
-				<Card className='mb-6'>
-					<CardContent className='p-8'>
-						<div className='min-h-[300px] flex flex-col justify-center'>
-							{currentContent?.image && (
-								<div className='mb-6 text-center'>
-									<div className='w-full max-w-md mx-auto aspect-video rounded-lg overflow-hidden shadow-lg'>
-										{/* eslint-disable-next-line @next/next/no-img-element */}
-										<img
-											src={
-												currentContent.image
-											}
-											alt={
-												currentContent.imagePrompt ||
-												`Illustration for ${currentContent.text?.substring(
-													0,
-													100
-												)}...`
-											}
-											className='w-full h-full object-cover'
-											onError={(e) => {
-												// Fallback to placeholder if image fails to load
-												const target =
-													e.target as HTMLImageElement;
-												target.style.display =
-													"none";
-												const fallback =
-													target.nextElementSibling as HTMLElement;
-												if (fallback)
-													fallback.style.display =
-														"flex";
-											}}
-										/>
-										<div
-											className='w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center'
-											style={{
-												display: "none",
-											}}
-										>
-											<BookOpen className='h-12 w-12 text-primary/60' />
-										</div>
-									</div>
-								</div>
-							)}
-
+				{/* Reading Content - Centered in viewport */}
+				<div className={`absolute inset-0 z-10 flex items-center justify-center p-6 ${
+					isFullscreenMode ? 'pt-40 pb-32' : 'pt-32 pb-24'
+				}`}>
+					<div className='w-full max-w-4xl'>
+						<div className='netflix-text-container bg-black/85 backdrop-blur-md rounded-2xl p-8 md:p-12 border border-white/20 shadow-2xl'>
 							<div
 								className={`reading-text ${
-									currentContent?.isTitle
-										? "text-center"
-										: ""
+									isFullscreenMode ? 'text-white' : 'text-slate-900 dark:text-slate-100'
+								} ${
+									currentContent?.isTitle ? "text-center" : ""
 								}`}
 							>
 								{currentContent?.text ? (
 									<div
 										className={`${
 											currentContent?.isTitle
-												? "text-xl font-semibold text-primary"
+												? "text-3xl md:text-4xl font-bold text-white mb-6"
 												: currentContent?.isEnding
-												? "text-lg font-medium"
-												: "text-base"
+												? "text-xl md:text-2xl font-semibold text-white"
+												: "text-lg md:text-xl text-white/95"
 										}`}
 									>
 										<ReactMarkdown
@@ -1010,60 +1131,61 @@ export default function ReadStoryPage() {
 											components={{
 												h1: (props) => (
 													<h1
-														className='text-3xl md:text-4xl font-bold mb-4'
+														className='text-4xl md:text-5xl font-bold mb-6 text-white'
 														{...props}
 													/>
 												),
 												h2: (props) => (
 													<h2
-														className='text-2xl md:text-3xl font-semibold mb-3'
+														className='text-3xl md:text-4xl font-semibold mb-4 text-white'
 														{...props}
 													/>
 												),
 												h3: (props) => (
 													<h3
-														className='text-xl md:text-2xl font-semibold mb-2'
+														className='text-2xl md:text-3xl font-semibold mb-3 text-white'
 														{...props}
 													/>
 												),
 												p: (props) => (
 													<p
-														className='text-base leading-relaxed mb-4'
+														className='text-lg md:text-xl leading-relaxed mb-6 text-white/95'
 														{...props}
 													/>
 												),
 												ul: (props) => (
 													<ul
-														className='list-disc pl-6 my-4 space-y-1'
+														className='list-disc pl-6 my-6 space-y-2 text-white/95'
 														{...props}
 													/>
 												),
 												ol: (props) => (
 													<ol
-														className='list-decimal pl-6 my-4 space-y-1'
+														className='list-decimal pl-6 my-6 space-y-2 text-white/95'
 														{...props}
 													/>
 												),
 												li: (props) => (
 													<li
+														className='text-white/95'
 														{...props}
 													/>
 												),
 												strong: (props) => (
 													<strong
-														className='font-semibold'
+														className='font-semibold text-white'
 														{...props}
 													/>
 												),
 												em: (props) => (
 													<em
-														className='italic'
+														className='italic text-white/90'
 														{...props}
 													/>
 												),
 												a: (props) => (
 													<a
-														className='underline text-primary hover:text-primary/80'
+														className='underline text-blue-300 hover:text-blue-200'
 														target='_blank'
 														rel='noopener noreferrer'
 														{...props}
@@ -1075,76 +1197,80 @@ export default function ReadStoryPage() {
 										</ReactMarkdown>
 									</div>
 								) : (
-									<span className='block text-center text-muted'>
+									<span className='block text-center text-white/80 text-xl'>
 										This story has no content to
 										display.
 									</span>
 								)}
 							</div>
 						</div>
-					</CardContent>
-				</Card>
-
-				{/* Navigation Controls */}
-				<div className='flex items-center justify-between'>
-					<Button
-						variant='outline'
-						onClick={handlePrevious}
-						disabled={currentSegment === 0}
-					>
-						<ArrowLeft className='h-4 w-4 mr-2' />
-						Previous
-					</Button>
-
-					<div className='flex items-center space-x-4'>
-						<span className='text-sm text-muted'>
-							{displayPage} of {totalSegments}
-						</span>
-
-						{isPlaying && (
-							<div className='flex items-center space-x-2 text-sm text-muted'>
-								<div className='w-2 h-2 bg-primary rounded-full animate-pulse'></div>
-								<span>Auto-reading...</span>
-							</div>
-						)}
 					</div>
-
-					<Button onClick={handleNext}>
-						{currentSegment === totalSegments - 1 ? (
-							<>
-								Questions
-								<Target className='h-4 w-4 ml-2' />
-							</>
-						) : (
-							<>
-								Next
-								<ArrowRight className='h-4 w-4 ml-2' />
-							</>
-						)}
-					</Button>
 				</div>
 
-				{/* Reading Tips */}
+				{/* Navigation Controls - Fixed at bottom */}
+				<div className='absolute bottom-0 left-0 right-0 z-20 p-4'>
+					<div className='flex items-center justify-between'>
+						<Button
+							variant='outline'
+							onClick={handlePrevious}
+							disabled={currentSegment === 0}
+							className='bg-white/20 backdrop-blur-sm text-white border-white/30 hover:bg-white/30'
+						>
+							<ArrowLeft className='h-4 w-4 mr-2' />
+							Previous
+						</Button>
+
+						<div className='flex items-center space-x-6'>
+							<span className='text-sm text-white/80 bg-black/40 px-3 py-2 rounded-full backdrop-blur-sm'>
+								{displayPage} of {totalSegments}
+							</span>
+
+							{isPlaying && (
+								<div className='flex items-center space-x-2 text-sm text-white/80 bg-black/40 px-3 py-2 rounded-full backdrop-blur-sm'>
+									<div className='w-2 h-2 bg-white rounded-full animate-pulse'></div>
+									<span>Auto-reading...</span>
+								</div>
+							)}
+						</div>
+
+						<Button 
+							onClick={handleNext}
+							className='bg-white text-black hover:bg-white/90 font-semibold'
+						>
+							{currentSegment === totalSegments - 1 ? (
+								<>
+									Questions
+									<Target className='h-4 w-4 ml-2' />
+								</>
+							) : (
+								<>
+									Next
+									<ArrowRight className='h-4 w-4 ml-2' />
+								</>
+							)}
+						</Button>
+					</div>
+				</div>
+
+				{/* Reading Tips - Only show on first segment */}
 				{currentSegment === 0 && (
-					<Card className='mt-6 bg-secondary/5 border-secondary/20'>
-						<CardContent className='p-4'>
-							<div className='flex items-center space-x-3'>
-								<Lightbulb className='h-5 w-5 text-secondary flex-shrink-0' />
+					<div className={`${
+						isFullscreenMode ? 'absolute bottom-24' : 'absolute bottom-20'
+					} left-6 right-6 z-20`}>
+						<div className='bg-black/60 backdrop-blur-sm border border-white/20 rounded-xl p-4 max-w-md mx-auto'>
+							<div className='flex items-center space-x-3 text-white'>
+								<Lightbulb className='h-5 w-5 text-yellow-400 flex-shrink-0' />
 								<div className='text-sm'>
-									<p className='font-medium text-secondary mb-1'>
+									<p className='font-medium text-yellow-400 mb-1'>
 										Reading Tip:
 									</p>
-									<p className='text-muted'>
-										Click the play button to
-										auto-read, or use the arrow
-										buttons to go at your own
-										pace. Try to picture the story
-										in your mind as you read!
+									<p className='text-white/80'>
+										Use controls to navigate at your own pace. Each section has its own beautiful background!
 									</p>
 								</div>
 							</div>
-						</CardContent>
-					</Card>
+						</div>
+					</div>
 				)}
 			</div>
 		</>

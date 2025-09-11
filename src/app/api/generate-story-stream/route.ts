@@ -28,6 +28,8 @@ interface ParsedSegment {
 	title: string;
 	content: string;
 	imagePrompt: string;
+	image?: string;
+	thumbnailUrl?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -62,7 +64,7 @@ export async function POST(request: NextRequest) {
 			customTopic, 
 			gradeLevel, 
 			storyType, 
-			generateImages = false,
+			// generateImages = false, // removed unused variable
 			imageStyle = "illustration" 
 		} = body;
 
@@ -320,6 +322,19 @@ ${research}`;
 						questionsPerStory: gradeConfig.questionsPerStory,
 						uiElements: gradeConfig.uiElements,
 					},
+					images: [] as {
+						segmentId: string;
+						imageUrl?: string;
+						thumbnailUrl?: string;
+						storagePath?: string;
+						thumbnailStoragePath?: string;
+						prompt: string;
+						revisedPrompt?: string;
+						type: string;
+						title: string;
+						canRegenerate: boolean;
+						regenerationCount: number;
+					}[],
 				};
 
 				console.log("=== FINAL STREAMING API RESPONSE ===");
@@ -333,21 +348,58 @@ ${research}`;
 					data: { story: storyData },
 				});
 
-				// Step 2: Generate images if requested
-				if (generateImages) {
-					const { extractImagePrompts } = await import("@/utils/images/story-images");
-					const imagePrompts = extractImagePrompts(storyContent, title);
+				// Step 2: Generate images (always generate images for seamless reading experience)
+				let finalStoryData = storyData; // Initialize with base story data
+				const generatedImages: {
+					segmentId: string;
+					imageUrl?: string;
+					thumbnailUrl?: string;
+					storagePath?: string;
+					thumbnailStoragePath?: string;
+					prompt: string;
+					revisedPrompt?: string;
+					type: string;
+					title: string;
+					canRegenerate: boolean;
+					regenerationCount: number;
+				}[] = []; // Initialize outside the block
+				
+				if (true) { // Always generate images regardless of generateImages flag
+					// Generate images based on the structured segments with their specific image prompts
+					const imagePrompts = [];
 					
-					// Limit to 5 images maximum (including cover)
-					const promptsToGenerate = imagePrompts.slice(0, 5);
+					// Add cover image
+					imagePrompts.push({
+						segmentId: "cover",
+						title: "Story Cover",
+						prompt: `Book cover illustration for a children's story titled "${title}". Show the main characters and setting in a welcoming, colorful style perfect for primary school children.`,
+						type: "cover"
+					});
+					
+					// Add segment images based on parsed segments
+					parsedSegments.forEach((segment, index) => {
+						if (segment.imagePrompt && segment.imagePrompt.trim()) {
+							imagePrompts.push({
+								segmentId: `segment_${index + 1}`,
+								title: segment.title || `Segment ${index + 1}`,
+								prompt: segment.imagePrompt,
+								type: "segment"
+							});
+						}
+					});
+					
+					console.log(`=== IMAGE GENERATION DEBUG ===`);
+					console.log(`Total segments: ${parsedSegments.length}`);
+					console.log(`Image prompts to generate: ${imagePrompts.length}`);
+					console.log("Image prompts:", imagePrompts.map(p => ({ id: p.segmentId, title: p.title })));
+					
+					const promptsToGenerate = imagePrompts; // Generate all images, not just first 5
 
 					sendUpdate({
 						step: "images",
 						progress: 35,
 						message: `Generating ${promptsToGenerate.length} images...`,
 					});
-
-					const generatedImages = [];
 
 					for (let i = 0; i < promptsToGenerate.length; i++) {
 						const prompt = promptsToGenerate[i];
@@ -360,12 +412,14 @@ ${research}`;
 						});
 
 						try {
+							// Use the current request host to avoid port conflicts
+							const host = request.headers.get('host') || 'localhost:3000';
 							const baseUrl =
 								(process.env.NEXT_PUBLIC_APP_URL &&
 									process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "")) ||
 								(process.env.VERCEL_URL
 									? `https://${process.env.VERCEL_URL}`
-									: "http://localhost:3000");
+									: `http://${host}`);
 
 							const response = await fetch(`${baseUrl}/api/generate-image`, {
 								method: "POST",
@@ -436,16 +490,57 @@ ${research}`;
 						message: `Generated ${generatedImages.length} images successfully!`,
 						data: { images: generatedImages },
 					});
+
+					// Update story segments with generated images
+					const updatedSegments = parsedSegments.map((segment, index) => {
+						const segmentId = `segment_${index + 1}`;
+						const imageData = generatedImages.find(img => img.segmentId === segmentId);
+						return {
+							...segment,
+							image: imageData?.imageUrl || imageData?.storagePath,
+							imagePrompt: segment.imagePrompt,
+							thumbnailUrl: imageData?.thumbnailUrl
+						};
+					});
+
+					// Update story data with images
+					finalStoryData = {
+						...storyData,
+						segments: updatedSegments,
+						content: {
+							...storyData.content,
+							structured: {
+								...storyData.content.structured,
+								segments: updatedSegments
+							}
+						},
+						images: generatedImages
+					};
+
+					console.log("=== FINAL STORY DATA WITH IMAGES ===");
+						console.log("Updated segments with images:", updatedSegments.map(s => ({ 
+						title: s.title, 
+						hasImage: !!s.image,
+						imageUrl: s.image 
+					})));
+					console.log("Generated images count:", generatedImages.length);
 				}
 
-				// Final completion
+				// Send final completion with the updated story data (regardless of image generation)
+				console.log("=== COMPLETION EVENT DEBUG ===");
+				console.log("finalStoryData structured segments:", finalStoryData?.content?.structured?.segments?.map(s => ({
+					title: s.title,
+					hasImage: !!s.image,
+					imageUrl: s.image
+				})));
+				
 				sendUpdate({
-					step: "complete",
+					step: "complete", 
 					progress: 100,
 					message: "Story generation complete!",
 					data: {
-						story: storyData,
-						...(generateImages && { images: [] }), // Images already sent individually
+						story: finalStoryData,
+						images: generatedImages || [],
 					},
 				});
 

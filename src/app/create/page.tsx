@@ -23,6 +23,7 @@ import {
 	Play,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 const getAllThemes = () => {
 	return [
@@ -617,6 +618,28 @@ interface StorySettings {
 	includeImages: boolean;
 }
 
+interface StoryContent {
+	raw?: string;
+	structured?: {
+		title: string;
+		description: string;
+		segments: {
+			title: string;
+			content: string;
+			image?: string;
+			imagePrompt?: string;
+			thumbnailUrl?: string;
+		}[];
+		questions: {
+			question_text: string;
+			question_type: string;
+			options: string[];
+			correct_answer: string;
+			explanation: string;
+		}[];
+	};
+}
+
 export default function CreatePage() {
 	const [currentStep, setCurrentStep] = useState<
 		"theme" | "details" | "generating" | "preview"
@@ -627,12 +650,12 @@ export default function CreatePage() {
 		storyType: "fiction",
 		customPrompt: "",
 		includeQuestions: true,
-		includeImages: true,
+		includeImages: true, // Always true for seamless reading experience
 	});
 	const [customPromptMode, setCustomPromptMode] = useState(false);
 	const [generatedStory, setGeneratedStory] = useState<{
 		title: string;
-		content: string;
+		content: string | StoryContent;
 		description?: string;
 		imageUrl?: string;
 		reading_level?: string;
@@ -648,6 +671,7 @@ export default function CreatePage() {
 			correct: string;
 		}>;
 	} | null>(null);
+	// Removed unused prevStory state
 	const [generatedImages, setGeneratedImages] = useState<
 		Array<{
 			segmentId: string;
@@ -686,12 +710,16 @@ export default function CreatePage() {
 
 		setIsSaving(true);
 		// Prepare images and segments
+		console.log("=== FRONTEND IMAGE DEBUG ===");
+		console.log("Generated images array:", generatedImages);
+		console.log("Generated images length:", generatedImages.length);
+		
 		const coverImage =
 			generatedImages.find((i) => i.type === "cover") ||
 			generatedImages[0];
-		const coverImageUrl = coverImage?.storagePath || coverImage?.imageUrl;
-		const coverThumbUrl =
-			coverImage?.thumbnailStoragePath || coverImage?.thumbnailUrl;
+		const coverImageUrl = coverImage?.imageUrl;
+		const coverImagePath = coverImage?.storagePath;
+		const coverThumbPath = coverImage?.thumbnailStoragePath;
 		const imageMap = new Map<string, string>(
 			generatedImages.map((i) => [
 				i.segmentId,
@@ -703,6 +731,12 @@ export default function CreatePage() {
 				i.segmentId,
 				i.thumbnailStoragePath || i.thumbnailUrl,
 			])
+		);
+		const imagePathMap = new Map<string, string | undefined>(
+			generatedImages.map((i) => [i.segmentId, i.storagePath])
+		);
+		const thumbPathMap = new Map<string, string | undefined>(
+			generatedImages.map((i) => [i.segmentId, i.thumbnailStoragePath])
 		);
 		const promptMap = new Map<string, string | undefined>(
 			generatedImages.map((i) => [i.segmentId, i.prompt])
@@ -750,7 +784,9 @@ export default function CreatePage() {
 						title,
 						content,
 						image_url: imageMap.get(`segment_${order}`),
+						image_path: imagePathMap.get(`segment_${order}`),
 						thumbnail_url: thumbMap.get(`segment_${order}`),
+						thumbnail_path: thumbPathMap.get(`segment_${order}`),
 						image_prompt: promptMap.get(`segment_${order}`),
 					};
 				});
@@ -761,9 +797,10 @@ export default function CreatePage() {
 					segment_order: 1,
 					title: generatedStory.title,
 					content: clean(raw),
-					image_url: imageMap.get("segment_1") || coverImageUrl,
-					thumbnail_url:
-						thumbMap.get("segment_1") || coverThumbUrl,
+					image_url: imageMap.get("segment_1") || coverImagePath || coverImageUrl,
+					image_path: imagePathMap.get("segment_1") || coverImagePath,
+					thumbnail_url: thumbMap.get("segment_1") || coverThumbPath,
+					thumbnail_path: thumbPathMap.get("segment_1") || coverThumbPath,
 					image_prompt: promptMap.get("segment_1"),
 				},
 			];
@@ -772,8 +809,44 @@ export default function CreatePage() {
 		// Handle both old format (string) and new format (object with raw/structured)
 		const contentString = typeof generatedStory.content === 'string' 
 			? generatedStory.content 
-			: generatedStory.content?.raw || generatedStory.content;
-		const segmentsToSave = parseSegmentsForSave(contentString);
+			: (generatedStory.content as StoryContent)?.raw || '';
+		
+		// Use structured segments with images if available, otherwise parse from content string
+		let segmentsToSave: any[] = [];
+		if (generatedStory.content && typeof generatedStory.content === 'object' && (generatedStory.content as StoryContent).structured?.segments) {
+			console.log("=== USING STRUCTURED SEGMENTS WITH IMAGES ===");
+			const structuredSegments = (generatedStory.content as StoryContent).structured!.segments;
+			console.log("Structured segments:", structuredSegments);
+			console.log("Structured segments with image data:", structuredSegments.map((s: any) => ({
+				title: s.title,
+				hasImage: !!s.image,
+				imageUrl: s.image,
+				hasImagePrompt: !!s.imagePrompt
+			})));
+			
+			segmentsToSave = structuredSegments.map((segment: any, idx: number) => {
+				const segmentId = `segment_${idx + 1}`;
+				return {
+					segment_order: idx + 1,
+					title: segment.title || `Segment ${idx + 1}`,
+					content: segment.content || "",
+					image_url: segment.image || imageMap.get(segmentId) || null,
+					image_path: imagePathMap.get(segmentId) || null,
+					thumbnail_url: segment.thumbnailUrl || thumbMap.get(segmentId) || null,
+					thumbnail_path: thumbPathMap.get(segmentId) || null,
+					image_prompt: segment.imagePrompt || promptMap.get(segmentId) || null
+				};
+			});
+			
+			console.log("Mapped segments to save:", segmentsToSave);
+			console.log("Mapped segments image URLs:", segmentsToSave.map(s => ({
+				title: s.title,
+				image_url: s.image_url
+			})));
+		} else {
+			console.log("=== PARSING SEGMENTS FROM CONTENT STRING ===");
+			segmentsToSave = parseSegmentsForSave(contentString);
+		}
 
 		// Parse questions from story content if questions are enabled
 		let questionsToSave: any[] = [];
@@ -783,9 +856,9 @@ export default function CreatePage() {
 		if (settings.includeQuestions) {
 			try {
 				// Check if we already have structured questions from the API
-				if (generatedStory.content && typeof generatedStory.content === 'object' && generatedStory.content.structured?.questions) {
+				if (generatedStory.content && typeof generatedStory.content === 'object' && (generatedStory.content as StoryContent).structured?.questions) {
 					console.log("Using structured questions from API response...");
-					const structuredQuestions = generatedStory.content.structured.questions;
+					const structuredQuestions = (generatedStory.content as StoryContent).structured!.questions;
 					questionsToSave = structuredQuestions.map((q: any) => ({
 						question_text: q.question_text,
 						question_type: q.question_type,
@@ -856,8 +929,16 @@ export default function CreatePage() {
 						getGradeLevelConfig(settings.yearLevel)
 							.questionComplexity,
 					cover_image_url: coverImageUrl,
-					cover_thumbnail_url: coverThumbUrl,
+					cover_image_path: coverImagePath,
+					cover_thumbnail_path: coverThumbPath,
 					segments: segmentsToSave,
+					images: generatedImages.map(img => ({
+						image_url: img.imageUrl,
+						alt_text: img.title || `Image for ${img.segmentId}`,
+						position_in_story: parseInt(img.segmentId.replace('segment_', '')) - 1,
+						is_ai_generated: true,
+						segmentId: img.segmentId  // Add this for mapping
+					})),
 					questions: questionsToSave,
 				}),
 			});
@@ -913,7 +994,7 @@ export default function CreatePage() {
 					customTopic: settings.customPrompt || undefined,
 					gradeLevel: settings.yearLevel,
 					storyType: settings.storyType,
-					generateImages: settings.includeImages,
+					generateImages: true, // Always generate images for seamless reading
 					imageStyle: "illustration",
 				}),
 			});
@@ -963,6 +1044,32 @@ export default function CreatePage() {
 							} else if (data.step === "images" && data.data?.newImage) {
 								setGeneratedImages(prev => [...prev, data.data.newImage]);
 							} else if (data.step === "complete") {
+								// Update with final story data containing image URLs
+								if (data.data?.story) {
+									console.log("=== FRONTEND RECEIVED FINAL STORY DATA WITH IMAGES ===");
+									console.log("Final story data:", data.data.story);
+									console.log("Final story segments:", data.data.story.segments);
+									console.log("Final story structured segments:", data.data.story.content?.structured?.segments);
+									
+									// Log image data specifically
+									const segments = data.data.story.content?.structured?.segments || [];
+									console.log("Completion event segments with image data:", segments.map((s: any) => ({
+										title: s.title,
+										hasImage: !!s.image,
+										imageUrl: s.image
+									})));
+									
+									setGeneratedStory(() => {
+										const updatedStory = data.data.story;
+										console.log("=== SETTING GENERATED STORY WITH IMAGES ===");
+										console.log("Updated story structured segments:", updatedStory?.content?.structured?.segments?.map((s: any) => ({
+											title: s.title,
+											hasImage: !!s.image,
+											imageUrl: s.image
+										})));
+										return updatedStory;
+									});
+								}
 								setCurrentStep("preview");
 							} else if (data.step === "error") {
 								throw new Error(data.message);
@@ -1572,23 +1679,12 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 										<label className='flex items-center space-x-3'>
 											<input
 												type='checkbox'
-												checked={
-													settings.includeImages
-												}
-												onChange={(e) =>
-													setSettings({
-														...settings,
-														includeImages:
-															e
-																.target
-																.checked,
-													})
-												}
-												className='w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded'
+												checked={true} // Always checked for seamless reading experience
+												disabled={true} // Disabled since images are always generated
+												className='w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded opacity-50'
 											/>
-											<span className='text-sm'>
-												Generate AI
-												illustrations
+											<span className='text-sm text-muted'>
+												Generate AI illustrations (always included for the best reading experience ✨)
 											</span>
 										</label>
 									</div>
@@ -1771,9 +1867,11 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 									{/* Story Image Display with Read Overlay */}
 									{generatedImages.length > 0 ? (
 										<div className='relative w-full max-w-md mx-auto rounded-lg overflow-hidden border shadow-lg group cursor-pointer'>
-											<img
-												src={generatedImages[0]?.imageUrl || generatedImages[0]?.thumbnailUrl}
+											<Image
+												src={generatedImages[0]?.imageUrl || generatedImages[0]?.thumbnailUrl || '/placeholder-image.png'}
 												alt={`Illustration for ${generatedStory.title}`}
+												width={400}
+												height={300}
 												className='w-full h-auto object-cover transition-transform group-hover:scale-105'
 												onError={(e) => {
 													console.error('Failed to load story image');
@@ -1807,9 +1905,11 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 										</div>
 									) : generatedStory.imageUrl ? (
 										<div className='relative w-full max-w-md mx-auto rounded-lg overflow-hidden border shadow-lg group cursor-pointer'>
-											<img
-												src={generatedStory.imageUrl}
+											<Image
+												src={generatedStory.imageUrl || '/placeholder-image.png'}
 												alt={`Illustration for ${generatedStory.title}`}
+												width={400}
+												height={300}
 												className='w-full h-auto object-cover transition-transform group-hover:scale-105'
 												onError={(e) => {
 													console.error('Failed to load story image');
@@ -2010,7 +2110,9 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 									description:
 										generatedStory.description ||
 										`A ${settings.storyType} story about ${settings.theme}`,
-									content: generatedStory.content,
+									content: typeof generatedStory.content === 'string' 
+										? generatedStory.content 
+										: (generatedStory.content as StoryContent)?.raw || '',
 									grade_level: settings.yearLevel,
 									estimated_reading_time:
 										generatedStory.estimatedReadingTime ||

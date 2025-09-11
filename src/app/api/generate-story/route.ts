@@ -259,29 +259,60 @@ ${research}`;
 
 		// Generate images if requested
 		let generatedImages: any[] = [];
+		console.log("=== IMAGE GENERATION DEBUG ===");
+		console.log("generateImages flag:", generateImages);
+		console.log("imageStyle:", imageStyle);
+		
 		if (generateImages) {
 			try {
+				console.log("Starting image generation...");
 				const { generateStoryImages } = await import("@/utils/images/story-images");
 				generatedImages = await generateStoryImages(storyContent, title, {
 					generateAll: true,
 					maxImages: 4, // Limit to avoid long generation times
 					style: imageStyle
 				});
+				console.log("Image generation completed. Generated", generatedImages.length, "images");
+				console.log("Generated images:", generatedImages.map(img => ({
+					segmentId: img.segmentId,
+					hasImageUrl: !!img.imageUrl,
+					imageUrl: img.imageUrl?.substring(0, 100) + "..."
+				})));
 			} catch (imageError) {
 				console.error("Image generation failed:", imageError);
 				// Continue without images if generation fails
 			}
+		} else {
+			console.log("Image generation skipped - generateImages is false");
 		}
 
 		// Create structured story data with parsed JSON
+		// Link generated images to their corresponding segments
+		const segmentsWithImages = (parsedStory.segments || []).map((segment: any, index: number) => {
+			const segmentId = `segment_${index + 1}`;
+			const matchingImage = generatedImages.find(img => img.segmentId === segmentId);
+			
+			return {
+				...segment,
+				image: matchingImage?.imageUrl || null,
+				imagePath: matchingImage?.storagePath || null,
+				thumbnailUrl: matchingImage?.thumbnailUrl || null,
+				thumbnailPath: matchingImage?.thumbnailStoragePath || null,
+				imagePrompt: segment.imagePrompt || matchingImage?.prompt || null,
+			};
+		});
+
 		const storyData = {
 			title,
 			description,
 			content: {
 				raw: storyContent, // Keep raw content for backward compatibility
-				structured: parsedStory // Add structured data
+				structured: {
+					...parsedStory,
+					segments: segmentsWithImages // Use segments with linked images
+				}
 			},
-			segments: parsedStory.segments || [],
+			segments: segmentsWithImages,
 			questions: parsedStory.questions || [],
 			genre: theme,
 			theme: topic,

@@ -65,13 +65,6 @@ export default function Dashboard() {
 	const [recentStories, setRecentStories] = useState<Story[]>([]);
 	const [suggestedStories, setSuggestedStories] = useState<Story[]>([]);
 
-	// Load dashboard data
-	useEffect(() => {
-		if (user) {
-			loadDashboardData();
-		}
-	}, [user, loadDashboardData]);
-
 	const loadDashboardData = useCallback(async () => {
 		try {
 			setLoading(true);
@@ -81,10 +74,12 @@ export default function Dashboard() {
 				credentials: 'include'
 			});
 			
+			let userStories: Story[] = [];
 			if (storiesResponse.ok) {
 				const storiesData = await storiesResponse.json();
 				if (storiesData.success) {
-					setRecentStories(storiesData.stories || []);
+					userStories = storiesData.stories || [];
+					setRecentStories(userStories);
 				}
 			}
 
@@ -98,14 +93,14 @@ export default function Dashboard() {
 				if (suggestedData.success) {
 					// Filter out user's own stories from suggestions
 					const filtered = (suggestedData.stories || []).filter((story: Story) => 
-						!recentStories.some(recent => recent.id === story.id)
+						!userStories.some(recent => recent.id === story.id)
 					);
 					setSuggestedStories(filtered.slice(0, 6));
 				}
 			}
 
 			// For now, use basic calculated progress based on stories
-			const storiesCount = recentStories.length;
+			const storiesCount = userStories.length;
 			setUserProgress({
 				level: Math.floor(storiesCount / 5) + 1,
 				experiencePoints: storiesCount * 50,
@@ -150,7 +145,14 @@ export default function Dashboard() {
 		} finally {
 			setLoading(false);
 		}
-	}, [recentStories]);
+	}, []);
+
+	// Load dashboard data
+	useEffect(() => {
+		if (user) {
+			loadDashboardData();
+		}
+	}, [user, loadDashboardData]);
 
 	return (
 		<ProtectedRoute>
