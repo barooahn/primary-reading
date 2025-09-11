@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -36,48 +36,6 @@ import { DeleteStoryButton } from "@/components/stories/delete-story-button";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-// Separate component for text input that manages its own state until submission
-const TextAnswerInput = ({ 
-	questionId, 
-	initialValue, 
-	isAnswered, 
-	placeholder, 
-	rows = 4,
-	valueRef
-}: {
-	questionId: number;
-	initialValue: string;
-	isAnswered: boolean;
-	placeholder: string;
-	rows?: number;
-	valueRef: React.MutableRefObject<string>;
-}) => {
-	const [localValue, setLocalValue] = useState(initialValue);
-	
-	// Update local value when question changes
-	useEffect(() => {
-		setLocalValue(initialValue);
-		valueRef.current = initialValue;
-	}, [questionId, initialValue, valueRef]);
-	
-	const handleChange = (newValue: string) => {
-		if (!isAnswered) {
-			setLocalValue(newValue);
-			valueRef.current = newValue; // Keep ref in sync
-		}
-	};
-	
-	return (
-		<textarea
-			className='w-full p-4 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
-			rows={rows}
-			placeholder={placeholder}
-			disabled={isAnswered}
-			value={localValue}
-			onChange={(e) => handleChange(e.target.value)}
-		/>
-	);
-};
 // Mock story data - in real app this would come from Supabase
 const defaultMockStory = {
 	id: "1",
@@ -303,9 +261,6 @@ export default function ReadStoryPage() {
 	
 	// Removed on-demand image generation state - images are now pre-generated during story creation
 	
-	// Refs to get current text input values
-	const shortAnswerValueRef = useRef<string>("");
-	const creativeAnswerValueRef = useRef<string>("");
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [isMuted, setIsMuted] = useState(false);
 	const [readingStartTime] = useState(Date.now());
@@ -380,47 +335,11 @@ export default function ReadStoryPage() {
 	};
 
 
-	// Function to check if a free text answer is correct
-	const checkFreeTextAnswer = (userAnswer: string, correctAnswer: string, questionType: string) => {
-		if (!userAnswer || !correctAnswer) return false;
-		
-		const userLower = userAnswer.toLowerCase().trim();
-		const correctLower = correctAnswer.toLowerCase().trim();
-		
-		// For creative questions, always mark as correct (participation credit)
-		if (questionType === "creative") {
-			return userAnswer.trim().length > 0;
-		}
-		
-		// For short answer questions, use fuzzy matching
-		if (questionType === "short_answer") {
-			// Exact match
-			if (userLower === correctLower) return true;
-			
-			// Check if user answer contains key words from correct answer
-			const correctWords = correctLower.split(/\s+/).filter(word => word.length > 2);
-			const userWords = userLower.split(/\s+/);
-			
-			// If at least 60% of key words are present, consider it correct
-			const matchedWords = correctWords.filter(word => 
-				userWords.some(userWord => 
-					userWord.includes(word) || word.includes(userWord)
-				)
-			);
-			
-			const matchPercentage = matchedWords.length / correctWords.length;
-			return matchPercentage >= 0.6;
-		}
-		
-		// For multiple choice, use exact match
-		return userLower === correctLower;
-	};
-
 	const calculateResults = () => {
 		const correctCount = (mockStory?.questions ?? []).reduce(
 			(count, question, index) => {
 				const userAnswer = userAnswers[index];
-				const isCorrect = checkFreeTextAnswer(userAnswer, question.correctAnswer, question.type);
+				const isCorrect = userAnswer === question.correctAnswer;
 				return isCorrect ? count + 1 : count;
 			},
 			0
@@ -725,126 +644,19 @@ export default function ReadStoryPage() {
 								</div>
 							)}
 
-							{question?.type === "short_answer" && (
-								<div className='space-y-4'>
-									<TextAnswerInput
-										questionId={currentQuestion}
-										initialValue={userAnswers[currentQuestion] || ""}
-										valueRef={shortAnswerValueRef}
-										isAnswered={isAnswered}
-										placeholder="Type your answer here..."
-										rows={4}
-									/>
-									{!isAnswered && (
-										<Button
-											onClick={() =>
-												handleAnswerQuestion(
-													shortAnswerValueRef.current || ""
-												)
-											}
-										>
-											Submit Answer
-										</Button>
-									)}
-								</div>
-							)}
-
-							{question?.type === "creative" && (
-								<div className='space-y-4'>
-									<TextAnswerInput
-										questionId={currentQuestion}
-										initialValue={userAnswers[currentQuestion] || ""}
-										valueRef={creativeAnswerValueRef}
-										isAnswered={isAnswered}
-										placeholder="Draw with words or describe your ideas here..."
-										rows={6}
-									/>
-									{!isAnswered && (
-										<Button
-											onClick={() =>
-												handleAnswerQuestion(
-													creativeAnswerValueRef.current || "Creative response given"
-												)
-											}
-										>
-											Share My Ideas
-										</Button>
-									)}
-								</div>
-							)}
 
 							{isAnswered && (
 								<div className='mt-6 p-4 bg-primary/10 rounded-lg border border-primary/20'>
-									{/* Show user's answer for text questions */}
-									{(question?.type === "short_answer" || question?.type === "creative") && (
-										<div className='mb-4 p-3 bg-background/50 rounded border'>
-											<h5 className='font-medium text-sm mb-2'>Your Answer:</h5>
-											<p className='text-sm text-muted-foreground italic'>
-												&ldquo;{userAnswers[currentQuestion] || ""}&rdquo;
+									<div className='flex items-start space-x-2'>
+										<Lightbulb className='h-5 w-5 text-primary mt-0.5 flex-shrink-0' />
+										<div>
+											<h4 className='font-medium text-primary mb-1'>
+												Explanation:
+											</h4>
+											<p className='text-sm leading-relaxed'>
+												{question?.explanation ?? ""}
 											</p>
 										</div>
-									)}
-									
-									{/* Feedback based on question type */}
-									<div className='flex items-start space-x-2'>
-										{question?.type === "creative" ? (
-											<>
-												<Trophy className='h-5 w-5 text-yellow-500 mt-0.5 flex-shrink-0' />
-												<div>
-													<h4 className='font-medium text-yellow-600 mb-1'>
-														Great Creativity! 🌟
-													</h4>
-													<p className='text-sm leading-relaxed'>
-														{question?.explanation ?? "Amazing creativity! Every reader might have a different favorite part, and that's what makes reading special."}
-													</p>
-												</div>
-											</>
-										) : question?.type === "short_answer" ? (
-											<>
-												{checkFreeTextAnswer(userAnswers[currentQuestion], question?.correctAnswer, question?.type) ? (
-													<>
-														<CheckCircle className='h-5 w-5 text-green-500 mt-0.5 flex-shrink-0' />
-														<div>
-															<h4 className='font-medium text-green-600 mb-1'>
-																Excellent Answer! ✓
-															</h4>
-															<p className='text-sm leading-relaxed'>
-																{question?.explanation ?? "Great job! Your answer shows good understanding."}
-															</p>
-														</div>
-													</>
-												) : (
-													<>
-														<Lightbulb className='h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0' />
-														<div>
-															<h4 className='font-medium text-blue-600 mb-1'>
-																Good Try! Here&apos;s more info:
-															</h4>
-															<p className='text-sm leading-relaxed mb-2'>
-																{question?.explanation ?? ""}
-															</p>
-															{question?.correctAnswer && (
-																<p className='text-sm text-muted-foreground'>
-																	<strong>Expected answer:</strong> {question.correctAnswer}
-																</p>
-															)}
-														</div>
-													</>
-												)}
-											</>
-										) : (
-											<>
-												<Lightbulb className='h-5 w-5 text-primary mt-0.5 flex-shrink-0' />
-												<div>
-													<h4 className='font-medium text-primary mb-1'>
-														Explanation:
-													</h4>
-													<p className='text-sm leading-relaxed'>
-														{question?.explanation ?? ""}
-													</p>
-												</div>
-											</>
-										)}
 									</div>
 								</div>
 							)}

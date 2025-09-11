@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
-export function AuthRedirectHandler() {
+function AuthRedirectHandlerContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
@@ -32,4 +32,12 @@ export function AuthRedirectHandler() {
   }, [searchParams, router, supabase.auth]);
   
   return null; // This component doesn't render anything
+}
+
+export function AuthRedirectHandler() {
+  return (
+    <Suspense fallback={null}>
+      <AuthRedirectHandlerContent />
+    </Suspense>
+  );
 }

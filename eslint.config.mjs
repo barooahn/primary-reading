@@ -21,12 +21,13 @@ const eslintConfig = [
 			"next-env.d.ts",
 			// Tests & jest helpers (not part of production build)
 			"__tests__/**",
-			"jest.config.js",
-			"jest.setup.js",
-			// One-off local script
-			"take-navigation-screenshots.js",
-			// Test scripts
-			"test-*.js",
+			"config/**",
+			// Scripts directory with utility scripts
+			"scripts/**",
+			// Database directory
+			"database/**",
+			// Docs directory
+			"docs/**",
 			// Temporarily ignore stories API file while we land parser-safe refactor
 			"src/app/api/stories/**",
 		],

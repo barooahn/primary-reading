@@ -1,9 +1,10 @@
 'use client';
 
+import { Suspense } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Header } from './header';
 
-export function ConditionalHeader() {
+function ConditionalHeaderContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   
@@ -18,4 +19,12 @@ export function ConditionalHeader() {
   }
   
   return <Header />;
+}
+
+export function ConditionalHeader() {
+  return (
+    <Suspense fallback={null}>
+      <ConditionalHeaderContent />
+    </Suspense>
+  );
 }

@@ -66,7 +66,7 @@ export const GRADE_LEVEL_CONFIGS: Record<number, GradeLevelConfig> = {
       commonWords: true,
       allowComplexWords: false,
     },
-    questionTypes: ['multiple_choice', 'true_false'],
+    questionTypes: ['multiple_choice'],
     questionsPerStory: 3,
     questionComplexity: 1,
     storyElements: {
@@ -102,7 +102,7 @@ export const GRADE_LEVEL_CONFIGS: Record<number, GradeLevelConfig> = {
       commonWords: true,
       allowComplexWords: false,
     },
-    questionTypes: ['multiple_choice', 'true_false', 'short_answer'],
+    questionTypes: ['multiple_choice'],
     questionsPerStory: 4,
     questionComplexity: 1,
     storyElements: {
@@ -138,7 +138,7 @@ export const GRADE_LEVEL_CONFIGS: Record<number, GradeLevelConfig> = {
       commonWords: true,
       allowComplexWords: true,
     },
-    questionTypes: ['multiple_choice', 'true_false', 'short_answer', 'sequence'],
+    questionTypes: ['multiple_choice'],
     questionsPerStory: 5,
     questionComplexity: 2,
     storyElements: {
@@ -174,7 +174,7 @@ export const GRADE_LEVEL_CONFIGS: Record<number, GradeLevelConfig> = {
       commonWords: false,
       allowComplexWords: true,
     },
-    questionTypes: ['multiple_choice', 'short_answer', 'sequence', 'drag_drop'],
+    questionTypes: ['multiple_choice'],
     questionsPerStory: 6,
     questionComplexity: 2,
     storyElements: {
@@ -210,7 +210,7 @@ export const GRADE_LEVEL_CONFIGS: Record<number, GradeLevelConfig> = {
       commonWords: false,
       allowComplexWords: true,
     },
-    questionTypes: ['multiple_choice', 'short_answer', 'sequence', 'drag_drop'],
+    questionTypes: ['multiple_choice'],
     questionsPerStory: 7,
     questionComplexity: 3,
     storyElements: {
@@ -246,7 +246,7 @@ export const GRADE_LEVEL_CONFIGS: Record<number, GradeLevelConfig> = {
       commonWords: false,
       allowComplexWords: true,
     },
-    questionTypes: ['multiple_choice', 'short_answer', 'sequence', 'drag_drop'],
+    questionTypes: ['multiple_choice'],
     questionsPerStory: 8,
     questionComplexity: 3,
     storyElements: {
