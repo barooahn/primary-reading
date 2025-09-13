@@ -117,7 +117,13 @@ const defaultMockStory = {
 		{
 			id: 3,
 			question: "What did Emma and Pixel decide to do together?",
-			type: "short_answer",
+			type: "multiple_choice",
+			options: [
+				"Create games and apps to help kids learn",
+				"Hide under the bed forever",
+				"Break all the computers",
+				"Go back to sleep"
+			],
 			correctAnswer: "Create games and apps to help kids learn",
 			explanation:
 				"Perfect! Emma and Pixel became a programming team, making educational games and apps for other children.",

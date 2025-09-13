@@ -185,8 +185,8 @@ RETURN YOUR RESPONSE AS A VALID JSON OBJECT WITH THIS EXACT STRUCTURE:
     },
     {
       "question_text": "What lesson do the characters learn?",
-      "question_type": "short_answer",
-      "options": [],
+      "question_type": "multiple_choice",
+      "options": ["The importance of friendship and teamwork", "Money is the most important thing", "You should always work alone", "Nothing can be learned from adventure"],
       "correct_answer": "The importance of friendship and teamwork",
       "explanation": "They learn that working together makes them stronger"
     }
@@ -197,10 +197,9 @@ CRITICAL REQUIREMENTS:
 1. MUST return ONLY valid JSON - no explanatory text, no markdown, no code blocks
 2. Start your response with { and end with } - nothing else
 3. Include EXACTLY ${questionsPerStory} questions in the "questions" array
-4. Use question types: ${questionTypes.join(", ")} (convert all to "multiple_choice" or "short_answer")
+4. Use question types: ${questionTypes.join(", ")} (use only "multiple_choice")
 5. Each question must have: question_text, question_type, options array, correct_answer, explanation
 6. For multiple_choice: options should be array of strings, correct_answer should match one option exactly
-7. For short_answer: options should be empty array [], correct_answer should be the expected answer
 8. Questions must test understanding of YOUR story content - replace examples with actual story questions
 9. Story segments must tell a complete, engaging story appropriate for the age group
 

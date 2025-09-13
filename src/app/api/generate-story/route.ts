@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
 			(gradeConfig as any)?.questionTypes
 		)
 			? (gradeConfig as any).questionTypes
-			: ["multiple_choice", "true_false", "short_answer"];
+			: ["multiple_choice"];
 		const sentenceAvg =
 			(gradeConfig as any)?.sentenceLength?.average ?? 8;
 		const sentenceMax =

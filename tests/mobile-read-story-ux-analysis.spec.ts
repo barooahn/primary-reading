@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 // Test configuration for child-friendly mobile UX (ages 5-11)
 const MOBILE_DEVICES = {
@@ -63,7 +63,7 @@ test.describe('Mobile Read Story Page UX Analysis (Ages 5-11)', () => {
 
       test(`${deviceName}: Navigation controls accessibility`, async ({ page }) => {
         // Test Previous/Next button sizing and positioning
-        const prevButton = page.locator('button').filter({ hasText: 'Previous' }).first();
+        // const prevButton = page.locator('button').filter({ hasText: 'Previous' }).first();
         const nextButton = page.locator('button').filter({ hasText: 'Next' }).first();
 
         // Check if navigation buttons exist

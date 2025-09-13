@@ -160,9 +160,9 @@ test.describe("Mobile Story Creation UX Analysis", () => {
 		const fictionButton = page
 			.locator('[data-testid="story-type-fiction"]')
 			.or(page.locator('button:has-text("Fiction")'));
-		const nonFictionButton = page
-			.locator('[data-testid="story-type-non_fiction"]')
-			.or(page.locator('button:has-text("Non-Fiction")'));
+		// const nonFictionButton = page
+		// 	.locator('[data-testid="story-type-non_fiction"]')
+		// 	.or(page.locator('button:has-text("Non-Fiction")'));
 
 		// Check if story type buttons are visible and properly sized
 		if ((await fictionButton.count()) > 0) {
@@ -229,7 +229,7 @@ test.describe("Mobile Story Creation UX Analysis", () => {
 			});
 
 			// Check for mobile-specific generation UI issues
-			const progressBar = page.locator(".bg-primary.h-2.rounded-full");
+			// const progressBar = page.locator(".bg-primary.h-2.rounded-full");
 			const loadingSpinner = page.locator(".animate-spin");
 
 			await expect(loadingSpinner).toBeVisible();

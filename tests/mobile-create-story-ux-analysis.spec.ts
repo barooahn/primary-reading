@@ -13,7 +13,7 @@ test.use({
 
 test.describe('Mobile Story Creation UX Analysis', () => {
 
-  test('analyze mobile create story page UX and identify issues', async ({ page, authenticatedPage }) => {
+  test('analyze mobile create story page UX and identify issues', async ({ page }) => {
     console.log('📱 Starting comprehensive mobile UX analysis for story creation...');
     
     // Enable detailed logging for mobile-specific issues
@@ -328,7 +328,7 @@ test.describe('Mobile Story Creation UX Analysis', () => {
   });
 
   // Simplified test for custom prompt flow on mobile
-  test('analyze custom prompt mobile UX', async ({ page, authenticatedPage }) => {
+  test('analyze custom prompt mobile UX', async ({ page }) => {
     console.log('📱 Testing custom prompt mobile UX...');
     
     const createStoryPage = new CreateStoryPage(page);

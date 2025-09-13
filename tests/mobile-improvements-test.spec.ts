@@ -10,7 +10,7 @@ test.use({
 });
 
 test.describe('Mobile UX Improvements Verification', () => {
-  test('verify mobile improvements are working', async ({ page, authenticatedPage }) => {
+  test('verify mobile improvements are working', async ({ page }) => {
     console.log('📱 Testing mobile improvements...');
     
     // Navigate to create story page
@@ -105,7 +105,7 @@ test.describe('Mobile UX Improvements Verification', () => {
     });
     
     const fictionButton = page.locator('[data-testid="story-type-fiction"]');
-    const nonFictionButton = page.locator('[data-testid="story-type-non_fiction"]');
+    // const nonFictionButton = page.locator('[data-testid="story-type-non_fiction"]');
     
     if (await fictionButton.count() > 0) {
       const fictionBox = await fictionButton.boundingBox();

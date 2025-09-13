@@ -55,7 +55,13 @@ Luna learned that she could help the garden by watering the plants and singing t
 
 2. **True/False:** The flowers in the garden could talk.
 
-3. **Short Answer:** How could Luna help the magical garden grow?`;
+3. **Multiple Choice:** How could Luna help the magical garden grow?
+   a) By watering the plants
+   b) By ignoring the garden
+   c) By picking all the flowers
+   d) By running away
+
+   (Correct answer: a)`;
 
 export async function POST(request: NextRequest) {
   try {
