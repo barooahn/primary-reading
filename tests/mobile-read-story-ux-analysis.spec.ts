@@ -335,7 +335,7 @@ test.describe('Mobile Read Story Page UX Analysis (Ages 5-11)', () => {
 
   // Cross-device comparison test
   test('Cross-device UX consistency analysis', async ({ page }) => {
-    const results = {};
+    const results: { [deviceName: string]: any } = {};
     
     for (const [deviceName, viewport] of Object.entries(MOBILE_DEVICES)) {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });

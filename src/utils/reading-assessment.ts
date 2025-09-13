@@ -217,8 +217,8 @@ export class ReadingLevelAssessment {
       
       // Prefer themes that match the target grade
       if (!targetConfig.storyElements.themes.some(theme => 
-        story.genre?.toLowerCase().includes(theme.toLowerCase()) ||
-        story.theme?.toLowerCase().includes(theme.toLowerCase())
+        (typeof story.genre === 'string' && story.genre.toLowerCase().includes(theme.toLowerCase())) ||
+        (typeof story.theme === 'string' && story.theme.toLowerCase().includes(theme.toLowerCase()))
       )) return false;
       
       return true;
@@ -258,7 +258,7 @@ export function calculateReadingMetrics(userAnswers: Array<{ score: number; [key
 
   // Calculate question accuracy by type
   const accuracyByType = userAnswers.reduce((acc, answer) => {
-    const type = answer.question?.question_type || 'multiple_choice';
+    const type = (typeof answer.question?.question_type === 'string' ? answer.question.question_type : 'multiple_choice');
     if (!acc[type]) acc[type] = { correct: 0, total: 0 };
     
     acc[type].total++;
@@ -282,8 +282,8 @@ export function calculateReadingMetrics(userAnswers: Array<{ score: number; [key
   const averageScore = userAnswers.reduce((sum, answer) => sum + (answer.is_correct ? 100 : 0), 0) / userAnswers.length;
 
   // Calculate reading metrics
-  const totalWordsRead = readingSessions.reduce((sum, session) => sum + (session.story?.word_count || 0), 0);
-  const totalReadingTime = readingSessions.reduce((sum, session) => sum + (session.reading_time_minutes || 0), 0);
+  const totalWordsRead = readingSessions.reduce((sum, session) => sum + (typeof session.story?.word_count === 'number' ? session.story.word_count : 0), 0);
+  const totalReadingTime = readingSessions.reduce((sum, session) => sum + (typeof session.reading_time_minutes === 'number' ? session.reading_time_minutes : 0), 0);
   
   const averageReadingTime = totalReadingTime / readingSessions.length;
   const comprehensionSpeed = totalReadingTime > 0 ? totalWordsRead / totalReadingTime : 0;

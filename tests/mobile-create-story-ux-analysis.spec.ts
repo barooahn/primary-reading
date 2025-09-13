@@ -75,7 +75,17 @@ test.describe('Mobile Story Creation UX Analysis', () => {
     // ANALYZE YEAR LEVEL SELECTOR BUTTONS
     console.log('📱 Step 3: Analyzing year level selector UX...');
     const yearButtons = await page.locator('[data-testid^="year-"][data-testid$="-selector"]').all();
-    const yearButtonAnalysis: { width: number; height: number; text: string; visible: boolean }[] = [];
+    const yearButtonAnalysis: { 
+      width: number; 
+      height: number; 
+      text: string; 
+      visible: boolean;
+      index?: number;
+      x?: number;
+      y?: number;
+      meetsMobileStandard?: boolean;
+      touchFriendly?: boolean;
+    }[] = [];
     
     for (let i = 0; i < yearButtons.length; i++) {
       const button = yearButtons[i];
@@ -83,10 +93,13 @@ test.describe('Mobile Story Creation UX Analysis', () => {
       const isVisible = await button.isVisible();
       
       if (boundingBox && isVisible) {
+        const buttonText = await button.textContent() || '';
         const analysis = {
           index: i + 1,
           width: boundingBox.width,
           height: boundingBox.height,
+          text: buttonText,
+          visible: isVisible,
           x: boundingBox.x,
           y: boundingBox.y,
           meetsMobileStandard: boundingBox.height >= 44 && boundingBox.width >= 44, // Apple HIG minimum
@@ -137,7 +150,14 @@ test.describe('Mobile Story Creation UX Analysis', () => {
     const themeButtons = await page.locator('button').filter({ hasText: /🔍|🏰|😂|⚽/ }).all();
     console.log(`📱 Found ${themeButtons.length} theme buttons`);
     
-    const themeButtonAnalysis: { width: number; height: number; text: string; index: number }[] = [];
+    const themeButtonAnalysis: { 
+      width: number; 
+      height: number; 
+      text: string; 
+      index: number;
+      aspectRatio?: string;
+      touchFriendly?: boolean;
+    }[] = [];
     for (let i = 0; i < Math.min(4, themeButtons.length); i++) {
       const button = themeButtons[i];
       const boundingBox = await button.boundingBox();

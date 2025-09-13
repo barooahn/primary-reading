@@ -229,8 +229,8 @@ ${research}`;
 		} catch (error) {
 			console.error('Failed to parse JSON response:', error);
 			// Fallback to old parsing method if JSON fails
-			const lines = storyContent.split("\n").filter((line) => line.trim());
-			const titleLine = lines.find((line) =>
+			const lines = storyContent.split("\n").filter((line: string) => line.trim());
+			const titleLine = lines.find((line: string) =>
 				line.toLowerCase().includes("title:") ||
 				line.toLowerCase().includes("story title:")
 			);
