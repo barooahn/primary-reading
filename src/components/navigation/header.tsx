@@ -100,7 +100,7 @@ export function Header() {
 			className='sticky top-0 z-50 w-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 border-b border-purple-200/30 shadow-sm dark:bg-gradient-to-r dark:from-indigo-900 dark:via-purple-900 dark:to-fuchsia-900 dark:border-purple-900/40 text-slate-900 dark:text-white'
 			style={{ height: "70px", boxSizing: "border-box" }}
 		>
-			<div className='mx-auto px-3 sm:px-4 w-full h-full'>
+			<div className='mx-auto px-4 sm:px-6 md:px-8 py-2 sm:py-2 w-full h-full'>
 				<div className='flex h-full items-center justify-between gap-4 min-w-0 xl:grid xl:grid-cols-[1fr_auto_1fr]'>
 					{/* Compact Logo */}
 					<Link

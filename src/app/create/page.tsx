@@ -1209,7 +1209,56 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 				</div>
 
 				{/* Progress Steps */}
-				<div className='flex items-center justify-center space-x-4 mb-8'>
+				{/* Mobile Progress Indicator */}
+				<div className='block sm:hidden mb-8'>
+					{(() => {
+						const stepKeys = ["theme", "details", "generating", "preview"];
+						const stepNames = ["Choose Theme", "Story Details", "Generating", "Preview"];
+						const currentIndex = stepKeys.indexOf(currentStep);
+						
+						return (
+							<div className='flex flex-col items-center space-y-3'>
+								<div className='text-sm font-medium text-muted-foreground'>
+									Step {currentIndex + 1} of 4
+								</div>
+								<div className='text-base font-semibold text-primary mb-2'>
+									{stepNames[currentIndex] || stepNames[0]}
+								</div>
+								<div className='w-64 max-w-[calc(100vw-2rem)] bg-muted/30 rounded-full h-2'>
+									<div 
+										className='bg-gradient-to-r from-primary to-secondary h-2 rounded-full transition-all duration-500'
+										style={{ 
+											width: `${((currentIndex + 1) / 4) * 100}%` 
+										}}
+									/>
+								</div>
+								{/* Mobile step dots */}
+								<div className='flex space-x-3'>
+									{[0, 1, 2, 3].map((index) => {
+										const isActive = index === currentIndex;
+										const isCompleted = index < currentIndex;
+										
+										return (
+											<div
+												key={index}
+												className={`w-3 h-3 rounded-full transition-all ${
+													isActive
+														? "bg-primary scale-125"
+														: isCompleted
+														? "bg-success"
+														: "bg-muted"
+												}`}
+											/>
+										);
+									})}
+								</div>
+							</div>
+						);
+					})()}
+				</div>
+
+				{/* Desktop Progress Steps */}
+				<div className='hidden sm:flex items-center justify-center space-x-4 mb-8'>
 					{[
 						"Choose Theme",
 						"Story Details",
@@ -1277,7 +1326,8 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 								</CardDescription>
 							</CardHeader>
 							<CardContent>
-								<div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3'>
+								{/* Mobile-first year level grid */}
+								<div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4'>
 									{[1, 2, 3, 4, 5, 6].map((year) => {
 										const config =
 											getGradeLevelConfig(
@@ -1286,6 +1336,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 										return (
 											<button
 												key={year}
+												data-testid={`year-${year}-selector`}
 												onClick={() =>
 													setSettings({
 														...settings,
@@ -1293,12 +1344,18 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 															year,
 													})
 												}
-												className={`p-4 rounded-lg border-2 text-center transition-all hover:scale-105 ${
-													settings.yearLevel ===
-													year
-														? "border-primary bg-primary/10"
-														: "border-border hover:border-primary/50"
-												}`}
+												className={`
+													min-h-[3.5rem] sm:min-h-[4rem] p-3 sm:p-4 
+													rounded-lg sm:rounded-xl border-2 text-center 
+													transition-all duration-200 
+													hover:scale-105 active:scale-95
+													touch-manipulation
+													${
+														settings.yearLevel === year
+															? "border-primary bg-primary/10 shadow-md"
+															: "border-border hover:border-primary/50 hover:bg-primary/5"
+													}
+												`}
 											>
 												<div className='text-2xl font-bold text-primary mb-1'>
 													Year {year}
@@ -1380,31 +1437,36 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 								</div>
 
 								{!customPromptMode ? (
-									<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+									<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4'>
 										{getThemesForYear(
 											settings.yearLevel
 										).map((theme, index) => (
 											<button
 												key={index}
+												data-testid="theme-button"
 												onClick={() =>
 													handleThemeSelect(
 														theme.name
 													)
 												}
-												className={`p-4 rounded-lg border-2 text-left transition-all hover:scale-105 ${
-													settings.theme ===
-													theme.name
-														? "border-primary bg-primary/10"
-														: "border-border hover:border-primary/50"
-												}`}
+												className={`
+													min-h-[4rem] sm:min-h-[4.5rem] p-4 sm:p-5
+													rounded-lg sm:rounded-xl border-2 text-left 
+													transition-all duration-200 
+													hover:scale-105 active:scale-95
+													touch-manipulation
+													${
+														settings.theme === theme.name
+															? "border-primary bg-primary/10 shadow-md"
+															: "border-border hover:border-primary/50 hover:bg-primary/5"
+													}
+												`}
 											>
-												<h3 className='font-semibold text-base mb-1'>
+												<h3 className='font-semibold text-base sm:text-lg mb-1'>
 													{theme.name}
 												</h3>
-												<p className='text-sm text-muted'>
-													{
-														theme.description
-													}
+												<p className='text-sm text-muted leading-relaxed'>
+													{theme.description}
 												</p>
 											</button>
 										))}
@@ -1416,9 +1478,12 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 												Your Story Idea
 											</label>
 											<textarea
-												className='w-full p-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
-												rows={4}
-												placeholder="Describe your story idea... For example: 'A story about a kid who finds a magical skateboard that can fly through clouds and has to save the sky kingdom from an evil storm wizard.'"
+												className='w-full p-4 sm:p-3 border-2 border-border rounded-lg sm:rounded-xl 
+												focus:outline-none focus:ring-3 focus:ring-primary/20 focus:border-primary
+												text-base leading-relaxed touch-manipulation resize-none'
+												style={{ fontSize: '16px' }} /* Prevents zoom on iOS */
+												rows={5}
+												placeholder="Tell us your story idea! For example: 'A story about a kid who finds a magical skateboard that can fly through clouds and has to save the sky kingdom from an evil storm wizard.'"
 												value={
 													settings.customPrompt
 												}
@@ -1488,10 +1553,13 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 											disabled={
 												!settings.customPrompt.trim()
 											}
-											className='w-full'
+											className='w-full h-12 sm:h-10 text-base sm:text-sm font-semibold
+											bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90
+											shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95 
+											disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none'
 										>
 											Continue with Custom Idea
-											<ChevronRight className='h-4 w-4 ml-2' />
+											<ChevronRight className='h-5 w-5 sm:h-4 sm:w-4 ml-2' />
 										</Button>
 									</div>
 								)}
@@ -1590,8 +1658,9 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 									<label className='block text-sm font-medium mb-3'>
 										Story Type
 									</label>
-									<div className='grid grid-cols-2 gap-4'>
+									<div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4'>
 										<button
+											data-testid="story-type-fiction"
 											onClick={() =>
 												setSettings({
 													...settings,
@@ -1599,25 +1668,31 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 														"fiction",
 												})
 											}
-											className={`p-4 rounded-lg border-2 text-center transition-all hover:scale-105 ${
-												settings.storyType ===
-												"fiction"
-													? "border-primary bg-primary/10"
-													: "border-border hover:border-primary/50"
-											}`}
+											className={`
+												min-h-[4.5rem] p-4 sm:p-5
+												rounded-lg sm:rounded-xl border-2 text-center 
+												transition-all duration-200 
+												hover:scale-105 active:scale-95
+												touch-manipulation
+												${
+													settings.storyType === "fiction"
+														? "border-primary bg-primary/10 shadow-md"
+														: "border-border hover:border-primary/50 hover:bg-primary/5"
+												}
+											`}
 										>
-											<div className='text-2xl mb-2'>
+											<div className='text-3xl mb-2'>
 												📚
 											</div>
-											<div className='font-medium'>
+											<div className='font-semibold text-base sm:text-lg'>
 												Fiction
 											</div>
-											<div className='text-sm text-muted'>
-												Made-up stories with
-												imagination
+											<div className='text-sm text-muted mt-1'>
+												Made-up stories with imagination
 											</div>
 										</button>
 										<button
+											data-testid="story-type-non_fiction"
 											onClick={() =>
 												setSettings({
 													...settings,
@@ -1625,22 +1700,27 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 														"non_fiction",
 												})
 											}
-											className={`p-4 rounded-lg border-2 text-center transition-all hover:scale-105 ${
-												settings.storyType ===
-												"non_fiction"
-													? "border-primary bg-primary/10"
-													: "border-border hover:border-primary/50"
-											}`}
+											className={`
+												min-h-[4.5rem] p-4 sm:p-5
+												rounded-lg sm:rounded-xl border-2 text-center 
+												transition-all duration-200 
+												hover:scale-105 active:scale-95
+												touch-manipulation
+												${
+													settings.storyType === "non_fiction"
+														? "border-primary bg-primary/10 shadow-md"
+														: "border-border hover:border-primary/50 hover:bg-primary/5"
+												}
+											`}
 										>
-											<div className='text-2xl mb-2'>
+											<div className='text-3xl mb-2'>
 												🔍
 											</div>
-											<div className='font-medium'>
+											<div className='font-semibold text-base sm:text-lg'>
 												Non-Fiction
 											</div>
-											<div className='text-sm text-muted'>
-												Real facts and
-												information
+											<div className='text-sm text-muted mt-1'>
+												Real facts and information
 											</div>
 										</button>
 									</div>
@@ -1690,22 +1770,26 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 									</div>
 								</div>
 
-								<div className='flex space-x-4'>
+								{/* Mobile-optimized action buttons */}
+								<div className='flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4'>
 									<Button
 										variant='outline'
 										onClick={() =>
 											setCurrentStep("theme")
 										}
-										className='flex-1'
+										className='w-full sm:flex-1 h-12 sm:h-10 text-base sm:text-sm font-medium'
 									>
-										Back
+										← Back
 									</Button>
 									<Button
+										data-testid="generate-story-btn"
 										onClick={generateStory}
-										className='flex-1'
+										className='w-full sm:flex-1 h-14 sm:h-10 text-lg sm:text-sm font-semibold
+										bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90
+										shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95'
 									>
-										<Sparkles className='h-4 w-4 mr-2' />
-										Create My Story!
+										<Sparkles className='h-5 w-5 sm:h-4 sm:w-4 mr-2' />
+										Create My Story! ✨
 									</Button>
 								</div>
 							</CardContent>

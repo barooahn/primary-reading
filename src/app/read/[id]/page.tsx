@@ -12,10 +12,6 @@ import {
 import { PrintButton } from "@/components/ui/print-button";
 import {
 	BookOpen,
-	Play,
-	Pause,
-	Volume2,
-	VolumeX,
 	CheckCircle,
 	Star,
 	Trophy,
@@ -28,6 +24,8 @@ import {
 	Award,
 	Maximize,
 	Minimize,
+	Info,
+	X,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
@@ -163,15 +161,19 @@ export default function ReadStoryPage() {
 				image: seg?.image_url ?? seg?.image ?? null,
 				imagePath: seg?.image_path ?? null,
 				thumbnailPath: seg?.thumbnail_path ?? null,
-				imagePrompt: seg?.image_prompt ?? seg?.imagePrompt ?? undefined,
-				thumbnailUrl: seg?.thumbnail_url ?? seg?.thumbnailUrl ?? null,
+				imagePrompt:
+					seg?.image_prompt ?? seg?.imagePrompt ?? undefined,
+				thumbnailUrl:
+					seg?.thumbnail_url ?? seg?.thumbnailUrl ?? null,
 				isTitle: idx === 0,
 				isEnding: idx === arr.length - 1,
 			};
 			console.log(`=== MAPPING SEGMENT ${idx} ===`);
 			console.log("Raw segment data:", seg);
 			console.log("Mapped segment data:", mappedSeg);
-			console.log(`Image sources - image_url: ${seg?.image_url}, image: ${seg?.image}`);
+			console.log(
+				`Image sources - image_url: ${seg?.image_url}, image: ${seg?.image}`
+			);
 			console.log(`Final image URL: ${mappedSeg.image}`);
 			return mappedSeg;
 		});
@@ -224,11 +226,23 @@ export default function ReadStoryPage() {
 				if (!active) return;
 				if (data?.success && data?.story) {
 					console.log("=== READ PAGE API RESPONSE ===");
-					console.log("Raw questions from API:", data.story.questions);
-					console.log("Questions count:", data.story.questions?.length || 0);
+					console.log(
+						"Raw questions from API:",
+						data.story.questions
+					);
+					console.log(
+						"Questions count:",
+						data.story.questions?.length || 0
+					);
 					const mappedStory = mapApiStory(data.story);
-					console.log("Mapped questions in read page:", mappedStory.questions);
-					console.log("Mapped questions count:", mappedStory.questions?.length || 0);
+					console.log(
+						"Mapped questions in read page:",
+						mappedStory.questions
+					);
+					console.log(
+						"Mapped questions count:",
+						mappedStory.questions?.length || 0
+					);
 					setStory(mappedStory);
 				}
 			} catch (e) {
@@ -256,13 +270,18 @@ export default function ReadStoryPage() {
 	const [showResults, setShowResults] = useState(false);
 	// Get fullscreen state from URL parameters
 	const [isFullscreenMode, setIsFullscreenMode] = useState(() => {
-		return searchParams.get('fullscreen') === 'true';
+		return searchParams.get("fullscreen") === "true";
 	});
 	
-	// Removed on-demand image generation state - images are now pre-generated during story creation
+	// Mobile info toggle state
+	const [showMobileInfo, setShowMobileInfo] = useState(false);
 	
-	const [isPlaying, setIsPlaying] = useState(false);
-	const [isMuted, setIsMuted] = useState(false);
+	// Reading tip modal state
+	const [showReadingTip, setShowReadingTip] = useState(false);
+
+	// Removed on-demand image generation state - images are now pre-generated during story creation
+
+	const [isPlaying] = useState(false);
 	const [readingStartTime] = useState(Date.now());
 	const [readingProgress, setReadingProgress] = useState<ReadingProgress>({
 		currentSegment: 0,
@@ -271,6 +290,18 @@ export default function ReadStoryPage() {
 		questionsAnswered: 0,
 		correctAnswers: 0,
 	});
+
+	// Check localStorage for reading tip preference
+	useEffect(() => {
+		const dontShowTip = localStorage.getItem('hideReadingTip') === 'true';
+		if (!dontShowTip && currentSegment === 0) {
+			// Show tip after a brief delay when story loads
+			const timer = setTimeout(() => {
+				setShowReadingTip(true);
+			}, 1000);
+			return () => clearTimeout(timer);
+		}
+	}, [currentSegment]);
 
 	// Auto-advance reading with reading speed calculation
 
@@ -322,6 +353,15 @@ export default function ReadStoryPage() {
 		}
 	};
 
+	const handleCloseTip = () => {
+		setShowReadingTip(false);
+	};
+
+	const handleDontShowAgain = () => {
+		localStorage.setItem('hideReadingTip', 'true');
+		setShowReadingTip(false);
+	};
+
 	const handleAnswerQuestion = (answer: string) => {
 		setUserAnswers({ ...userAnswers, [currentQuestion]: answer });
 
@@ -333,7 +373,6 @@ export default function ReadStoryPage() {
 			}
 		}, 1500);
 	};
-
 
 	const calculateResults = () => {
 		const correctCount = (mockStory?.questions ?? []).reduce(
@@ -644,7 +683,6 @@ export default function ReadStoryPage() {
 								</div>
 							)}
 
-
 							{isAnswered && (
 								<div className='mt-6 p-4 bg-primary/10 rounded-lg border border-primary/20'>
 									<div className='flex items-start space-x-2'>
@@ -654,7 +692,8 @@ export default function ReadStoryPage() {
 												Explanation:
 											</h4>
 											<p className='text-sm leading-relaxed'>
-												{question?.explanation ?? ""}
+												{question?.explanation ??
+													""}
 											</p>
 										</div>
 									</div>
@@ -669,7 +708,7 @@ export default function ReadStoryPage() {
 
 	// Main reading interface
 	const currentContent = mockStory?.content?.[currentSegment];
-	
+
 	// Debug logging for current content and images
 	console.log("=== READING PAGE DEBUG ===");
 	console.log("Current segment:", currentSegment);
@@ -687,58 +726,104 @@ export default function ReadStoryPage() {
 
 	// Image generation is now handled during story creation for seamless reading experience
 
-	// Use pre-generated story images with smart fallbacks for seamless reading experience  
+	// Use pre-generated story images with smart fallbacks for seamless reading experience
 	const getBackgroundImage = (segment: any, index: number) => {
 		// First priority: use the segment's own pre-generated image URL
-		if (segment?.image && segment.image !== null && segment.image !== "") {
+		if (
+			segment?.image &&
+			segment.image !== null &&
+			segment.image !== ""
+		) {
 			return segment.image;
 		}
-		
+
 		// Second priority: if we have storage paths but no URLs, convert them
-		if (segment?.imagePath || segment?.thumbnailPath || segment?.image_path || segment?.thumbnail_path) {
-			const storagePath = segment.thumbnailPath || segment.imagePath || segment.thumbnail_path || segment.image_path;
+		if (
+			segment?.imagePath ||
+			segment?.thumbnailPath ||
+			segment?.image_path ||
+			segment?.thumbnail_path
+		) {
+			const storagePath =
+				segment.thumbnailPath ||
+				segment.imagePath ||
+				segment.thumbnail_path ||
+				segment.image_path;
 			return `/api/images/${encodeURIComponent(storagePath)}`;
 		}
 
 		// Third priority: look for images from other segments in the story (pre-generated)
 		const allSegments = mockStory?.content || [];
 		const preGeneratedImages = allSegments
-			.filter((seg: any) => seg?.image && seg.image !== null && seg.image !== "")
+			.filter(
+				(seg: any) =>
+					seg?.image && seg.image !== null && seg.image !== ""
+			)
 			.map((seg: any) => seg.image);
-		
+
 		if (preGeneratedImages.length > 0) {
-			const selectedImage = preGeneratedImages[index % preGeneratedImages.length];
+			const selectedImage =
+				preGeneratedImages[index % preGeneratedImages.length];
 			return selectedImage;
 		}
-		
+
 		// Fourth priority: choose themed images based on image prompt content
 		const imagePrompt = segment?.imagePrompt?.toLowerCase() || "";
 		const imagePromptAlt = segment?.image_prompt?.toLowerCase() || "";
 		const finalPrompt = imagePrompt || imagePromptAlt;
-		
+
 		// Match prompt keywords to appropriate themed background images
-		if (finalPrompt.includes("kitchen") || finalPrompt.includes("house") || finalPrompt.includes("home")) {
+		if (
+			finalPrompt.includes("kitchen") ||
+			finalPrompt.includes("house") ||
+			finalPrompt.includes("home")
+		) {
 			return "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"; // Cozy kitchen
 		}
-		if (finalPrompt.includes("backyard") || finalPrompt.includes("garden") || finalPrompt.includes("outdoor")) {
+		if (
+			finalPrompt.includes("backyard") ||
+			finalPrompt.includes("garden") ||
+			finalPrompt.includes("outdoor")
+		) {
 			return "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"; // Beautiful backyard
 		}
-		if (finalPrompt.includes("tree") || finalPrompt.includes("nest") || finalPrompt.includes("squirrel")) {
+		if (
+			finalPrompt.includes("tree") ||
+			finalPrompt.includes("nest") ||
+			finalPrompt.includes("squirrel")
+		) {
 			return "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"; // Forest with trees
 		}
-		if (finalPrompt.includes("party") || finalPrompt.includes("celebration") || finalPrompt.includes("friends")) {
+		if (
+			finalPrompt.includes("party") ||
+			finalPrompt.includes("celebration") ||
+			finalPrompt.includes("friends")
+		) {
 			return "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"; // Party/celebration
 		}
-		if (finalPrompt.includes("morning") || finalPrompt.includes("sunny") || finalPrompt.includes("bright")) {
+		if (
+			finalPrompt.includes("morning") ||
+			finalPrompt.includes("sunny") ||
+			finalPrompt.includes("bright")
+		) {
 			return "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2040&q=80"; // Sunny morning
 		}
-		if (finalPrompt.includes("mystery") || finalPrompt.includes("detective") || finalPrompt.includes("clue") || finalPrompt.includes("cat") || finalPrompt.includes("coding")) {
+		if (
+			finalPrompt.includes("mystery") ||
+			finalPrompt.includes("detective") ||
+			finalPrompt.includes("clue") ||
+			finalPrompt.includes("cat") ||
+			finalPrompt.includes("coding")
+		) {
 			return "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"; // Mysterious path
 		}
-		if (finalPrompt.includes("birthday") || finalPrompt.includes("cake")) {
+		if (
+			finalPrompt.includes("birthday") ||
+			finalPrompt.includes("cake")
+		) {
 			return "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80"; // Birthday/celebration
 		}
-		
+
 		// Final fallback: cycle through general story-appropriate images
 		const fallbackImages = [
 			"https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80", // Library/books
@@ -746,36 +831,142 @@ export default function ReadStoryPage() {
 			"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80", // Mountain landscape
 			"https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80", // Meadow
 		];
-		
-		const selectedFallback = fallbackImages[index % fallbackImages.length];
+
+		const selectedFallback =
+			fallbackImages[index % fallbackImages.length];
 		return selectedFallback;
 	};
 
 	return (
 		<>
-			{/* Reading interface with proper navigation spacing */}
-			<div className={`netflix-reading-container bg-black overflow-hidden ${
-				isFullscreenMode ? 'fixed inset-0' : 'fixed top-[70px] left-0 right-0 bottom-0'
-			}`}>
-				{/* Background Image with Overlay */}
-				<div className='absolute inset-0'>
-					<div 
-						className='absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-in-out'
-						style={{
-							backgroundImage: `url(${getBackgroundImage(currentContent, currentSegment)})`,
-						}}
-						onError={(e) => {
-							console.error("Background image failed to load:", e);
-							console.log("Attempted image URL:", getBackgroundImage(currentContent, currentSegment));
-						}}
-					/>
-					{/* Gradient overlay for text readability */}
-					<div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20' />
-				</div>
+			{/* Reading interface with conditional fullscreen coverage */}
+			<div
+				className={`netflix-reading-container ${
+					isFullscreenMode ? "fullscreen-mode" : ""
+				} ${
+					isFullscreenMode
+						? "fixed top-0 left-0 right-0 bottom-0 z-[99999] min-h-screen"
+						: "relative h-[calc(100vh-70px)] max-h-[calc(100vh-70px)]"
+				} flex flex-col overflow-hidden`}
+				style={{
+					backgroundColor: "black",
+					backgroundImage: `url(${getBackgroundImage(
+						currentContent,
+						currentSegment
+					)})`,
+					backgroundSize: "cover",
+					backgroundPosition: "center",
+					backgroundRepeat: "no-repeat",
+				}}
+			>
+				{/* Background overlay for text readability */}
+				<div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 pointer-events-none' />
 
-				{/* Story Header - Fixed at top */}
-				<div className='absolute top-0 left-0 right-0 z-20 p-4'>
-					<div className='flex items-center justify-between'>
+				{/* Story Header - Relative positioning */}
+<div className={`relative z-50 bg-gradient-to-b from-black/95 via-black/70 to-transparent ${
+					isFullscreenMode ? 'p-3 md:p-4' : 'px-3 md:px-8 py-3 md:py-4'
+				}`}>
+					{/* Mobile Layout */}
+					<div className='md:hidden'>
+						{/* Title - Full Width */}
+						<div className='mb-3'>
+							<h1 className='text-xl font-bold text-white'>
+								{mockStory.title}
+							</h1>
+						</div>
+						
+						{/* Action Buttons Row */}
+						<div className='flex items-center justify-between mb-2'>
+							<Button
+								variant='ghost'
+								size='icon'
+								onClick={() => setShowMobileInfo(!showMobileInfo)}
+								className='text-white hover:bg-white/30 h-10 w-10'
+								title='Story Information'
+							>
+								<Info className='h-5 w-5' />
+							</Button>
+							
+							<div className='flex items-center space-x-3'>
+								{/* Fullscreen Mode Toggle */}
+								<Button
+									variant='ghost'
+									size='icon'
+									onClick={() => {
+										const newFullscreenState = !isFullscreenMode;
+										setIsFullscreenMode(newFullscreenState);
+										
+										// Update URL parameters
+										const currentParams = new URLSearchParams(searchParams.toString());
+										if (newFullscreenState) {
+											currentParams.set("fullscreen", "true");
+										} else {
+											currentParams.delete("fullscreen");
+										}
+										
+										const newUrl = currentParams.toString() 
+											? `${window.location.pathname}?${currentParams.toString()}`
+											: window.location.pathname;
+										
+										router.replace(newUrl);
+									}}
+									className='text-white hover:bg-white/30 h-10 w-10'
+									title={isFullscreenMode ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+								>
+									{isFullscreenMode ? (
+										<Minimize className='h-5 w-5' />
+									) : (
+										<Maximize className='h-5 w-5' />
+									)}
+								</Button>
+								<PrintButton
+									story={{
+										id: mockStory.id,
+										title: mockStory.title,
+										content: mockStory.content.map((segment: any) => segment.text).join('\n\n'),
+										questions: mockStory.questions || []
+									}}
+									variant='ghost'
+									className='text-white hover:bg-white/30 border-white/30 h-10 w-10'
+								/>
+								{mockStory?.id && (
+									<DeleteStoryButton
+										storyId={mockStory.id}
+										storyTitle={mockStory.title}
+										hasImages={mockStory.content?.some((segment: any) => segment.image)}
+										variant='ghost'
+										size='sm'
+										showText={false}
+										redirectAfterDelete='/dashboard'
+										className='text-white hover:bg-white/30 h-10 w-10'
+									/>
+								)}
+							</div>
+						</div>
+						
+						{/* Mobile Info Panel - Toggleable */}
+						{showMobileInfo && (
+							<div className='bg-black/60 backdrop-blur-sm rounded-lg p-3 mb-2 border border-white/20'>
+								<div className='flex flex-wrap gap-2'>
+									<span className='px-2 py-1 bg-white/20 rounded-full text-xs text-white/80'>
+										{mockStory.genre}
+									</span>
+									<span className='capitalize px-2 py-1 bg-white/20 rounded-full text-xs text-white/80'>
+										{mockStory.readingLevel}
+									</span>
+									<div className='flex items-center space-x-1 px-2 py-1 bg-white/20 rounded-full'>
+										<Clock className='h-3 w-3' />
+										<span className='text-xs text-white/80'>
+											{mockStory.estimatedTime} min
+										</span>
+									</div>
+								</div>
+							</div>
+						)}
+					</div>
+
+					{/* Desktop Layout - Keep Original */}
+					<div className='hidden md:flex items-center justify-between'>
 						<div className='text-white'>
 							<h1 className='text-2xl font-bold mb-1'>
 								{mockStory.title}
@@ -785,45 +976,65 @@ export default function ReadStoryPage() {
 								<span className='capitalize'>
 									{mockStory.readingLevel}
 								</span>
-								<span className='flex items-center space-x-1'>
+								<div className='flex items-center space-x-1'>
 									<Clock className='h-3 w-3' />
 									<span>
 										{mockStory.estimatedTime} min
 									</span>
-								</span>
+								</div>
 							</div>
 						</div>
 
 						<div className='flex items-center space-x-2'>
-							{/* Fullscreen Mode Toggle */}
+							{/* Fullscreen Mode Toggle - Larger for mobile */}
 							<Button
 								variant='ghost'
 								size='icon'
 								onClick={() => {
-									const newFullscreenState = !isFullscreenMode;
-									setIsFullscreenMode(newFullscreenState);
-									
+									const newFullscreenState =
+										!isFullscreenMode;
+									setIsFullscreenMode(
+										newFullscreenState
+									);
+
 									// Update URL parameters
-									const currentParams = new URLSearchParams(searchParams.toString());
+									const currentParams =
+										new URLSearchParams(
+											searchParams.toString()
+										);
 									if (newFullscreenState) {
-										currentParams.set('fullscreen', 'true');
+										currentParams.set(
+											"fullscreen",
+											"true"
+										);
 									} else {
-										currentParams.delete('fullscreen');
+										currentParams.delete(
+											"fullscreen"
+										);
 									}
-									
-									const newUrl = currentParams.toString() 
-										? `${window.location.pathname}?${currentParams.toString()}`
-										: window.location.pathname;
-									
+
+									const newUrl =
+										currentParams.toString()
+											? `${
+													window.location
+														.pathname
+											  }?${currentParams.toString()}`
+											: window.location
+													.pathname;
+
 									router.replace(newUrl);
 								}}
-								className='text-white hover:bg-white/20'
-								title={isFullscreenMode ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+								className='text-white hover:bg-white/30 h-14 w-14 md:h-12 md:w-12'
+								title={
+									isFullscreenMode
+										? "Exit Fullscreen"
+										: "Enter Fullscreen"
+								}
 							>
 								{isFullscreenMode ? (
-									<Minimize className='h-4 w-4' />
+									<Minimize className='h-8 w-8 md:h-6 md:w-6' />
 								) : (
-									<Maximize className='h-4 w-4' />
+									<Maximize className='h-8 w-8 md:h-6 md:w-6' />
 								)}
 							</Button>
 							<PrintButton
@@ -832,7 +1043,7 @@ export default function ReadStoryPage() {
 									title: mockStory.title,
 									content: mockStory.content
 										.map(
-											(segment) => segment.text
+											(segment: any) => segment.text
 										)
 										.join("\n\n"),
 									grade_level: 3,
@@ -842,32 +1053,9 @@ export default function ReadStoryPage() {
 								variant='ghost'
 								size='sm'
 								showText={false}
-								className='text-white hover:bg-white/20 border-white/30'
+								className='text-white hover:bg-white/30 border-white/30 h-14 w-14 md:h-12 md:w-12'
 							/>
-							<Button
-								variant='ghost'
-								size='icon'
-								onClick={() => setIsMuted(!isMuted)}
-								className='text-white hover:bg-white/20'
-							>
-								{isMuted ? (
-									<VolumeX className='h-4 w-4' />
-								) : (
-									<Volume2 className='h-4 w-4' />
-								)}
-							</Button>
-							<Button
-								variant='ghost'
-								size='icon'
-								onClick={() => setIsPlaying(!isPlaying)}
-								className='text-white hover:bg-white/20'
-							>
-								{isPlaying ? (
-									<Pause className='h-4 w-4' />
-								) : (
-									<Play className='h-4 w-4' />
-								)}
-							</Button>
+							{/* Audio controls removed - no audio functionality currently */}
 							{mockStory?.id && (
 								<DeleteStoryButton
 									storyId={mockStory.id}
@@ -880,50 +1068,64 @@ export default function ReadStoryPage() {
 									size='sm'
 									showText={false}
 									redirectAfterDelete='/dashboard'
-									className='text-white hover:bg-white/20'
+									className='text-white hover:bg-white/30 h-14 w-14 md:h-12 md:w-12'
 								/>
 							)}
 						</div>
 					</div>
 				</div>
 
-				{/* Progress Bar - Fixed below header */}
-				<div className={`${
-					isFullscreenMode ? 'absolute top-24' : 'absolute top-20'
-				} left-0 right-0 z-20 px-4`}>
+				{/* Progress Bar - Relative positioning */}
+				<div className={`relative z-40 ${
+					isFullscreenMode ? 'px-3 md:px-4' : 'px-3 md:px-8'
+				}`}>
 					<div className='space-y-2'>
 						<div className='flex justify-between text-sm text-white/80'>
 							<span>Reading Progress</span>
 							<span>{Math.round(progress)}%</span>
 						</div>
-						<div className={`w-full rounded-full h-2 ${
-							isFullscreenMode ? 'bg-white/20' : 'bg-slate-300 dark:bg-slate-600'
-						}`}>
+						<div
+							className={`w-full rounded-full h-2 ${
+								isFullscreenMode
+									? "bg-white/20"
+									: "bg-slate-300 dark:bg-slate-600"
+							}`}
+						>
 							<div
 								className={`h-2 rounded-full transition-all duration-500 relative shadow-lg ${
-									isFullscreenMode ? 'bg-white' : 'bg-blue-500 dark:bg-blue-400'
+									isFullscreenMode
+										? "bg-white"
+										: "bg-blue-500 dark:bg-blue-400"
 								}`}
 								style={{ width: `${progress}%` }}
 							>
-								<div className={`absolute right-0 top-0 w-4 h-2 rounded-full shadow-xl ${
-									isFullscreenMode ? 'bg-white' : 'bg-blue-500 dark:bg-blue-400'
-								}`}></div>
+								<div
+									className={`absolute right-0 top-0 w-4 h-2 rounded-full shadow-xl ${
+										isFullscreenMode
+											? "bg-white"
+											: "bg-blue-500 dark:bg-blue-400"
+									}`}
+								></div>
 							</div>
 						</div>
 					</div>
 				</div>
 
-				{/* Reading Content - Centered in viewport */}
-				<div className={`absolute inset-0 z-10 flex items-center justify-center p-6 ${
-					isFullscreenMode ? 'pt-40 pb-32' : 'pt-32 pb-24'
+				{/* Reading Content - Positioned after progress bar */}
+				<div className={`relative z-30 pt-4 pb-24 md:pb-28 flex-1 overflow-y-auto ${
+					isFullscreenMode ? 'px-3 md:px-4' : 'px-3 md:px-8'
 				}`}>
-					<div className='w-full max-w-4xl'>
-						<div className='netflix-text-container bg-black/85 backdrop-blur-md rounded-2xl p-8 md:p-12 border border-white/20 shadow-2xl'>
+					<div className='w-full'>
+						<div className='netflix-text-container bg-black/75 backdrop-blur-md rounded-2xl p-8 md:p-12 border border-white/10 shadow-2xl'>
 							<div
 								className={`reading-text ${
-									isFullscreenMode ? 'text-white' : 'text-slate-900 dark:text-slate-100'
+									isFullscreenMode
+										? "text-white"
+										: "text-slate-900 dark:text-slate-100"
 								} ${
-									currentContent?.isTitle ? "text-center" : ""
+									currentContent?.isTitle
+										? "text-center"
+										: ""
 								}`}
 							>
 								{currentContent?.text ? (
@@ -943,7 +1145,7 @@ export default function ReadStoryPage() {
 											components={{
 												h1: (props) => (
 													<h1
-														className='text-4xl md:text-5xl font-bold mb-6 text-white'
+														className='text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 md:mb-6 text-white leading-tight'
 														{...props}
 													/>
 												),
@@ -961,7 +1163,7 @@ export default function ReadStoryPage() {
 												),
 												p: (props) => (
 													<p
-														className='text-lg md:text-xl leading-relaxed mb-6 text-white/95'
+														className='text-base md:text-lg lg:text-xl leading-relaxed mb-4 md:mb-6 text-white/95'
 														{...props}
 													/>
 												),
@@ -1019,23 +1221,36 @@ export default function ReadStoryPage() {
 					</div>
 				</div>
 
-				{/* Navigation Controls - Fixed at bottom */}
-				<div className='absolute bottom-0 left-0 right-0 z-20 p-4'>
+				{/* Navigation Controls - Always fixed at bottom */}
+				<div className={`fixed left-0 right-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent pb-safe ${
+					showReadingTip ? 'z-[110]' : 'z-50'
+				}`}>
+					<div className={`pt-8 pb-4 md:pb-6 ${
+						isFullscreenMode ? 'px-3 md:px-4' : 'px-3 md:px-8'
+					}`}>
 					<div className='flex items-center justify-between'>
 						<Button
 							variant='outline'
 							onClick={handlePrevious}
 							disabled={currentSegment === 0}
-							className='bg-white/20 backdrop-blur-sm text-white border-white/30 hover:bg-white/30'
+							className={`bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 h-14 md:h-12 px-4 md:px-4 transition-all duration-300 ${
+								showReadingTip ? 'border-purple-400 border-2 shadow-lg shadow-purple-400/50' : 'border-white/30'
+							}`}
+							id="prev-button"
 						>
-							<ArrowLeft className='h-4 w-4 mr-2' />
-							Previous
+							<ArrowLeft className='h-6 w-6 mr-2' />
+							<span className='hidden sm:inline'>
+								Previous
+							</span>
+							<span className='sm:hidden'>Prev</span>
 						</Button>
 
 						<div className='flex items-center space-x-6'>
-							<span className='text-sm text-white/80 bg-black/40 px-3 py-2 rounded-full backdrop-blur-sm'>
-								{displayPage} of {totalSegments}
-							</span>
+							{!showReadingTip && (
+								<span className='text-sm text-white/80 bg-black/40 px-3 py-2 rounded-full backdrop-blur-sm'>
+									{displayPage} of {totalSegments}
+								</span>
+							)}
 
 							{isPlaying && (
 								<div className='flex items-center space-x-2 text-sm text-white/80 bg-black/40 px-3 py-2 rounded-full backdrop-blur-sm'>
@@ -1045,41 +1260,83 @@ export default function ReadStoryPage() {
 							)}
 						</div>
 
-						<Button 
+						<Button
 							onClick={handleNext}
-							className='bg-white text-black hover:bg-white/90 font-semibold'
+							className={`bg-white text-black hover:bg-white/90 font-semibold h-14 md:h-12 px-4 md:px-4 transition-all duration-300 ${
+								showReadingTip ? 'border-purple-400 border-2 shadow-lg shadow-purple-400/50' : ''
+							}`}
+							id="next-button"
 						>
 							{currentSegment === totalSegments - 1 ? (
 								<>
-									Questions
-									<Target className='h-4 w-4 ml-2' />
+									<span className='hidden sm:inline'>
+										Questions
+									</span>
+									<span className='sm:hidden'>
+										Quiz
+									</span>
+									<Target className='h-6 w-6 ml-2' />
 								</>
 							) : (
 								<>
-									Next
-									<ArrowRight className='h-4 w-4 ml-2' />
+									<span>Next</span>
+									<ArrowRight className='h-6 w-6 ml-2' />
 								</>
 							)}
 						</Button>
 					</div>
+					</div>
 				</div>
 
-				{/* Reading Tips - Only show on first segment */}
-				{currentSegment === 0 && (
-					<div className={`${
-						isFullscreenMode ? 'absolute bottom-24' : 'absolute bottom-20'
-					} left-6 right-6 z-20`}>
-						<div className='bg-black/60 backdrop-blur-sm border border-white/20 rounded-xl p-4 max-w-md mx-auto'>
-							<div className='flex items-center space-x-3 text-white'>
-								<Lightbulb className='h-5 w-5 text-yellow-400 flex-shrink-0' />
-								<div className='text-sm'>
-									<p className='font-medium text-yellow-400 mb-1'>
-										Reading Tip:
+				{/* Reading Tip Modal */}
+				{showReadingTip && (
+					<div className='fixed inset-0 z-[100] flex items-center justify-center p-4'>
+						{/* Backdrop */}
+						<div 
+							className='absolute inset-0 bg-black/50 backdrop-blur-sm'
+							onClick={handleCloseTip}
+						/>
+						
+						{/* Modal Content */}
+						<div className='relative bg-black/90 backdrop-blur-md border border-yellow-400/50 rounded-xl p-6 max-w-md mx-auto shadow-2xl shadow-yellow-400/20'>
+							{/* Close Button */}
+							<button
+								onClick={handleCloseTip}
+								className='absolute top-3 right-3 text-white/70 hover:text-white transition-colors'
+							>
+								<X className='h-5 w-5' />
+							</button>
+							
+							{/* Content */}
+							<div className='flex items-start space-x-3 text-white mb-4'>
+								<Lightbulb className='h-6 w-6 text-yellow-400 flex-shrink-0 mt-1' />
+								<div>
+									<h3 className='font-bold text-yellow-400 mb-2 text-lg'>
+										Welcome to Your Story!
+									</h3>
+									<p className='text-white/90 mb-3 leading-relaxed'>
+										Use the highlighted <span className='text-purple-400 font-semibold'>Previous</span> and <span className='text-purple-400 font-semibold'>Next</span> buttons to navigate through your story at your own pace.
 									</p>
-									<p className='text-white/80'>
-										Use controls to navigate at your own pace. Each section has its own beautiful background!
+									<p className='text-white/80 text-sm'>
+										Each section has its own beautiful background to enhance your reading experience!
 									</p>
 								</div>
+							</div>
+							
+							{/* Action Buttons */}
+							<div className='flex flex-col space-y-2'>
+								<Button
+									onClick={handleCloseTip}
+									className='bg-yellow-400 text-black hover:bg-yellow-300 font-semibold'
+								>
+									Got it!
+								</Button>
+								<button
+									onClick={handleDontShowAgain}
+									className='text-white/60 hover:text-white/80 text-sm transition-colors'
+								>
+									Don&apos;t show this again
+								</button>
 							</div>
 						</div>
 					</div>
