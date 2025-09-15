@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,21 +20,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
-interface ChildProfile {
-	id: string;
-	name: string;
-	yearLevel: number;
-	age: number;
-	gender: 'boy' | 'girl' | 'other';
-	preferences: {
-		favoriteGenres: string[];
-		contentFilters: string[];
-		allowedTopics: string[];
-		blockedTopics: string[];
-	};
-	createdAt: Date;
-}
+import { useChildProfiles } from "@/hooks/use-child-profiles";
+import { ChildProfile } from "@/types/child-profile";
+import { useAuth } from "@/contexts/auth-context";
 
 // Available topics organized by category
 const ALL_TOPICS = {
@@ -184,6 +172,14 @@ const getTopicSuggestions = (age: number, gender: 'boy' | 'girl' | 'other') => {
 
 export default function ParentSetupPage() {
 	const router = useRouter();
+	const { user, loading: authLoading } = useAuth();
+	const {
+		fetchChildProfiles,
+		createChildProfile,
+		updateChildProfile,
+		deleteChildProfile
+	} = useChildProfiles();
+
 	const [children, setChildren] = useState<ChildProfile[]>([]);
 	const [isAddingChild, setIsAddingChild] = useState(false);
 	const [newChildName, setNewChildName] = useState("");
@@ -192,6 +188,25 @@ export default function ParentSetupPage() {
 	const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
 	const [editingChild, setEditingChild] = useState<string | null>(null);
 	const [currentStep, setCurrentStep] = useState<'basic' | 'topics'>('basic');
+
+	// Load child profiles only after authentication is complete
+	useEffect(() => {
+		const loadChildren = async () => {
+			// Don't make API calls if user is not authenticated or still loading
+			if (authLoading || !user) {
+				return;
+			}
+
+			try {
+				const profiles = await fetchChildProfiles();
+				setChildren(profiles);
+			} catch (error) {
+				console.error('Failed to load child profiles:', error);
+			}
+		};
+
+		loadChildren();
+	}, [fetchChildProfiles, user, authLoading]);
 
 	const handleProceedToTopics = () => {
 		if (!newChildName.trim()) return;
@@ -202,31 +217,36 @@ export default function ParentSetupPage() {
 		setCurrentStep('topics');
 	};
 
-	const handleAddChild = () => {
-		const newChild: ChildProfile = {
-			id: Date.now().toString(),
-			name: newChildName.trim(),
-			yearLevel: newChildYear,
-			age: newChildYear + 4,
-			gender: newChildGender,
-			preferences: {
-				favoriteGenres: [],
-				contentFilters: ["age-appropriate"],
-				allowedTopics: selectedTopics,
-				blockedTopics: []
-			},
-			createdAt: new Date()
-		};
+	const handleAddChild = async () => {
+		try {
 
-		setChildren(prev => [...prev, newChild]);
+			const profileData = {
+				name: newChildName.trim(),
+				year_level: newChildYear,
+				age: newChildYear + 4,
+				gender: newChildGender,
+				preferences: {
+					favoriteGenres: [],
+					contentFilters: ["age-appropriate"],
+					allowedTopics: selectedTopics,
+					blockedTopics: []
+				}
+			};
 
-		// Reset form
-		setNewChildName("");
-		setNewChildYear(3);
-		setNewChildGender('other');
-		setSelectedTopics([]);
-		setCurrentStep('basic');
-		setIsAddingChild(false);
+			const newProfile = await createChildProfile(profileData);
+			setChildren(prev => [...prev, newProfile]);
+
+			// Reset form
+			setNewChildName("");
+			setNewChildYear(3);
+			setNewChildGender('other');
+			setSelectedTopics([]);
+			setCurrentStep('basic');
+			setIsAddingChild(false);
+		} catch (error) {
+			console.error('Failed to create child profile:', error);
+			// You might want to show an error message to the user here
+		}
 	};
 
 	const handleTopicToggle = (topic: string) => {
@@ -267,19 +287,32 @@ export default function ParentSetupPage() {
 		setSelectedTopics(prev => prev.filter(topic => !categoryTopics.includes(topic)));
 	};
 
-	const handleDeleteChild = (childId: string) => {
+	const handleDeleteChild = async (childId: string) => {
 		if (confirm("Are you sure you want to remove this child's profile?")) {
-			setChildren(prev => prev.filter(child => child.id !== childId));
+			try {
+				await deleteChildProfile(childId);
+				setChildren(prev => prev.filter(child => child.id !== childId));
+			} catch (error) {
+				console.error('Failed to delete child profile:', error);
+				// You might want to show an error message to the user here
+			}
 		}
 	};
 
-	const handleUpdateChildYear = (childId: string, newYear: number) => {
-		setChildren(prev => prev.map(child =>
-			child.id === childId
-				? { ...child, yearLevel: newYear, age: newYear + 4 }
-				: child
-		));
-		setEditingChild(null);
+	const handleUpdateChildYear = async (childId: string, newYear: number) => {
+		try {
+			const updatedProfile = await updateChildProfile(childId, {
+				year_level: newYear,
+				age: newYear + 4
+			});
+			setChildren(prev => prev.map(child =>
+				child.id === childId ? updatedProfile : child
+			));
+			setEditingChild(null);
+		} catch (error) {
+			console.error('Failed to update child profile:', error);
+			// You might want to show an error message to the user here
+		}
 	};
 
 	const handleNavigateToEditTopics = (childId: string) => {
@@ -682,7 +715,7 @@ export default function ParentSetupPage() {
 												<div className="space-y-1">
 													<CardTitle className="text-lg">{child.name}</CardTitle>
 													<CardDescription>
-														Year {child.yearLevel} • Age {child.age}
+														Year {child.year_level} • Age {child.age}
 													</CardDescription>
 												</div>
 												<div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -726,7 +759,7 @@ export default function ParentSetupPage() {
 																	key={year}
 																	onClick={() => handleUpdateChildYear(child.id, year)}
 																	className={`p-2 rounded text-xs border transition-all ${
-																		year === child.yearLevel
+																		year === child.year_level
 																			? "border-primary bg-primary text-white"
 																			: "border-gray-200 hover:border-primary"
 																	}`}
@@ -753,7 +786,7 @@ export default function ParentSetupPage() {
 													<div className="bg-gray-50 p-3 rounded-lg">
 														<div className="text-xs text-gray-600 mb-1">Reading Level</div>
 														<div className="font-medium capitalize">
-															{getGradeLevelConfig(child.yearLevel).readingLevel}
+															{getGradeLevelConfig(child.year_level).readingLevel}
 														</div>
 													</div>
 													<div className="bg-blue-50 p-3 rounded-lg">
@@ -769,7 +802,7 @@ export default function ParentSetupPage() {
 													<div className="text-xs text-gray-600">
 														<div className="flex items-center space-x-2 mb-1">
 															<BookOpen className="h-3 w-3" />
-															<span>Stories: ~{getGradeLevelConfig(child.yearLevel).wordCount.recommended} words</span>
+															<span>Stories: ~{getGradeLevelConfig(child.year_level).wordCount.recommended} words</span>
 														</div>
 														<div className="flex items-center space-x-2">
 															<Shield className="h-3 w-3" />

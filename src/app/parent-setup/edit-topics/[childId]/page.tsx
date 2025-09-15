@@ -6,22 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProtectedRoute } from "@/components/auth/protected-route";
 import { ArrowLeft, AlertCircle, CheckCircle, Settings } from "lucide-react";
-
-// This would typically come from a context or prop, but for now we'll use the same structure
-interface ChildProfile {
-	id: string;
-	name: string;
-	yearLevel: number;
-	age: number;
-	gender: 'boy' | 'girl' | 'other';
-	preferences: {
-		favoriteGenres: string[];
-		contentFilters: string[];
-		allowedTopics: string[];
-		blockedTopics: string[];
-	};
-	createdAt: Date;
-}
+import { useChildProfiles } from "@/hooks/use-child-profiles";
+import { ChildProfile } from "@/types/child-profile";
+import { useAuth } from "@/contexts/auth-context";
 
 // Same topics structure as parent-setup page
 const ALL_TOPICS = {
@@ -171,34 +158,39 @@ export default function EditTopicsPage() {
 	const params = useParams();
 	const router = useRouter();
 	const childId = params.childId as string;
+	const { user, loading: authLoading } = useAuth();
+
+	const {
+		getChildProfile,
+		updateChildProfile
+	} = useChildProfiles();
 
 	const [child, setChild] = useState<ChildProfile | null>(null);
 	const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 
-	// In a real app, you'd fetch this from context or API
+	// Load child profile from database only after authentication is complete
 	useEffect(() => {
-		// Simulate loading child data - in real app this would come from context/API
-		// For now, create a mock child for demonstration
-		const mockChild: ChildProfile = {
-			id: childId,
-			name: "Demo Child",
-			yearLevel: 3,
-			age: 7,
-			gender: 'other',
-			preferences: {
-				favoriteGenres: [],
-				contentFilters: ["age-appropriate"],
-				allowedTopics: ['🐱 Cats & Kittens', '🏫 School Adventures', '🎨 Art & Drawing'],
-				blockedTopics: []
-			},
-			createdAt: new Date()
+		const loadChild = async () => {
+			// Don't make API calls if user is not authenticated or still loading
+			if (authLoading || !user) {
+				return;
+			}
+
+			try {
+				setIsLoading(true);
+				const profile = await getChildProfile(childId);
+				setChild(profile);
+				setSelectedTopics([...profile.preferences.allowedTopics]);
+			} catch (error) {
+				console.error('Failed to load child profile:', error);
+			} finally {
+				setIsLoading(false);
+			}
 		};
 
-		setChild(mockChild);
-		setSelectedTopics([...mockChild.preferences.allowedTopics]);
-		setIsLoading(false);
-	}, [childId]);
+		loadChild();
+	}, [childId, getChildProfile, user, authLoading]);
 
 	const handleTopicToggle = (topic: string) => {
 		setSelectedTopics(prev =>
@@ -240,17 +232,32 @@ export default function EditTopicsPage() {
 		setSelectedTopics(prev => prev.filter(topic => !categoryTopics.includes(topic)));
 	};
 
-	const handleSave = () => {
-		// In a real app, you'd save to context/API
-		console.log('Saving topics:', selectedTopics);
-		// Navigate back to parent setup
-		router.push('/parent-setup');
+	const handleSave = async () => {
+		if (!child) return;
+
+		try {
+			setIsLoading(true);
+			await updateChildProfile(child.id, {
+				preferences: {
+					...child.preferences,
+					allowedTopics: selectedTopics
+				}
+			});
+			// Navigate back to parent setup
+			router.push('/parent-setup');
+		} catch (error) {
+			console.error('Failed to save topics:', error);
+			// You might want to show an error message to the user here
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	const handleCancel = () => {
 		router.push('/parent-setup');
 	};
 
+	// Show loading spinner while loading child data
 	if (isLoading) {
 		return (
 			<ProtectedRoute>
@@ -299,7 +306,7 @@ export default function EditTopicsPage() {
 								<span>Edit Topics for {child.name}</span>
 							</h1>
 							<p className="text-gray-600 mt-1">
-								Year {child.yearLevel} • Age {child.age} • {child.gender === 'other' ? 'Child' : child.gender === 'boy' ? 'Boy' : 'Girl'}
+								Year {child.year_level} • Age {child.age} • {child.gender === 'other' ? 'Child' : child.gender === 'boy' ? 'Boy' : 'Girl'}
 							</p>
 						</div>
 					</div>

@@ -21,14 +21,8 @@ export function ProtectedRoute({
 		setMounted(true);
 	}, []);
 
-	// Allow bypassing auth locally for visual QA or when explicitly enabled
-	const isLocalhost =
-		typeof window !== "undefined" &&
-		(window.location.hostname === "localhost" ||
-			window.location.hostname === "127.0.0.1");
-	const bypassAuth =
-		process.env.NEXT_PUBLIC_BYPASS_AUTH === "true" ||
-		(process.env.NODE_ENV !== "production" && isLocalhost);
+	// Only allow bypassing auth when explicitly enabled via environment variable
+	const bypassAuth = process.env.NEXT_PUBLIC_BYPASS_AUTH === "true";
 
 	useEffect(() => {
 		if (mounted && !bypassAuth && !loading && !user) {
