@@ -46,7 +46,16 @@ export default function Home() {
 	const [loading, setLoading] = useState(true);
 	const [currentSlide, setCurrentSlide] = useState(0);
 
+	// Redirect non-authenticated users to welcome page
 	useEffect(() => {
+		if (!user) {
+			window.location.href = '/welcome';
+		}
+	}, [user]);
+
+	useEffect(() => {
+		if (!user) return; // Don't load stories if not authenticated
+
 		const loadStories = async () => {
 			try {
 				setLoading(true);
@@ -84,7 +93,7 @@ export default function Home() {
 		};
 
 		loadStories();
-	}, []);
+	}, [user]);
 
 	// Auto-advance carousel
 	useEffect(() => {
@@ -106,7 +115,7 @@ export default function Home() {
 		size?: "normal" | "large";
 	}) => (
 		<div
-			className={`group relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-white/98 to-teal-50/30 backdrop-blur-xl border-2 border-teal-100/50 shadow-[0_8px_30px_rgba(40,184,184,0.08)] hover:shadow-[0_20px_60px_rgba(40,184,184,0.12)] hover:border-teal-200/70 transition-all duration-500 hover:scale-[1.03] hover:-translate-y-3 ${
+			className={`group relative overflow-hidden rounded-3xl bg-white/80 backdrop-blur-xl border-2 border-gray-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.15)] hover:border-gray-300/70 transition-all duration-500 hover:scale-[1.03] hover:-translate-y-3 ${
 				size === "large" ? "min-h-[320px]" : "min-h-[280px]"
 			}`}
 		>
@@ -274,16 +283,16 @@ export default function Home() {
 
 				{/* Text Content - Bottom positioned */}
 				<div className='absolute inset-0 flex items-center justify-center pt-16 z-10'>
-					<div className='container mx-auto px-4 pb-20 max-w-7xl'>
+					<div className='px-4 pb-20'>
 						<div
-							className='text-center transform transition-all duration-1000 ease-out'
+							className='text-center transform transition-all duration-1000 ease-out bg-white/70 backdrop-blur-md border-2 border-gray-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.1)] rounded-3xl px-6 py-8 md:px-8 md:py-10 max-w-2xl mx-auto'
 							style={{
 								animation:
 									"heroContentSlide 1.2s ease-out",
 							}}
 						>
 							{/* Brand-Aligned Badge */}
-							<div className='inline-flex items-center space-x-3 px-8 py-4 rounded-3xl bg-white/90 backdrop-blur-xl border border-blue-100 shadow-lg shadow-blue-500/10 mb-8 hover:scale-105 transition-all duration-300 hover:shadow-blue-500/20'>
+							<div className='inline-flex items-center space-x-3 px-8 py-4 rounded-3xl bg-white/80 backdrop-blur-xl border-2 border-gray-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.1)] mb-8 hover:scale-105 transition-all duration-300 hover:shadow-[0_20px_60px_rgba(0,0,0,0.15)]'>
 								<div className='w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-600 rounded-full animate-pulse' />
 								<Sparkles className='h-5 w-5 text-blue-600' />
 								<span className='text-sm font-bold bg-gradient-to-r from-blue-600 to-purple-700 bg-clip-text text-transparent'>
@@ -315,7 +324,7 @@ export default function Home() {
 							<div className='flex flex-col sm:flex-row gap-6 justify-center items-center'>
 								<Link
 									href={
-										user ? "/dashboard" : "/login"
+										user ? "/dashboard" : "/welcome"
 									}
 								>
 									<button className='group relative px-10 py-5 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold text-lg rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 overflow-hidden border-2 border-blue-400/30'>
@@ -324,13 +333,13 @@ export default function Home() {
 											<Play className='h-6 w-6 group-hover:scale-110 transition-transform duration-200' />
 											{user
 												? "Continue Reading"
-												: "Start Reading"}
+												: "Get Started"}
 										</div>
 									</button>
 								</Link>
 
 								<Link href='/stories'>
-									<button className='group px-10 py-5 bg-white/95 backdrop-blur-xl border-2 border-blue-200/50 text-blue-700 font-bold text-lg rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 hover:bg-blue-50/50 hover:border-blue-300/70'>
+									<button className='group px-10 py-5 bg-white/80 backdrop-blur-xl border-2 border-gray-200/60 text-blue-700 font-bold text-lg rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.15)] transition-all duration-300 hover:scale-105 hover:-translate-y-1 hover:bg-white/90 hover:border-gray-300/70'>
 										<div className='flex items-center gap-3'>
 											<BookOpen className='h-6 w-6 group-hover:scale-110 transition-transform duration-200 text-blue-600' />
 											Browse Library
@@ -723,11 +732,11 @@ export default function Home() {
 							className='text-lg px-8 py-4 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg hover:shadow-xl transition-all duration-300'
 							asChild
 						>
-							<Link href={user ? "/dashboard" : "/login"}>
+							<Link href={user ? "/dashboard" : "/welcome"}>
 								<Zap className='h-5 w-5 mr-2' />
 								{user
 									? "Go to Dashboard"
-									: "Start Reading Now"}
+									: "Get Started Now"}
 							</Link>
 						</Button>
 						<Button

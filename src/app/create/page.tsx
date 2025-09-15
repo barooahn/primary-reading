@@ -1312,76 +1312,33 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 				{/* Step 1: Theme Selection */}
 				{currentStep === "theme" && (
 					<div className='space-y-6'>
-						{/* Year Level Selector */}
-						<Card>
+						{/* Reading Level Display - No longer editable */}
+						<Card className="bg-blue-50 border-blue-200">
 							<CardHeader>
 								<CardTitle className='flex items-center space-x-2'>
-									<BookOpen className='h-5 w-5 text-primary' />
-									<span>What year are you in?</span>
+									<BookOpen className='h-5 w-5 text-blue-600' />
+									<span>Your Reading Level</span>
 								</CardTitle>
 								<CardDescription>
-									This helps us create a story
-									that&apos;s perfect for your
-									reading level!
+									Your parent/teacher has set up the perfect reading level for you!
 								</CardDescription>
 							</CardHeader>
 							<CardContent>
-								{/* Mobile-first year level grid */}
-								<div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4'>
-									{[1, 2, 3, 4, 5, 6].map((year) => {
-										const config =
-											getGradeLevelConfig(
-												year
-											);
-										return (
-											<button
-												key={year}
-												data-testid={`year-${year}-selector`}
-												onClick={() =>
-													setSettings({
-														...settings,
-														yearLevel:
-															year,
-													})
-												}
-												className={`
-													min-h-[3.5rem] sm:min-h-[4rem] p-3 sm:p-4 
-													rounded-lg sm:rounded-xl border-2 text-center 
-													transition-all duration-200 
-													hover:scale-105 active:scale-95
-													touch-manipulation
-													${
-														settings.yearLevel === year
-															? "border-primary bg-primary/10 shadow-md"
-															: "border-border hover:border-primary/50 hover:bg-primary/5"
-													}
-												`}
-											>
-												<div className='text-2xl font-bold text-primary mb-1'>
-													Year {year}
-												</div>
-												<div className='text-xs text-muted'>
-													Age{" "}
-													{`${
-														year + 4
-													}+`}{" "}
-													•{" "}
-													{
-														config.readingLevel
-													}
-												</div>
-												<div className='text-xs text-muted mt-1'>
-													~
-													{
-														config
-															.wordCount
-															.recommended
-													}{" "}
-													words
-												</div>
-											</button>
-										);
-									})}
+								<div className='bg-white p-4 rounded-lg border border-blue-200'>
+									<div className='text-center space-y-2'>
+										<div className='text-3xl font-bold text-blue-600'>
+											Year {settings.yearLevel}
+										</div>
+										<div className='text-sm text-gray-600'>
+											Age {settings.yearLevel + 4}+ • {getGradeLevelConfig(settings.yearLevel).readingLevel} Level
+										</div>
+										<div className='text-sm text-blue-700'>
+											Stories perfect for you: ~{getGradeLevelConfig(settings.yearLevel).wordCount.recommended} words
+										</div>
+									</div>
+								</div>
+								<div className='mt-3 text-xs text-blue-700 text-center'>
+									🔒 This setting is managed by your parent/teacher for your safety
 								</div>
 							</CardContent>
 						</Card>
