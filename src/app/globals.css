@@ -12,36 +12,42 @@ body:has(.netflix-reading-container.fullscreen-mode) header[class*="sticky top-0
 }
 
 :root {
-	/* PrimaryReading Brand Colors */
-	--education-blue: #4a90e2;
-	--sunshine-yellow: #f5d547;
-	--forest-green: #7ed321;
-	--soft-purple: #bd10e0;
-	--coral-orange: #ff6b6b;
-	--sky-blue: #87ceeb;
+	/* PrimaryReading Brand Colors - Design System Aligned */
+	--education-blue: #3b82f6;
+	--education-purple: #8b5cf6;
+	--education-pink: #ec4899;
+	--education-indigo: #6366f1;
+	--warm-orange: #ff8c42;
+	--soft-yellow: #ffd93d;
+	--sage-green: #6ee7b7;
+	--coral-pink: #ff7b9d;
 
-	/* Neutral Colors */
-	--background: #f8f9fa;
-	--foreground: #2c3e50;
-	--muted: #6c757d;
-	--border: #e9ecef;
+	/* Enhanced Neutrals */
+	--background: #fafbfc;
+	--foreground: #1f2937;
+	--muted: #6b7280;
+	--border: #e5e7eb;
 	--card: #ffffff;
+	--card-hover: #f9fafb;
 
-	/* Semantic Colors */
+	/* Semantic Colors - Brand Aligned */
 	--primary: var(--education-blue);
-	--secondary: var(--sunshine-yellow);
-	--success: var(--forest-green);
-	--warning: #ff9500;
-	--error: var(--coral-orange);
+	--primary-hover: var(--education-purple);
+	--secondary: var(--education-pink);
+	--success: var(--sage-green);
+	--warning: var(--soft-yellow);
+	--error: var(--coral-pink);
 
-	/* Typography */
-	--font-sans: Inter, system-ui, -apple-system, BlinkMacSystemFont,
+	/* Ello-Style Typography */
+	--font-sans: "Muli", "Poppins", Inter, system-ui, -apple-system, BlinkMacSystemFont,
 		"Segoe UI", sans-serif;
-	--font-reading: Georgia, "Times New Roman", serif;
+	--font-reading: "Muli", Inter, system-ui, sans-serif;
+	--font-heading: "Poppins", "Muli", Inter, system-ui, sans-serif;
 }
 
 @theme inline {
 	--color-primary: var(--primary);
+	--color-primary-hover: var(--primary-hover);
 	--color-secondary: var(--secondary);
 	--color-success: var(--success);
 	--color-warning: var(--warning);
@@ -51,11 +57,15 @@ body:has(.netflix-reading-container.fullscreen-mode) header[class*="sticky top-0
 	--color-muted: var(--muted);
 	--color-border: var(--border);
 	--color-card: var(--card);
+	--color-card-hover: var(--card-hover);
 	--font-sans: var(--font-sans);
 	--font-reading: var(--font-reading);
+	--font-heading: var(--font-heading);
 
-	/* Radius for child-friendly rounded corners */
-	--radius: 12px;
+	/* Ello-style generous rounded corners for child-friendliness */
+	--radius: 16px;
+	--radius-large: 24px;
+	--radius-button: 20px;
 }
 
 html,
@@ -214,6 +224,128 @@ body:has(.netflix-reading-container:not(.fullscreen-mode)) .flex.min-h-screen {
 	}
 }
 
+/* Floating animation for books and elements */
+@keyframes float {
+	0%, 100% {
+		transform: translateY(0px) rotate(0deg);
+	}
+	50% {
+		transform: translateY(-10px) rotate(2deg);
+	}
+}
+
+@keyframes floatReverse {
+	0%, 100% {
+		transform: translateY(0px) rotate(0deg);
+	}
+	50% {
+		transform: translateY(-8px) rotate(-2deg);
+	}
+}
+
+/* Gentle rotation for magical elements */
+@keyframes gentleRotate {
+	0% {
+		transform: rotate(0deg) scale(1);
+	}
+	25% {
+		transform: rotate(2deg) scale(1.05);
+	}
+	50% {
+		transform: rotate(0deg) scale(1);
+	}
+	75% {
+		transform: rotate(-2deg) scale(1.05);
+	}
+	100% {
+		transform: rotate(0deg) scale(1);
+	}
+}
+
+/* Hero content animation */
+@keyframes heroContentSlide {
+	from {
+		opacity: 0;
+		transform: translateY(40px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* Child-friendly floating animations for mobile hero */
+@keyframes float-delayed {
+	0%, 100% {
+		transform: translateY(0px) rotate(0deg);
+	}
+	50% {
+		transform: translateY(-12px) rotate(3deg);
+	}
+}
+
+@keyframes bounce-slow {
+	0%, 100% {
+		transform: translateY(0px) scale(1);
+	}
+	25% {
+		transform: translateY(-8px) scale(1.05);
+	}
+	50% {
+		transform: translateY(0px) scale(1);
+	}
+	75% {
+		transform: translateY(-4px) scale(1.02);
+	}
+}
+
+/* Apply animations with proper timing */
+.animate-float {
+	animation: float 4s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+	animation: float-delayed 5s ease-in-out infinite;
+	animation-delay: 1s;
+}
+
+.animate-bounce-slow {
+	animation: bounce-slow 3s ease-in-out infinite;
+	animation-delay: 0.5s;
+}
+
+/* Pulsing glow for interactive elements */
+@keyframes pulseGlow {
+	0%, 100% {
+		box-shadow: 0 0 10px rgba(40, 184, 184, 0.3);
+	}
+	50% {
+		box-shadow: 0 0 20px rgba(40, 184, 184, 0.6);
+	}
+}
+
+/* Hero image optimization */
+.hero-asset {
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: crisp-edges;
+	transform-origin: center;
+	will-change: transform;
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+}
+
+/* Smooth image transitions */
+.hero-asset img {
+	transition: opacity 0.3s ease-in-out;
+}
+
+/* Performance optimizations for animations */
+.floating-element {
+	transform: translateZ(0);
+	-webkit-transform: translateZ(0);
+	will-change: transform;
+}
+
 /* Mobile-specific optimizations */
 .netflix-reading-container {
 	/* Ensure proper mobile viewport handling */
@@ -277,12 +409,28 @@ body:has(.netflix-reading-container:not(.fullscreen-mode)) .flex.min-h-screen {
 	-webkit-tap-highlight-color: transparent;
 }
 
-/* Accessibility improvements */
+/* Enhanced Accessibility improvements */
 @media (prefers-reduced-motion: reduce) {
-	.netflix-reading-container * {
+	.netflix-reading-container *,
+	.floating-element,
+	.hero-asset,
+	*[style*="animation"] {
 		animation-duration: 0.01ms !important;
 		animation-iteration-count: 1 !important;
 		transition-duration: 0.01ms !important;
+		animation-play-state: paused !important;
+	}
+
+	/* Keep static transforms but remove animation */
+	.floating-element {
+		transform: none !important;
+	}
+
+	/* Reduce bouncing and floating effects */
+	.animate-bounce,
+	.animate-ping,
+	.animate-pulse {
+		animation: none !important;
 	}
 }
 
@@ -292,12 +440,162 @@ body:has(.netflix-reading-container:not(.fullscreen-mode)) .flex.min-h-screen {
 		background-color: rgba(0, 0, 0, 0.9);
 		border: 2px solid white;
 	}
-	
+
 	.netflix-reading-container .text-white\/95 {
 		color: white !important;
 	}
-	
+
 	.netflix-reading-container .text-white\/80 {
 		color: white !important;
 	}
+
+	/* Enhanced contrast for hero section */
+	.hero-asset {
+		filter: contrast(1.2) brightness(1.1);
+	}
+
+	/* Better text contrast */
+	h1, h2, h3, .text-gray-900 {
+		color: #000000 !important;
+	}
+
+	/* Button contrast */
+	button {
+		border: 2px solid currentColor !important;
+	}
+}
+
+/* Focus indicators for better accessibility */
+.hero-asset:focus,
+button:focus,
+a:focus {
+	outline: 3px solid #3b82f6;
+	outline-offset: 2px;
+	border-radius: 4px;
+}
+
+/* Ensure minimum touch target sizes */
+.hero-asset,
+button,
+.floating-element {
+	min-width: 44px;
+	min-height: 44px;
+}
+
+/* Age-appropriate cognitive load management */
+/* Hide complex elements for younger children on smaller screens (mobile-first approach) */
+@media (max-width: 640px) {
+	/* Reduce cognitive load by hiding some floating elements */
+	.floating-element:nth-child(n+7) {
+		display: none;
+	}
+
+	/* Slower animations for better processing */
+	.floating-element,
+	.hero-asset {
+		animation-duration: 8s !important;
+	}
+
+	/* Larger, simpler elements for easier interaction */
+	.hero-asset img {
+		transform: scale(1.2);
+	}
+
+	/* Reduce sparkle effects */
+	.animate-ping:nth-child(n+3) {
+		display: none;
+	}
+}
+
+/* Medium screens - balanced complexity */
+@media (min-width: 641px) and (max-width: 1024px) {
+	.floating-element:nth-child(n+9) {
+		display: none;
+	}
+}
+
+/* Age-specific optimizations via CSS custom properties */
+.age-friendly-5-7 {
+	/* Slower, more deliberate animations */
+	--animation-speed: 8s;
+	--element-scale: 1.3;
+	--reduced-complexity: true;
+}
+
+.age-friendly-8-11 {
+	/* Standard complexity and speed */
+	--animation-speed: 4s;
+	--element-scale: 1.0;
+	--reduced-complexity: false;
+}
+
+/* Priority-based element management for cognitive load */
+@media (max-width: 640px) {
+	/* Hide lower priority elements on mobile for younger users */
+	.priority-low {
+		display: none;
+	}
+
+	.priority-medium {
+		opacity: 0.6;
+	}
+
+	/* Keep only essential high-priority elements fully visible */
+	.priority-high {
+		opacity: 1;
+	}
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+	/* Gradually reduce opacity for less important elements */
+	.priority-low {
+		opacity: 0.4;
+	}
+
+	.priority-medium {
+		opacity: 0.8;
+	}
+}
+
+/* Cognitive load indicators */
+.reduced-animation {
+	animation-duration: 8s !important;
+	animation-timing-function: ease-in-out !important;
+}
+
+/* Full viewport hero arc layout optimizations */
+.hero-arc-layout {
+	height: 100vh;
+	min-height: 100dvh; /* Dynamic viewport height for mobile */
+}
+
+/* Arc formation responsive adjustments */
+@media (max-width: 768px) {
+	/* Mobile: Simplify arc to just 5 main elements */
+	.floating-element:nth-child(n+6) {
+		display: none !important;
+	}
+
+	/* Adjust arc positions for mobile */
+	.hero-asset {
+		transform: scale(0.8) !important;
+	}
+
+	/* Move text higher on mobile for better balance */
+	.hero-text-content {
+		bottom: 15% !important;
+	}
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+	/* Tablet: Show 8 main elements */
+	.floating-element:nth-child(n+9) {
+		display: none !important;
+	}
+}
+
+/* Ensure text is readable over the arc */
+.hero-text-overlay {
+	background: linear-gradient(to top, rgba(248, 249, 250, 0.95) 0%, rgba(248, 249, 250, 0.8) 50%, transparent 100%);
+	backdrop-filter: blur(8px);
 }

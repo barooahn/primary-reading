@@ -33,9 +33,18 @@ import { DeleteStoryButton } from "@/components/stories/delete-story-button";
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import {
+	ReadingStory,
+	StorySegment,
+	ReadingQuestion,
+	ReadingProgress,
+	ApiStory,
+	ApiStorySegment,
+	ApiQuestion,
+} from "@/types";
 
 // Mock story data - in real app this would come from Supabase
-const defaultMockStory = {
+const defaultMockStory: ReadingStory = {
 	id: "1",
 	title: "The Mystery of the Coding Cat",
 	genre: "Mystery",
@@ -139,38 +148,29 @@ const defaultMockStory = {
 	],
 };
 
-interface ReadingProgress {
-	currentSegment: number;
-	totalSegments: number;
-	timeSpent: number;
-	questionsAnswered: number;
-	correctAnswers: number;
-}
 
 export default function ReadStoryPage() {
 	// Load actual story by ID and shadow mock data
 	const params = useParams<{ id: string }>();
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const [story, setStory] = useState<any | null>(null);
+	const [story, setStory] = useState<ReadingStory | null>(null);
 	const [loading, setLoading] = useState(true);
 
-	function mapApiStory(api: any) {
+	function mapApiStory(api: ApiStory): ReadingStory {
 		// Server already processes segments, so just map them to the expected format
 		console.log("=== MAPPING API STORY ===");
 		console.log("API segments raw:", api?.segments);
 		const segs = Array.isArray(api?.segments) ? api.segments : [];
-		const segments = segs.map((seg: any, idx: number, arr: any[]) => {
-			const mappedSeg = {
+		const segments: StorySegment[] = segs.map((seg: ApiStorySegment, idx: number, arr: ApiStorySegment[]) => {
+			const mappedSeg: StorySegment = {
 				id: seg?.segment_order ?? seg?.id ?? idx + 1,
 				text: seg?.content ?? seg?.text ?? "",
 				image: seg?.image_url ?? seg?.image ?? null,
 				imagePath: seg?.image_path ?? null,
 				thumbnailPath: seg?.thumbnail_path ?? null,
-				imagePrompt:
-					seg?.image_prompt ?? seg?.imagePrompt ?? undefined,
-				thumbnailUrl:
-					seg?.thumbnail_url ?? seg?.thumbnailUrl ?? null,
+				imagePrompt: seg?.image_prompt ?? seg?.imagePrompt ?? undefined,
+				thumbnailUrl: seg?.thumbnail_url ?? seg?.thumbnailUrl ?? null,
 				isTitle: idx === 0,
 				isEnding: idx === arr.length - 1,
 			};
@@ -186,7 +186,7 @@ export default function ReadStoryPage() {
 
 		// Handle questions
 		const qs = Array.isArray(api?.questions) ? api.questions : [];
-		const questions = (qs || []).map((q: any, idx: number) => ({
+		const questions: ReadingQuestion[] = (qs || []).map((q: ApiQuestion, idx: number) => ({
 			id: idx + 1,
 			question: q?.question_text ?? q?.question ?? "",
 			type: q?.question_type ?? q?.type ?? "multiple_choice",
@@ -200,7 +200,7 @@ export default function ReadStoryPage() {
 					? q.correct_answer
 						? "True"
 						: "False"
-					: q?.correct_answer ?? q?.answer,
+					: q?.correct_answer ?? q?.answer ?? "",
 			explanation: q?.explanation ?? "",
 		}));
 
@@ -270,7 +270,7 @@ export default function ReadStoryPage() {
 	const [, setIsReading] = useState(true);
 	const [showQuestions, setShowQuestions] = useState(false);
 	const [currentQuestion, setCurrentQuestion] = useState(0);
-	const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>(
+	const [userAnswers, setUserAnswers] = useState<Record<number, string>>(
 		{}
 	);
 	const [showResults, setShowResults] = useState(false);
@@ -733,7 +733,7 @@ export default function ReadStoryPage() {
 	// Image generation is now handled during story creation for seamless reading experience
 
 	// Use pre-generated story images with smart fallbacks for seamless reading experience
-	const getBackgroundImage = (segment: any, index: number) => {
+	const getBackgroundImage = (segment: StorySegment | undefined, index: number): string => {
 		// First priority: use the segment's own pre-generated image URL
 		if (
 			segment?.image &&
@@ -746,37 +746,34 @@ export default function ReadStoryPage() {
 		// Second priority: if we have storage paths but no URLs, convert them
 		if (
 			segment?.imagePath ||
-			segment?.thumbnailPath ||
-			segment?.image_path ||
-			segment?.thumbnail_path
+			segment?.thumbnailPath
 		) {
 			const storagePath =
 				segment.thumbnailPath ||
-				segment.imagePath ||
-				segment.thumbnail_path ||
-				segment.image_path;
-			return `/api/images/${encodeURIComponent(storagePath)}`;
+				segment.imagePath;
+			if (storagePath) {
+				return `/api/images/${encodeURIComponent(storagePath)}`;
+			}
 		}
 
 		// Third priority: look for images from other segments in the story (pre-generated)
 		const allSegments = mockStory?.content || [];
 		const preGeneratedImages = allSegments
 			.filter(
-				(seg: any) =>
+				(seg: StorySegment) =>
 					seg?.image && seg.image !== null && seg.image !== ""
 			)
-			.map((seg: any) => seg.image);
+			.map((seg: StorySegment) => seg.image);
 
 		if (preGeneratedImages.length > 0) {
 			const selectedImage =
 				preGeneratedImages[index % preGeneratedImages.length];
-			return selectedImage;
+			return selectedImage || '';
 		}
 
 		// Fourth priority: choose themed images based on image prompt content
 		const imagePrompt = segment?.imagePrompt?.toLowerCase() || "";
-		const imagePromptAlt = segment?.image_prompt?.toLowerCase() || "";
-		const finalPrompt = imagePrompt || imagePromptAlt;
+		const finalPrompt = imagePrompt;
 
 		// Match prompt keywords to appropriate themed background images
 		if (
@@ -929,8 +926,7 @@ export default function ReadStoryPage() {
 									story={{
 										id: mockStory.id,
 										title: mockStory.title,
-										content: mockStory.content.map((segment: any) => segment.text).join('\n\n'),
-										questions: mockStory.questions || []
+										content: mockStory.content.map((segment: StorySegment) => segment.text).join('\n\n')
 									}}
 									variant='ghost'
 									className='text-white hover:bg-white/30 border-white/30 h-10 w-10'
@@ -939,7 +935,7 @@ export default function ReadStoryPage() {
 									<DeleteStoryButton
 										storyId={mockStory.id}
 										storyTitle={mockStory.title}
-										hasImages={mockStory.content?.some((segment: any) => segment.image)}
+										hasImages={mockStory.content?.some((segment: StorySegment) => segment.image)}
 										variant='ghost'
 										size='sm'
 										showText={false}
@@ -1049,7 +1045,7 @@ export default function ReadStoryPage() {
 									title: mockStory.title,
 									content: mockStory.content
 										.map(
-											(segment: any) => segment.text
+											(segment: StorySegment) => segment.text
 										)
 										.join("\n\n"),
 									grade_level: 3,
@@ -1067,7 +1063,7 @@ export default function ReadStoryPage() {
 									storyId={mockStory.id}
 									storyTitle={mockStory.title}
 									hasImages={mockStory.content?.some(
-										(segment: any) =>
+										(segment: StorySegment) =>
 											segment.image
 									)}
 									variant='ghost'
@@ -1118,7 +1114,7 @@ export default function ReadStoryPage() {
 				</div>
 
 				{/* Reading Content - Positioned after progress bar */}
-				<div className={`relative z-30 pt-4 pb-24 md:pb-28 flex-1 overflow-y-auto ${
+				<div className={`relative z-30 pt-4 pb-32 md:pb-40 flex-1 overflow-y-auto ${
 					isFullscreenMode ? 'px-3 md:px-4' : 'px-3 md:px-8'
 				}`}>
 					<div className='w-full'>

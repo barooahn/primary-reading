@@ -125,3 +125,79 @@ export interface Badge {
   earned_at: string;
   category: 'reading' | 'comprehension' | 'streak' | 'exploration' | 'achievement';
 }
+
+// Types specific to the reading interface
+export interface StorySegment {
+  id: number;
+  text: string;
+  image?: string | null;
+  imagePath?: string | null;
+  thumbnailPath?: string | null;
+  imagePrompt?: string;
+  thumbnailUrl?: string | null;
+  isTitle?: boolean;
+  isEnding?: boolean;
+}
+
+export interface ReadingQuestion {
+  id: number;
+  question: string;
+  type: QuestionType;
+  options?: string[];
+  correctAnswer: string | boolean;
+  explanation: string;
+}
+
+export interface ReadingStory {
+  id: string;
+  title: string;
+  genre: string;
+  readingLevel: ReadingLevel;
+  estimatedTime: number;
+  content: StorySegment[];
+  questions: ReadingQuestion[];
+}
+
+export interface ReadingProgress {
+  currentSegment: number;
+  totalSegments: number;
+  timeSpent: number;
+  questionsAnswered: number;
+  correctAnswers: number;
+}
+
+export interface ApiStorySegment {
+  id?: number;
+  segment_order?: number;
+  content?: string;
+  text?: string;
+  image_url?: string | null;
+  image?: string | null;
+  image_path?: string | null;
+  thumbnail_path?: string | null;
+  image_prompt?: string;
+  imagePrompt?: string;
+  thumbnail_url?: string | null;
+  thumbnailUrl?: string | null;
+}
+
+export interface ApiQuestion {
+  question_text?: string;
+  question?: string;
+  question_type?: QuestionType;
+  type?: QuestionType;
+  options?: string[] | Record<string, string>;
+  correct_answer?: string | boolean;
+  answer?: string | boolean;
+  explanation?: string;
+}
+
+export interface ApiStory {
+  id?: string;
+  title?: string;
+  genre?: string;
+  reading_level?: ReadingLevel;
+  estimated_reading_time?: number;
+  segments?: ApiStorySegment[];
+  questions?: ApiQuestion[];
+}

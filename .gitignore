@@ -91,6 +91,11 @@ test-results/
 playwright-report/
 tests/screenshots/navbar-*.png
 
+# Admin scripts (potentially destructive operations)
+scripts/admin/
+*clear_all_data*
+*clear_storage*
+
 # API keys and secrets
 secrets.json
 config/secrets.*
