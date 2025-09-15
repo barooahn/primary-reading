@@ -51,7 +51,9 @@ interface Story {
 
 export default function Dashboard() {
 	const { user } = useAuth();
-	const [selectedTab, setSelectedTab] = useState<"continue" | "suggested" | "create">("continue");
+	const [selectedTab, setSelectedTab] = useState<
+		"continue" | "suggested" | "create"
+	>("continue");
 	const [loading, setLoading] = useState(true);
 	const [userProgress, setUserProgress] = useState<UserProgress>({
 		level: 1,
@@ -60,7 +62,7 @@ export default function Dashboard() {
 		storiesRead: 0,
 		questionsAnswered: 0,
 		correctAnswers: 0,
-		badges: []
+		badges: [],
 	});
 	const [recentStories, setRecentStories] = useState<Story[]>([]);
 	const [suggestedStories, setSuggestedStories] = useState<Story[]>([]);
@@ -68,12 +70,15 @@ export default function Dashboard() {
 	const loadDashboardData = useCallback(async () => {
 		try {
 			setLoading(true);
-			
+
 			// Load user's stories (recent/continue reading)
-			const storiesResponse = await fetch('/api/stories?limit=5&user_created_only=true', {
-				credentials: 'include'
-			});
-			
+			const storiesResponse = await fetch(
+				"/api/stories?limit=5&user_created_only=true",
+				{
+					credentials: "include",
+				}
+			);
+
 			let userStories: Story[] = [];
 			if (storiesResponse.ok) {
 				const storiesData = await storiesResponse.json();
@@ -84,16 +89,22 @@ export default function Dashboard() {
 			}
 
 			// Load suggested stories (all stories, not user-created)
-			const suggestedResponse = await fetch('/api/stories?limit=10&user_created_only=false', {
-				credentials: 'include'
-			});
-			
+			const suggestedResponse = await fetch(
+				"/api/stories?limit=10&user_created_only=false",
+				{
+					credentials: "include",
+				}
+			);
+
 			if (suggestedResponse.ok) {
 				const suggestedData = await suggestedResponse.json();
 				if (suggestedData.success) {
 					// Filter out user's own stories from suggestions
-					const filtered = (suggestedData.stories || []).filter((story: Story) => 
-						!userStories.some(recent => recent.id === story.id)
+					const filtered = (suggestedData.stories || []).filter(
+						(story: Story) =>
+							!userStories.some(
+								(recent) => recent.id === story.id
+							)
 					);
 					setSuggestedStories(filtered.slice(0, 6));
 				}
@@ -120,7 +131,7 @@ export default function Dashboard() {
 						id: "2",
 						name: "Story Creator",
 						icon: "✍️",
-						color: "#FF6B6B", 
+						color: "#FF6B6B",
 						earned: storiesCount >= 3,
 					},
 					{
@@ -137,11 +148,10 @@ export default function Dashboard() {
 						color: "#87CEEB",
 						earned: storiesCount >= 20,
 					},
-				]
+				],
 			});
-
 		} catch (error) {
-			console.error('Failed to load dashboard data:', error);
+			console.error("Failed to load dashboard data:", error);
 		} finally {
 			setLoading(false);
 		}
@@ -154,6 +164,12 @@ export default function Dashboard() {
 		}
 	}, [user, loadDashboardData]);
 
+	// Derive a human-friendly display name from Supabase user metadata
+	const displayName =
+		((user?.user_metadata as { name?: string; full_name?: string } | undefined)?.name ??
+			(user?.user_metadata as { name?: string; full_name?: string } | undefined)?.full_name ??
+			(user?.email ? user.email.split("@")[0] : undefined)) || undefined;
+
 	return (
 		<ProtectedRoute>
 			<div className='container mx-auto px-4 py-8 max-w-7xl'>
@@ -162,7 +178,9 @@ export default function Dashboard() {
 					<div className='flex items-center justify-between mb-4'>
 						<div>
 							<h1 className='text-3xl font-bold text-foreground'>
-								Welcome back{user?.name ? `, ${user.name}` : ', Reader'}! 🌟
+								Welcome back
+								{displayName ? `, ${displayName}` : ", Reader"}
+								! 🌟
 							</h1>
 							<p className='text-muted mt-2'>
 								Ready for your next reading adventure?
@@ -178,7 +196,8 @@ export default function Dashboard() {
 							<div className='flex items-center space-x-2 px-4 py-2 bg-secondary/10 rounded-full'>
 								<Flame className='h-5 w-5 text-orange-500' />
 								<span className='font-semibold'>
-									{userProgress.readingStreak} day streak!
+									{userProgress.readingStreak} day
+									streak!
 								</span>
 							</div>
 						</div>
@@ -189,7 +208,7 @@ export default function Dashboard() {
 					{/* Main Content */}
 					<div className='lg:col-span-2 space-y-6'>
 						{/* Progress Stats Cards */}
-						<div className='grid sm:grid-cols-3 gap-4'>
+						<div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
 							<Card className='bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20'>
 								<CardContent className='p-6'>
 									<div className='flex items-center justify-between'>
@@ -198,7 +217,9 @@ export default function Dashboard() {
 												Stories Read
 											</p>
 											<p className='text-2xl font-bold'>
-												{userProgress.storiesRead}
+												{
+													userProgress.storiesRead
+												}
 											</p>
 										</div>
 										<BookOpen className='h-8 w-8 text-primary' />
@@ -214,7 +235,9 @@ export default function Dashboard() {
 												Questions Correct
 											</p>
 											<p className='text-2xl font-bold'>
-												{userProgress.correctAnswers}
+												{
+													userProgress.correctAnswers
+												}
 											</p>
 										</div>
 										<Target className='h-8 w-8 text-success' />
@@ -230,7 +253,9 @@ export default function Dashboard() {
 												Experience Points
 											</p>
 											<p className='text-2xl font-bold'>
-												{userProgress.experiencePoints}
+												{
+													userProgress.experiencePoints
+												}
 											</p>
 										</div>
 										<Zap className='h-8 w-8 text-orange-600' />
@@ -242,7 +267,7 @@ export default function Dashboard() {
 						{/* Story Tabs */}
 						<Card>
 							<CardHeader>
-								<div className='flex space-x-1 bg-muted/20 p-1 rounded-lg w-fit'>
+								<div className='flex flex-wrap gap-1 bg-muted/20 p-1 rounded-lg w-full sm:w-fit max-w-full'>
 									<button
 										onClick={() =>
 											setSelectedTab(
@@ -292,8 +317,13 @@ export default function Dashboard() {
 									<div className='space-y-4'>
 										{loading ? (
 											<div className='space-y-4'>
-												{Array.from({ length: 3 }).map((_, i) => (
-													<div key={i} className='flex items-center space-x-4 p-4 rounded-lg border'>
+												{Array.from({
+													length: 3,
+												}).map((_, i) => (
+													<div
+														key={i}
+														className='flex items-center space-x-4 p-4 rounded-lg border'
+													>
 														<div className='flex-1 space-y-2'>
 															<div className='h-5 bg-gray-200 rounded animate-pulse' />
 															<div className='h-4 bg-gray-200 rounded w-2/3 animate-pulse' />
@@ -302,46 +332,82 @@ export default function Dashboard() {
 													</div>
 												))}
 											</div>
-										) : recentStories.length > 0 ? (
-											recentStories.map((story) => (
-												<div
-													key={story.id}
-													className='flex items-center space-x-4 p-4 rounded-lg border hover:shadow-md transition-all'
-												>
-													<div className='flex-1'>
-														<h3 className='font-semibold text-lg'>
-															{story.title?.replace(/\*\*/g, '') || 'Untitled Story'}
-														</h3>
-														<div className='flex items-center space-x-4 mt-2 text-sm text-muted'>
-															{story.genre && <span>{story.genre}</span>}
-															{story.reading_level && (
-																<span className='capitalize'>{story.reading_level}</span>
-															)}
-															{story.estimated_reading_time && (
-																<span>{story.estimated_reading_time} min read</span>
-															)}
+										) : recentStories.length >
+										  0 ? (
+											recentStories.map(
+												(story) => (
+													<div
+														key={
+															story.id
+														}
+														className='flex flex-col sm:flex-row sm:items-center items-start gap-3 sm:gap-4 p-4 rounded-lg border hover:shadow-md transition-all'
+													>
+														<div className='flex-1 min-w-0'>
+															<h3 className='font-semibold text-lg break-words'>
+																{story.title?.replace(
+																	/\*\*/g,
+																	""
+																) ||
+																	"Untitled Story"}
+															</h3>
+															<div className='flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-muted'>
+																{story.genre && (
+																	<span>
+																		{
+																			story.genre
+																		}
+																	</span>
+																)}
+																{story.reading_level && (
+																	<span className='capitalize'>
+																		{
+																			story.reading_level
+																		}
+																	</span>
+																)}
+																{story.estimated_reading_time && (
+																	<span>
+																		{
+																			story.estimated_reading_time
+																		}{" "}
+																		min
+																		read
+																	</span>
+																)}
+															</div>
+															{/* For now, all stories are considered "completed" since we don't have progress tracking yet */}
 														</div>
-														{/* For now, all stories are considered "completed" since we don't have progress tracking yet */}
+														<Button
+															className='shrink-0'
+															asChild
+														>
+															<Link
+																href={`/read/${story.id}`}
+															>
+																<Play className='h-4 w-4 mr-2' />
+																Read
+																Story
+															</Link>
+														</Button>
 													</div>
-													<Button asChild>
-														<Link href={`/read/${story.id}`}>
-															<Play className='h-4 w-4 mr-2' />
-															Read Story
-														</Link>
-													</Button>
-												</div>
-											))
+												)
+											)
 										) : (
 											<div className='text-center py-12'>
 												<BookOpen className='h-16 w-16 text-muted mx-auto mb-4' />
-												<h3 className='text-xl font-semibold mb-2'>No stories yet</h3>
+												<h3 className='text-xl font-semibold mb-2'>
+													No stories yet
+												</h3>
 												<p className='text-muted mb-6'>
-													Create your first story to get started!
+													Create your
+													first story to
+													get started!
 												</p>
 												<Button asChild>
 													<Link href='/create'>
 														<Sparkles className='h-5 w-5 mr-2' />
-														Create Story
+														Create
+														Story
 													</Link>
 												</Button>
 											</div>
@@ -353,8 +419,13 @@ export default function Dashboard() {
 									<div className='space-y-4'>
 										{loading ? (
 											<div className='space-y-4'>
-												{Array.from({ length: 3 }).map((_, i) => (
-													<div key={i} className='flex items-center space-x-4 p-4 rounded-lg border'>
+												{Array.from({
+													length: 3,
+												}).map((_, i) => (
+													<div
+														key={i}
+														className='flex items-center space-x-4 p-4 rounded-lg border'
+													>
 														<div className='flex-1 space-y-2'>
 															<div className='h-5 bg-gray-200 rounded animate-pulse' />
 															<div className='h-4 bg-gray-200 rounded w-3/4 animate-pulse' />
@@ -363,66 +434,120 @@ export default function Dashboard() {
 													</div>
 												))}
 											</div>
-										) : suggestedStories.length > 0 ? (
-											suggestedStories.map((story) => (
-												<div
-													key={story.id}
-													className='flex items-center space-x-4 p-4 rounded-lg border hover:shadow-md transition-all'
-												>
-													<div className='flex-1'>
-														<div className='flex items-center space-x-2'>
-															<h3 className='font-semibold text-lg'>
-																{story.title?.replace(/\*\*/g, '') || 'Untitled Story'}
-															</h3>
-															{story.is_featured && (
-																<span className='px-2 py-1 bg-secondary/20 text-secondary text-xs rounded-full font-medium'>
-																	FEATURED
-																</span>
-															)}
+										) : suggestedStories.length >
+										  0 ? (
+											suggestedStories.map(
+												(story) => (
+													<div
+														key={
+															story.id
+														}
+														className='flex flex-col sm:flex-row sm:items-center items-start gap-3 sm:gap-4 p-4 rounded-lg border hover:shadow-md transition-all'
+													>
+														<div className='flex-1 min-w-0'>
+															<div className='flex items-center space-x-2'>
+																<h3 className='font-semibold text-lg break-words'>
+																	{story.title?.replace(
+																		/\*\*/g,
+																		""
+																	) ||
+																		"Untitled Story"}
+																</h3>
+																{story.is_featured && (
+																	<span className='px-2 py-1 bg-secondary/20 text-secondary text-xs rounded-full font-medium'>
+																		FEATURED
+																	</span>
+																)}
+															</div>
+															<div className='flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-muted'>
+																{story.genre && (
+																	<span>
+																		{
+																			story.genre
+																		}
+																	</span>
+																)}
+																{story.reading_level && (
+																	<span className='capitalize'>
+																		{
+																			story.reading_level
+																		}
+																	</span>
+																)}
+																{story.estimated_reading_time && (
+																	<span>
+																		{
+																			story.estimated_reading_time
+																		}{" "}
+																		min
+																		read
+																	</span>
+																)}
+																{story.difficulty_rating && (
+																	<div className='flex items-center'>
+																		{Array.from(
+																			{
+																				length: 5,
+																			}
+																		).map(
+																			(
+																				_,
+																				i
+																			) => (
+																				<Star
+																					key={
+																						i
+																					}
+																					className={`h-3 w-3 ${
+																						i <
+																						story.difficulty_rating!
+																							? "text-secondary fill-secondary"
+																							: "text-muted/30"
+																					}`}
+																				/>
+																			)
+																		)}
+																	</div>
+																)}
+															</div>
 														</div>
-														<div className='flex items-center space-x-4 mt-2 text-sm text-muted'>
-															{story.genre && <span>{story.genre}</span>}
-															{story.reading_level && (
-																<span className='capitalize'>{story.reading_level}</span>
-															)}
-															{story.estimated_reading_time && (
-																<span>{story.estimated_reading_time} min read</span>
-															)}
-															{story.difficulty_rating && (
-																<div className='flex items-center'>
-																	{Array.from({ length: 5 }).map((_, i) => (
-																		<Star
-																			key={i}
-																			className={`h-3 w-3 ${
-																				i < story.difficulty_rating!
-																					? "text-secondary fill-secondary"
-																					: "text-muted/30"
-																			}`}
-																		/>
-																	))}
-																</div>
-															)}
-														</div>
+														<Button
+															className='shrink-0'
+															asChild
+														>
+															<Link
+																href={`/read/${story.id}`}
+															>
+																<Play className='h-4 w-4 mr-2' />
+																Start
+																Reading
+															</Link>
+														</Button>
 													</div>
-													<Button asChild>
-														<Link href={`/read/${story.id}`}>
-															<Play className='h-4 w-4 mr-2' />
-															Start Reading
-														</Link>
-													</Button>
-												</div>
-											))
+												)
+											)
 										) : (
 											<div className='text-center py-12'>
 												<BookOpen className='h-16 w-16 text-muted mx-auto mb-4' />
-												<h3 className='text-xl font-semibold mb-2'>No suggestions yet</h3>
+												<h3 className='text-xl font-semibold mb-2'>
+													No suggestions
+													yet
+												</h3>
 												<p className='text-muted mb-6'>
-													Suggestions will appear as more stories are added to the library.
+													Suggestions
+													will appear as
+													more stories
+													are added to
+													the library.
 												</p>
-												<Button asChild variant='outline'>
+												<Button
+													asChild
+													variant='outline'
+												>
 													<Link href='/stories'>
 														<BookOpen className='h-5 w-5 mr-2' />
-														Browse Library
+														Browse
+														Library
 													</Link>
 												</Button>
 											</div>
@@ -468,7 +593,7 @@ export default function Dashboard() {
 								</CardTitle>
 							</CardHeader>
 							<CardContent>
-								<div className='grid grid-cols-2 gap-3'>
+								<div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
 									{userProgress.badges.map(
 										(badge) => (
 											<div
