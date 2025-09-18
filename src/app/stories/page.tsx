@@ -176,7 +176,7 @@ export default function StoriesPage() {
 				{/* Search and Filters */}
 				{/* Auth CTA for My stories */}
 				{ownerFilter === "mine" && message && (
-					<div className='mb-4 p-4 border rounded-lg bg-[#FAA533]/10 text-[#EF7722] border-[#FAA533]/30 flex items-center justify-between'>
+					<div className='mb-4 p-4 border rounded-lg bg-student-secondary/10 text-student border-student-secondary/30 flex items-center justify-between'>
 						<span>{message}</span>
 						<Button asChild>
 							<Link href='/login'>Sign in</Link>
@@ -215,7 +215,7 @@ export default function StoriesPage() {
 								onChange={(e) =>
 									setSearchQuery(e.target.value)
 								}
-								className='w-full px-4 py-2 border border-[#EBEBEB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EF7722] focus:border-[#EF7722]'
+								className='w-full px-4 py-2 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-student focus:border-student'
 							/>
 						</div>
 						<select
@@ -223,7 +223,7 @@ export default function StoriesPage() {
 							onChange={(e) =>
 								setSelectedGenre(e.target.value)
 							}
-							className='px-4 py-2 border border-[#EBEBEB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EF7722] focus:border-[#EF7722]'
+							className='px-4 py-2 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-student focus:border-student'
 						>
 							<option value='All'>All Genres</option>
 							<option value='Fantasy'>Fantasy</option>
@@ -236,7 +236,7 @@ export default function StoriesPage() {
 							onChange={(e) =>
 								setSelectedLevel(e.target.value)
 							}
-							className='px-4 py-2 border border-[#EBEBEB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EF7722] focus:border-[#EF7722]'
+							className='px-4 py-2 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-student focus:border-student'
 						>
 							<option value='All'>All Levels</option>
 							<option value='beginner'>Beginner</option>
@@ -285,12 +285,12 @@ export default function StoriesPage() {
 											}
 										/>
 										{story.isNew && (
-											<div className='absolute top-2 right-2 bg-[#0BA6DF] text-white px-2 py-1 rounded-full text-xs font-bold'>
+											<div className='absolute top-2 right-2 bg-parent text-white px-2 py-1 rounded-full text-xs font-bold'>
 												NEW
 											</div>
 										)}
 										{story.isPopular && (
-											<div className='absolute top-2 left-2 bg-[#EF7722] text-white px-2 py-1 rounded-full text-xs font-bold'>
+											<div className='absolute top-2 left-2 bg-student text-white px-2 py-1 rounded-full text-xs font-bold'>
 												POPULAR
 											</div>
 										)}
@@ -324,7 +324,7 @@ export default function StoriesPage() {
 									<CardContent>
 										<div className='space-y-3'>
 											<div className='flex items-center justify-between text-sm'>
-												<span className='bg-[#EF7722]/10 text-[#EF7722] px-2 py-1 rounded-full text-xs font-medium border border-[#EF7722]/20'>
+												<span className='bg-student-light text-student px-2 py-1 rounded-full text-xs font-medium border border-student-border'>
 													{story.genre}
 												</span>
 												<span className='text-muted'>
@@ -336,7 +336,7 @@ export default function StoriesPage() {
 											</div>
 											<div className='flex items-center justify-between'>
 												<div className='flex items-center space-x-1'>
-													<span className='text-[#FAA533]'>
+													<span className='text-student-secondary'>
 														★
 													</span>
 													<span className='text-sm font-medium'>

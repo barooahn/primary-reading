@@ -48,7 +48,7 @@ export function PrintButton({
               }
               h1 { 
                 color: #333; 
-                border-bottom: 2px solid #4A90E2; 
+                border-bottom: 2px solid var(--parent); 
                 padding-bottom: 8px; 
                 margin-bottom: 15px;
                 font-size: 18pt;
@@ -86,7 +86,7 @@ export function PrintButton({
             }
             h1 { 
               color: #333; 
-              border-bottom: 2px solid #4A90E2; 
+              border-bottom: 2px solid var(--parent); 
               padding-bottom: 10px; 
               margin-bottom: 20px;
             }

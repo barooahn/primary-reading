@@ -55,7 +55,7 @@ export default function SettingsPage() {
 					Settings
 				</h1>
 
-				<div className='rounded-xl border border-[#EF7722] bg-[#EF7722]/10 shadow-sm p-4 space-y-4 max-w-xl'>
+				<div className='rounded-xl border border-student bg-student-light shadow-sm p-4 space-y-4 max-w-xl'>
 					<div className='flex items-center justify-between'>
 						<div>
 							<div className='font-medium text-gray-900'>
@@ -71,8 +71,8 @@ export default function SettingsPage() {
 							onClick={() => setShowStats((v) => !v)}
 							className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
 								showStats
-									? "bg-[#EF7722]"
-									: "bg-[#EBEBEB]"
+									? "bg-student"
+									: "bg-light-gray"
 							}`}
 						>
 							<span
@@ -99,8 +99,8 @@ export default function SettingsPage() {
 							onClick={() => setCompactNav((v) => !v)}
 							className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
 								compactNav
-									? "bg-[#EF7722]"
-									: "bg-[#EBEBEB]"
+									? "bg-student"
+									: "bg-light-gray"
 							}`}
 						>
 							<span
@@ -123,7 +123,7 @@ export default function SettingsPage() {
 						<select
 							value={theme}
 							onChange={(e) => setTheme(e.target.value)}
-							className='h-9 rounded-md border border-[#EF7722] bg-white px-2 text-sm text-gray-900 focus:border-[#EF7722] focus:ring-1 focus:ring-[#EF7722] focus:outline-none'
+							className='h-9 rounded-md border border-student bg-white px-2 text-sm text-gray-900 focus:border-student focus:ring-1 focus:ring-student focus:outline-none'
 						>
 							<option value='system'>System</option>
 							<option value='light'>Light</option>
@@ -136,7 +136,7 @@ export default function SettingsPage() {
 							type='button'
 							onClick={onSave}
 							disabled={saving}
-							className='inline-flex items-center justify-center h-9 px-4 rounded-md bg-[#EF7722] text-white text-sm disabled:opacity-60 hover:bg-[#FAA533] transition-colors'
+							className='inline-flex items-center justify-center h-9 px-4 rounded-md bg-student text-white text-sm disabled:opacity-60 hover:bg-student-secondary transition-colors'
 						>
 							{saving ? "Saving…" : "Save settings"}
 						</button>

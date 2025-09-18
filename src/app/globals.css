@@ -63,21 +63,67 @@ body:has(.netflix-reading-container.fullscreen-mode) header[class*="sticky top-0
 }
 
 @theme inline {
-	--color-primary: var(--primary);
-	--color-primary-hover: var(--primary-hover);
-	--color-secondary: var(--secondary);
-	--color-success: var(--success);
-	--color-warning: var(--warning);
-	--color-error: var(--error);
-	--color-background: var(--background);
-	--color-foreground: var(--foreground);
-	--color-muted: var(--muted);
-	--color-border: var(--border);
-	--color-card: var(--card);
-	--color-card-hover: var(--card-hover);
-	--font-sans: var(--font-sans);
-	--font-reading: var(--font-reading);
-	--font-heading: var(--font-heading);
+	/* PrimaryReading Brand Colors - Direct values for Tailwind v4 */
+	--color-primary-orange: #EF7722;
+	--color-secondary-orange: #FAA533;
+	--color-primary-blue: #0BA6DF;
+	--color-light-gray: #EBEBEB;
+
+	/* User Journey Colors - Semantic Naming */
+	--color-parent: #0BA6DF;
+	--color-parent-light: rgb(11 166 223 / 0.1);
+	--color-parent-hover: rgb(11 166 223 / 0.9);
+	--color-parent-active: rgb(11 166 223 / 0.8);
+	--color-parent-border: rgb(11 166 223 / 0.2);
+
+	--color-student: #EF7722;
+	--color-student-light: rgb(239 119 34 / 0.1);
+	--color-student-hover: rgb(239 119 34 / 0.9);
+	--color-student-active: rgb(239 119 34 / 0.8);
+	--color-student-border: rgb(239 119 34 / 0.2);
+	--color-student-secondary: #FAA533;
+
+	/* Enhanced Neutrals - WCAG AA Compliant */
+	--color-background: #EBEBEB;
+	--color-foreground: #0f172a;
+	--color-border: #d1d5db;
+	--color-card-hover: #f9fafb;
+
+	/* Text Contrast Colors - Educational Focus */
+	--color-text-primary: #0f172a;
+	--color-text-secondary: #334155;
+	--color-text-muted: #475569;
+	--color-placeholder: #64748b;
+
+	/* Semantic Colors - Brand Aligned */
+	--color-primary: #EF7722;
+	--color-primary-hover: #FAA533;
+	--color-secondary: #0BA6DF;
+	--color-success: #0BA6DF;
+	--color-warning: #FAA533;
+	--color-error: #EF7722;
+
+	/* Legacy compatibility */
+	--color-education-blue: #0BA6DF;
+	--color-warm-orange: #EF7722;
+	--color-soft-yellow: #FAA533;
+
+	/* shadcn/ui compatibility */
+	--color-destructive: #EF7722;
+	--color-destructive-foreground: #ffffff;
+	--color-muted: #1e293b;
+	--color-muted-foreground: #475569;
+	--color-accent: #EF7722;
+	--color-accent-foreground: #ffffff;
+	--color-popover: #ffffff;
+	--color-popover-foreground: #0f172a;
+	--color-card: #ffffff;
+	--color-card-foreground: #0f172a;
+
+	/* Typography */
+	--font-sans: var(--font-primary);
+	--font-reading: var(--font-primary);
+	--font-heading: var(--font-display);
 
 	/* Ello-style generous rounded corners for child-friendliness */
 	--radius: 16px;

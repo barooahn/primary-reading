@@ -1221,12 +1221,12 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 								<div className='text-sm font-medium text-text-muted'>
 									Step {currentIndex + 1} of 4
 								</div>
-								<div className='text-base font-semibold text-[#EF7722] mb-2'>
+								<div className='text-base font-semibold text-student mb-2'>
 									{stepNames[currentIndex] || stepNames[0]}
 								</div>
 								<div className='w-64 max-w-[calc(100vw-2rem)] bg-muted/30 rounded-full h-2'>
 									<div 
-										className='bg-gradient-to-r from-[#EF7722] to-[#FAA533] h-2 rounded-full transition-all duration-500'
+										className='bg-gradient-to-r from-student to-student-secondary h-2 rounded-full transition-all duration-500'
 										style={{ 
 											width: `${((currentIndex + 1) / 4) * 100}%` 
 										}}
@@ -1243,7 +1243,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 												key={index}
 												className={`w-3 h-3 rounded-full transition-all ${
 													isActive
-														? "bg-[#EF7722] scale-125"
+														? "bg-student scale-125"
 														: isCompleted
 														? "bg-success"
 														: "bg-muted"
@@ -1284,7 +1284,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 								<div
 									className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
 										isActive
-											? "bg-[#EF7722] text-white"
+											? "bg-student text-white"
 											: isCompleted
 											? "bg-success text-white"
 											: "bg-muted text-text-muted"
@@ -1313,10 +1313,10 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 				{currentStep === "theme" && (
 					<div className='space-y-6'>
 						{/* Reading Level Display - No longer editable */}
-						<Card className="bg-[#0BA6DF]/10 border-[#0BA6DF]/30">
+						<Card className="bg-parent-light border-parent-border">
 							<CardHeader>
 								<CardTitle className='flex items-center space-x-2'>
-									<BookOpen className='h-5 w-5 text-[#0BA6DF]' />
+									<BookOpen className='h-5 w-5 text-parent' />
 									<span>Your Reading Level</span>
 								</CardTitle>
 								<CardDescription>
@@ -1324,20 +1324,20 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 								</CardDescription>
 							</CardHeader>
 							<CardContent>
-								<div className='bg-white p-4 rounded-lg border border-[#0BA6DF]/30'>
+								<div className='bg-white p-4 rounded-lg border border-parent-border'>
 									<div className='text-center space-y-2'>
-										<div className='text-3xl font-bold text-[#0BA6DF]'>
+										<div className='text-3xl font-bold text-parent'>
 											Year {settings.yearLevel}
 										</div>
 										<div className='text-sm text-gray-600'>
 											Age {settings.yearLevel + 4}+ • {getGradeLevelConfig(settings.yearLevel).readingLevel} Level
 										</div>
-										<div className='text-sm text-[#0BA6DF]'>
+										<div className='text-sm text-parent'>
 											Stories perfect for you: ~{getGradeLevelConfig(settings.yearLevel).wordCount.recommended} words
 										</div>
 									</div>
 								</div>
-								<div className='mt-3 text-xs text-[#0BA6DF] text-center'>
+								<div className='mt-3 text-xs text-parent text-center'>
 									🔒 This setting is managed by your parent/teacher for your safety
 								</div>
 							</CardContent>
@@ -1346,7 +1346,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 						<Card>
 							<CardHeader>
 								<CardTitle className='flex items-center space-x-2'>
-									<Lightbulb className='h-5 w-5 text-[#FAA533]' />
+									<Lightbulb className='h-5 w-5 text-student-secondary' />
 									<span>
 										What kind of adventure do you
 										want?
@@ -1370,7 +1370,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 											}
 											className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
 												!customPromptMode
-													? "bg-[#EF7722] text-white shadow-sm"
+													? "bg-student text-white shadow-sm"
 													: "text-muted hover:text-foreground"
 											}`}
 										>
@@ -1384,7 +1384,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 											}
 											className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
 												customPromptMode
-													? "bg-[#EF7722] text-white shadow-sm"
+													? "bg-student text-white shadow-sm"
 													: "text-muted hover:text-foreground"
 											}`}
 										>
@@ -1414,8 +1414,8 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 													touch-manipulation
 													${
 														settings.theme === theme.name
-															? "border-[#EF7722] bg-[#EF7722]/10 shadow-md"
-															: "border-[#EBEBEB] hover:border-[#EF7722]/50 hover:bg-[#EF7722]/5"
+															? "border-student bg-student/10 shadow-md"
+															: "border-light-gray hover:border-student/50 hover:bg-student/5"
 													}
 												`}
 											>
@@ -1436,7 +1436,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 											</label>
 											<textarea
 												className='w-full p-4 sm:p-3 border-2 border-border rounded-lg sm:rounded-xl 
-												focus:outline-none focus:ring-3 focus:ring-[#EF7722]/20 focus:border-[#EF7722]
+												focus:outline-none focus:ring-3 focus:ring-student/20 focus:border-student
 												text-base leading-relaxed touch-manipulation resize-none'
 												style={{ fontSize: '16px' }} /* Prevents zoom on iOS */
 												rows={5}
@@ -1458,7 +1458,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 
 										<div>
 											<h3 className='font-medium mb-3 flex items-center space-x-2'>
-												<Lightbulb className='h-4 w-4 text-[#FAA533]' />
+												<Lightbulb className='h-4 w-4 text-student-secondary' />
 												<span>
 													Need
 													inspiration?
@@ -1488,7 +1488,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 																	}
 																)
 															}
-															className='p-3 text-left rounded-lg border border-[#EBEBEB] hover:border-[#EF7722]/50 hover:bg-[#EF7722]/5 transition-all'
+															className='p-3 text-left rounded-lg border border-light-gray hover:border-student/50 hover:bg-student/5 transition-all'
 														>
 															<p className='text-sm'>
 																{
@@ -1511,7 +1511,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 												!settings.customPrompt.trim()
 											}
 											className='w-full h-12 sm:h-10 text-base sm:text-sm font-semibold
-											bg-gradient-to-r from-[#EF7722] to-[#FAA533] hover:from-[#EF7722]/90 hover:to-[#FAA533]/90
+											bg-gradient-to-r from-student to-student-secondary hover:from-student/90 hover:to-student-secondary/90
 											shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95 
 											disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none'
 										>
@@ -1531,7 +1531,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 						<Card>
 							<CardHeader>
 								<CardTitle className='flex items-center space-x-2'>
-									<Wand2 className='h-5 w-5 text-[#EF7722]' />
+									<Wand2 className='h-5 w-5 text-student' />
 									<span>Story Settings</span>
 								</CardTitle>
 								<CardDescription>
@@ -1541,18 +1541,18 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 							</CardHeader>
 							<CardContent className='space-y-6'>
 								{/* Selected Theme Display */}
-								<div className='p-4 bg-[#EF7722]/10 rounded-lg border border-[#EF7722]/20'>
+								<div className='p-4 bg-student/10 rounded-lg border border-student/20'>
 									<h3 className='font-medium mb-1'>
 										Your Story Theme:
 									</h3>
-									<p className='text-[#EF7722] font-semibold'>
+									<p className='text-student font-semibold'>
 										{settings.theme ||
 											settings.customPrompt}
 									</p>
 								</div>
 
 								{/* Year Level Display */}
-								<div className='p-4 bg-[#0BA6DF]/10 rounded-lg border border-[#0BA6DF]/30'>
+								<div className='p-4 bg-parent-light rounded-lg border border-parent-border'>
 									<h3 className='font-medium mb-2'>
 										Story Configuration for Year{" "}
 										{settings.yearLevel}
@@ -1633,8 +1633,8 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 												touch-manipulation
 												${
 													settings.storyType === "fiction"
-														? "border-[#EF7722] bg-[#EF7722]/10 shadow-md"
-														: "border-[#EBEBEB] hover:border-[#EF7722]/50 hover:bg-[#EF7722]/5"
+														? "border-student bg-student/10 shadow-md"
+														: "border-light-gray hover:border-student/50 hover:bg-student/5"
 												}
 											`}
 										>
@@ -1665,8 +1665,8 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 												touch-manipulation
 												${
 													settings.storyType === "non_fiction"
-														? "border-[#EF7722] bg-[#EF7722]/10 shadow-md"
-														: "border-[#EBEBEB] hover:border-[#EF7722]/50 hover:bg-[#EF7722]/5"
+														? "border-student bg-student/10 shadow-md"
+														: "border-light-gray hover:border-student/50 hover:bg-student/5"
 												}
 											`}
 										>
@@ -1704,7 +1704,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 																.checked,
 													})
 												}
-												className='w-4 h-4 text-[#EF7722] focus:ring-[#EF7722] border-gray-300 rounded'
+												className='w-4 h-4 text-student focus:ring-student border-gray-300 rounded'
 											/>
 											<span className='text-sm'>
 												Include
@@ -1718,7 +1718,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 												type='checkbox'
 												checked={true} // Always checked for seamless reading experience
 												disabled={true} // Disabled since images are always generated
-												className='w-4 h-4 text-[#EF7722] focus:ring-[#EF7722] border-gray-300 rounded opacity-50'
+												className='w-4 h-4 text-student focus:ring-student border-gray-300 rounded opacity-50'
 											/>
 											<span className='text-sm text-muted'>
 												Generate AI illustrations (always included for the best reading experience ✨)
@@ -1742,7 +1742,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 										data-testid="generate-story-btn"
 										onClick={generateStory}
 										className='w-full sm:flex-1 h-14 sm:h-10 text-lg sm:text-sm font-semibold
-										bg-gradient-to-r from-[#EF7722] to-[#FAA533] hover:from-[#EF7722]/90 hover:to-[#FAA533]/90
+										bg-gradient-to-r from-student to-student-secondary hover:from-student/90 hover:to-student-secondary/90
 										shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95'
 									>
 										<Sparkles className='h-5 w-5 sm:h-4 sm:w-4 mr-2' />
@@ -1759,7 +1759,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 					<div className='text-center py-12'>
 						<Card className='max-w-2xl mx-auto'>
 							<CardContent className='p-8'>
-								<div className='animate-spin w-12 h-12 border-4 border-[#EF7722] border-t-transparent rounded-full mx-auto mb-4'></div>
+								<div className='animate-spin w-12 h-12 border-4 border-student border-t-transparent rounded-full mx-auto mb-4'></div>
 								
 								{/* Progress Bar */}
 								<div className='mb-6'>
@@ -1769,7 +1769,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 									</div>
 									<div className='w-full bg-gray-200 rounded-full h-2'>
 										<div 
-											className='bg-[#EF7722] h-2 rounded-full transition-all duration-500'
+											className='bg-student h-2 rounded-full transition-all duration-500'
 											style={{ width: `${generationProgress.progress}%` }}
 										></div>
 									</div>
@@ -1843,7 +1843,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 								{/* Step Indicators */}
 								<div className='flex justify-center space-x-8 text-sm'>
 									<div className={`flex items-center space-x-2 ${
-										generationProgress.step === "story" ? "text-[#EF7722] font-medium" : 
+										generationProgress.step === "story" ? "text-student font-medium" : 
 										generationProgress.progress >= 30 ? "text-green-600" : "text-muted"
 									}`}>
 										<BookOpen className='h-4 w-4' />
@@ -1851,7 +1851,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 									</div>
 									{settings.includeImages && (
 										<div className={`flex items-center space-x-2 ${
-											generationProgress.step === "images" ? "text-[#EF7722] font-medium" : 
+											generationProgress.step === "images" ? "text-student font-medium" : 
 											generationProgress.progress >= 95 ? "text-green-600" : "text-muted"
 										}`}>
 											<Sparkles className='h-4 w-4' />

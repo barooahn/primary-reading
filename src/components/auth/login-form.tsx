@@ -11,12 +11,12 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="text-center space-y-4">
-        <div className="mx-auto w-16 h-16 bg-gradient-to-br from-[#EF7722] to-[#FAA533] rounded-3xl flex items-center justify-center shadow-lg">
+        <div className="mx-auto w-16 h-16 bg-gradient-to-br from-student to-student-secondary rounded-3xl flex items-center justify-center shadow-lg">
           <span className="text-2xl text-white">📚</span>
         </div>
         <CardTitle className="text-2xl font-black">
           <span className="text-gray-900">Welcome to </span>
-          <span className="text-[#EF7722]">PrimaryReading</span>
+          <span className="text-student">PrimaryReading</span>
         </CardTitle>
         <CardDescription className="text-base text-gray-600 leading-relaxed">
           Sign in to continue your magical reading adventure

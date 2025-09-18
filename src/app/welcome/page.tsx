@@ -10,12 +10,12 @@ export default function WelcomePage() {
 	const [selectedRole, setSelectedRole] = useState<"parent" | "child" | null>(null);
 
 	return (
-		<div className="h-[calc(100vh-5rem)] bg-gradient-to-br from-[#EBEBEB]/30 via-[#EF7722]/5 to-[#FAA533]/10 flex items-center justify-center overflow-hidden p-4 md:p-6">
+		<div className="h-[calc(100vh-5rem)] bg-gradient-to-br from-light-gray/30 via-student/5 to-student-secondary/10 flex items-center justify-center overflow-hidden p-4 md:p-6">
 			{/* Background decoration */}
 			<div className="absolute inset-0 overflow-hidden pointer-events-none">
-				<div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-[#FAA533]/20 to-[#EF7722]/20 rounded-full blur-3xl" />
-				<div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-br from-[#0BA6DF]/20 to-[#0BA6DF]/10 rounded-full blur-3xl" />
-				<div className="absolute top-1/2 left-1/4 w-24 h-24 bg-gradient-to-br from-[#0BA6DF]/20 to-[#0BA6DF]/10 rounded-full blur-2xl" />
+				<div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-student-secondary/20 to-student/20 rounded-full blur-3xl" />
+				<div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-br from-parent/20 to-parent/10 rounded-full blur-3xl" />
+				<div className="absolute top-1/2 left-1/4 w-24 h-24 bg-gradient-to-br from-parent/20 to-parent/10 rounded-full blur-2xl" />
 			</div>
 
 			<div className="container mx-auto max-w-6xl relative z-10 h-full flex flex-col justify-center">
@@ -25,8 +25,8 @@ export default function WelcomePage() {
 						{/* Header */}
 						<div className="space-y-3 mb-8">
 							<div className="flex items-center justify-center space-x-2 mb-4">
-								<BookOpen className="h-8 w-8 text-[#EF7722]" />
-								<h1 className="text-3xl md:text-4xl font-black font-heading bg-gradient-to-r from-[#EF7722] to-[#FAA533] bg-clip-text text-transparent">
+								<BookOpen className="h-8 w-8 text-student" />
+								<h1 className="text-3xl md:text-4xl font-black font-heading bg-gradient-to-r from-student to-student-secondary bg-clip-text text-transparent">
 									PrimaryReading
 								</h1>
 							</div>
@@ -42,14 +42,14 @@ export default function WelcomePage() {
 						<div className="grid md:grid-cols-2 gap-4 md:gap-6 max-w-4xl mx-auto px-2 sm:px-0">
 							{/* Parent/Teacher Card */}
 							<Card
-								className="group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl border-2 hover:border-[#0BA6DF] bg-white/95 backdrop-blur-sm"
+								className="group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl border-2 hover:border-parent bg-white/95 backdrop-blur-sm"
 								onClick={() => setSelectedRole("parent")}
 							>
 								<CardHeader className="text-center p-6">
-									<div className="mx-auto w-16 h-16 bg-[#0BA6DF]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#0BA6DF]/20 transition-colors">
-										<Users className="h-10 w-10 text-[#0BA6DF]" />
+									<div className="mx-auto w-16 h-16 bg-parent-light rounded-full flex items-center justify-center mb-3 group-hover:bg-parent/20 transition-colors">
+										<Users className="h-10 w-10 text-parent" />
 									</div>
-									<CardTitle className="text-2xl text-[#0BA6DF] mb-2">I&apos;m a Parent/Teacher</CardTitle>
+									<CardTitle className="text-2xl text-parent mb-2">I&apos;m a Parent/Teacher</CardTitle>
 									<CardDescription className="text-base text-text-secondary">
 										Set up reading levels and manage children&apos;s accounts
 									</CardDescription>
@@ -57,15 +57,15 @@ export default function WelcomePage() {
 								<CardContent className="space-y-3 px-6 pb-6">
 									<div className="space-y-2 text-sm text-gray-700">
 										<div className="flex items-center space-x-2">
-											<ShieldCheck className="h-4 w-4 text-[#0BA6DF]" />
+											<ShieldCheck className="h-4 w-4 text-parent" />
 											<span>Control age-appropriate content</span>
 										</div>
 										<div className="flex items-center space-x-2">
-											<Star className="h-4 w-4 text-[#0BA6DF]" />
+											<Star className="h-4 w-4 text-parent" />
 											<span>Track reading progress</span>
 										</div>
 										<div className="flex items-center space-x-2">
-											<Heart className="h-4 w-4 text-[#0BA6DF]" />
+											<Heart className="h-4 w-4 text-parent" />
 											<span>Create safe reading environment</span>
 										</div>
 									</div>
@@ -74,14 +74,14 @@ export default function WelcomePage() {
 
 							{/* Child Card */}
 							<Card
-								className="group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl border-2 hover:border-[#EF7722] bg-white/95 backdrop-blur-sm"
+								className="group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl border-2 hover:border-student bg-white/95 backdrop-blur-sm"
 								onClick={() => setSelectedRole("child")}
 							>
 								<CardHeader className="text-center p-6">
-									<div className="mx-auto w-16 h-16 bg-[#EF7722]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#EF7722]/20 transition-colors">
-										<Sparkles className="h-10 w-10 text-[#EF7722]" />
+									<div className="mx-auto w-16 h-16 bg-student-light rounded-full flex items-center justify-center mb-3 group-hover:bg-student/20 transition-colors">
+										<Sparkles className="h-10 w-10 text-student" />
 									</div>
-									<CardTitle className="text-2xl text-[#EF7722] mb-2">I&apos;m a Student</CardTitle>
+									<CardTitle className="text-2xl text-student mb-2">I&apos;m a Student</CardTitle>
 									<CardDescription className="text-base text-text-secondary">
 										Start reading amazing stories made just for you!
 									</CardDescription>
@@ -89,15 +89,15 @@ export default function WelcomePage() {
 								<CardContent className="space-y-3 px-6 pb-6">
 									<div className="space-y-2 text-sm text-gray-700">
 										<div className="flex items-center space-x-2">
-											<BookOpen className="h-4 w-4 text-[#EF7722]" />
+											<BookOpen className="h-4 w-4 text-student" />
 											<span>Fun interactive stories</span>
 										</div>
 										<div className="flex items-center space-x-2">
-											<Star className="h-4 w-4 text-[#FAA533]" />
+											<Star className="h-4 w-4 text-student-secondary" />
 											<span>Reading games & rewards</span>
 										</div>
 										<div className="flex items-center space-x-2">
-											<Sparkles className="h-4 w-4 text-[#EF7722]" />
+											<Sparkles className="h-4 w-4 text-student" />
 											<span>AI-generated adventures</span>
 										</div>
 									</div>
@@ -133,8 +133,8 @@ export default function WelcomePage() {
 					/* Parent/Teacher Setup Screen */
 					<div className="max-w-2xl mx-auto text-center space-y-6 px-4 sm:px-0">
 						<div className="space-y-3">
-							<div className="mx-auto w-14 h-14 bg-[#0BA6DF]/10 rounded-full flex items-center justify-center mb-3">
-								<Users className="h-8 w-8 text-[#0BA6DF]" />
+							<div className="mx-auto w-14 h-14 bg-parent-light rounded-full flex items-center justify-center mb-3">
+								<Users className="h-8 w-8 text-parent" />
 							</div>
 							<h2 className="text-2xl font-bold text-gray-900">Parent/Teacher Setup</h2>
 							<p className="text-base text-text-secondary">
@@ -154,21 +154,21 @@ export default function WelcomePage() {
 									<h3 className="font-semibold">What you can do:</h3>
 									<div className="space-y-2 text-sm">
 										<div className="flex items-start space-x-3">
-											<ShieldCheck className="h-5 w-5 text-[#0BA6DF] mt-0.5" />
+											<ShieldCheck className="h-5 w-5 text-parent mt-0.5" />
 											<div>
 												<p className="font-medium">Set Reading Levels</p>
 												<p className="text-text-secondary">Control what content is appropriate for each child&apos;s age and ability</p>
 											</div>
 										</div>
 										<div className="flex items-start space-x-3">
-											<Star className="h-5 w-5 text-[#0BA6DF] mt-0.5" />
+											<Star className="h-5 w-5 text-parent mt-0.5" />
 											<div>
 												<p className="font-medium">Track Progress</p>
 												<p className="text-text-secondary">Monitor reading achievements and comprehension scores</p>
 											</div>
 										</div>
 										<div className="flex items-start space-x-3">
-											<Heart className="h-5 w-5 text-[#0BA6DF] mt-0.5" />
+											<Heart className="h-5 w-5 text-parent mt-0.5" />
 											<div>
 												<p className="font-medium">Manage Multiple Children</p>
 												<p className="text-text-secondary">Create profiles for multiple students or children</p>
@@ -177,8 +177,8 @@ export default function WelcomePage() {
 									</div>
 								</div>
 
-								<div className="bg-[#0BA6DF]/10 p-4 rounded-lg border border-[#0BA6DF]/20">
-									<h3 className="font-semibold text-[#0BA6DF] mb-2">Professional Features:</h3>
+								<div className="bg-parent-light p-4 rounded-lg border border-parent-border">
+									<h3 className="font-semibold text-parent mb-2">Professional Features:</h3>
 									<div className="space-y-2 text-sm text-gray-700">
 										<div className="flex items-center space-x-2">
 											<span className="text-lg">📊</span>
@@ -199,13 +199,13 @@ export default function WelcomePage() {
 									<Button
 										variant="outline"
 										onClick={() => setSelectedRole(null)}
-										className="flex-1 border-[#0BA6DF] text-[#0BA6DF] hover:bg-[#0BA6DF] hover:text-white"
+										className="flex-1 border-parent text-parent hover:bg-parent hover:text-white"
 									>
 										← Back
 									</Button>
 									<Button
 										asChild
-										className="flex-1 bg-[#0BA6DF] hover:bg-[#0BA6DF]/90 active:bg-[#0BA6DF]/80 focus:bg-[#0BA6DF] focus:ring-[#0BA6DF]/50 text-white border-[#0BA6DF]"
+										className="flex-1 bg-parent hover:bg-parent-hover active:bg-parent-active focus:bg-parent focus:ring-parent/50 text-white border-parent"
 									>
 										<Link href="/parent-setup">Continue Setup</Link>
 									</Button>
@@ -217,8 +217,8 @@ export default function WelcomePage() {
 					/* Child Login Screen */
 					<div className="max-w-2xl mx-auto text-center space-y-6 px-4 sm:px-0">
 						<div className="space-y-3">
-							<div className="mx-auto w-14 h-14 bg-[#EF7722]/10 rounded-full flex items-center justify-center mb-3">
-								<Sparkles className="h-8 w-8 text-[#EF7722]" />
+							<div className="mx-auto w-14 h-14 bg-student-light rounded-full flex items-center justify-center mb-3">
+								<Sparkles className="h-8 w-8 text-student" />
 							</div>
 							<h2 className="text-2xl font-bold text-gray-900">Ready to Read! 📚</h2>
 							<p className="text-base text-text-secondary">
@@ -237,8 +237,8 @@ export default function WelcomePage() {
 								</CardDescription>
 							</CardHeader>
 							<CardContent className="space-y-4">
-								<div className="bg-[#EF7722]/10 p-4 rounded-lg border border-[#EF7722]/20">
-									<h3 className="font-semibold text-[#EF7722] mb-2">What&apos;s waiting for you:</h3>
+								<div className="bg-student-light p-4 rounded-lg border border-student-border">
+									<h3 className="font-semibold text-student mb-2">What&apos;s waiting for you:</h3>
 									<div className="space-y-2 text-sm text-gray-700">
 										<div className="flex items-center space-x-2">
 											<span className="text-lg">🎨</span>
@@ -265,7 +265,7 @@ export default function WelcomePage() {
 									</Button>
 									<Button
 										asChild
-										className="flex-1 bg-[#EF7722] hover:bg-[#EF7722]/90 active:bg-[#EF7722]/80 focus:bg-[#EF7722] focus:ring-[#EF7722]/50 text-white border-[#EF7722]"
+										className="flex-1 bg-student hover:bg-student-hover active:bg-student-active focus:bg-student focus:ring-student/50 text-white border-student"
 									>
 										<Link href="/login?role=student">Start Reading!</Link>
 									</Button>

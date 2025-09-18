@@ -75,13 +75,13 @@ export function ShareStory({ story, showDownload = true }: ShareStoryProps) {
           <style>
             @media print {
               body { margin: 0; padding: 20px; font-family: Georgia, serif; }
-              h1 { color: #333; border-bottom: 2px solid #4A90E2; padding-bottom: 10px; }
+              h1 { color: #333; border-bottom: 2px solid var(--parent); padding-bottom: 10px; }
               .story-meta { background: #f5f5f5; padding: 10px; margin: 20px 0; border-radius: 5px; }
               .story-content { line-height: 1.6; font-size: 14px; }
               .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ccc; font-size: 12px; color: #666; }
             }
             body { font-family: Georgia, serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-            h1 { color: #333; border-bottom: 2px solid #4A90E2; padding-bottom: 10px; }
+            h1 { color: #333; border-bottom: 2px solid var(--parent); padding-bottom: 10px; }
             .story-meta { background: #f5f5f5; padding: 15px; margin: 20px 0; border-radius: 8px; }
             .story-content { line-height: 1.8; font-size: 16px; margin: 30px 0; }
             .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ccc; font-size: 14px; color: #666; }

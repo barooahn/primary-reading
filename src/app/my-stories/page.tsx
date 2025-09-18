@@ -166,7 +166,7 @@ export default function MyStoriesPage() {
 			</div>
 
 			{message && (
-				<div className='mb-6 p-4 border border-[#EF7722] rounded-lg bg-[#EF7722]/10 text-gray-900 flex items-center justify-between'>
+				<div className='mb-6 p-4 border border-student rounded-lg bg-student-light text-gray-900 flex items-center justify-between'>
 					<span>{message}</span>
 					<Button asChild>
 						<Link href='/login'>Sign in</Link>
@@ -178,13 +178,13 @@ export default function MyStoriesPage() {
 				<div className='grid md:grid-cols-2 lg:grid-cols-3 gap-6'>
 					{Array.from({ length: 6 }).map((_, idx) => (
 						<Card key={idx} className='overflow-hidden'>
-							<div className='w-full h-48 bg-[#EBEBEB] animate-pulse' />
+							<div className='w-full h-48 bg-light-gray animate-pulse' />
 							<CardHeader>
-								<div className='h-5 w-3/4 bg-[#EBEBEB] animate-pulse rounded mb-2' />
-								<div className='h-4 w-full bg-[#EBEBEB] animate-pulse rounded' />
+								<div className='h-5 w-3/4 bg-light-gray animate-pulse rounded mb-2' />
+								<div className='h-4 w-full bg-light-gray animate-pulse rounded' />
 							</CardHeader>
 							<CardContent>
-								<div className='h-10 w-full bg-[#EBEBEB] animate-pulse rounded' />
+								<div className='h-10 w-full bg-light-gray animate-pulse rounded' />
 							</CardContent>
 						</Card>
 					))}
@@ -209,7 +209,7 @@ export default function MyStoriesPage() {
 											blurDataURL={BLUR_DATA_URL}
 										/>
 									) : (
-										<div className='w-full h-48 bg-[#EF7722]/10 flex items-center justify-center'>
+										<div className='w-full h-48 bg-student-light flex items-center justify-center'>
 											<div className='text-center'>
 												<div className='text-4xl mb-2'>📚</div>
 												<div className='text-sm text-gray-900'>No Image</div>
@@ -241,7 +241,7 @@ export default function MyStoriesPage() {
 								<CardContent>
 									<div className='space-y-3'>
 										<div className='flex items-center justify-between text-sm'>
-											<span className='bg-[#EF7722]/10 text-[#EF7722] px-2 py-1 rounded-full text-xs font-medium border border-[#EF7722]'>
+											<span className='bg-student-light text-student px-2 py-1 rounded-full text-xs font-medium border border-student'>
 												{story.genre}
 											</span>
 											<span className='text-gray-600'>

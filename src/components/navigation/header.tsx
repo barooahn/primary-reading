@@ -103,7 +103,7 @@ export const Header = memo(function Header() {
 	return (
 		<header
 			ref={menuRef}
-			className='sticky top-0 z-50 w-full bg-white shadow-lg border-b-2 border-[#EF7722] dark:bg-slate-900 dark:border-[#FAA533] text-gray-800 dark:text-white'
+			className='sticky top-0 z-50 w-full bg-white shadow-lg border-b-2 border-student dark:bg-slate-900 dark:border-student-secondary text-gray-800 dark:text-white'
 			style={{ height: "80px", boxSizing: "border-box" }}
 		>
 			<div className='mx-auto px-6 sm:px-8 md:px-12 py-3 w-full h-full'>
@@ -116,13 +116,13 @@ export const Header = memo(function Header() {
 						aria-label='PrimaryReading Home'
 					>
 						<div className='relative'>
-							<div className='bg-gradient-to-br from-[#EF7722] to-[#FAA533] p-2.5 rounded-xl shadow-xl'>
+							<div className='bg-gradient-to-br from-student to-student-secondary p-2.5 rounded-xl shadow-xl'>
 								<BookOpen className='h-7 w-7 text-white' />
 								<Sparkles className='h-3 w-3 text-yellow-200 absolute -top-1 -right-1 animate-pulse' />
 							</div>
 						</div>
 						<div className='hidden sm:block'>
-							<h1 className='text-2xl font-black bg-gradient-to-r from-[#EF7722] to-[#FAA533] bg-clip-text text-transparent'>
+							<h1 className='text-2xl font-black bg-gradient-to-r from-student to-student-secondary bg-clip-text text-transparent'>
 								PrimaryReading
 							</h1>
 							<p className='text-xs text-gray-500 font-medium tracking-wide uppercase'>
@@ -141,28 +141,28 @@ export const Header = memo(function Header() {
 							href='/dashboard'
 							icon={<Rocket className='h-5 w-5' />}
 							label='Dashboard'
-							colorClass='text-white bg-[#EF7722] hover:bg-[#EF7722]/90 shadow-md hover:shadow-lg dark:bg-[#FAA533] dark:hover:bg-[#FAA533]/90'
+							colorClass='text-white bg-student hover:bg-student-hover shadow-md hover:shadow-lg dark:bg-student-secondary dark:hover:bg-student-secondary/90'
 							compact={compactNav}
 						/>
 						<IconNavButton
 							href='/stories'
 							icon={<BookOpen className='h-5 w-5' />}
 							label='Stories'
-							colorClass='text-white bg-[#0BA6DF] hover:bg-[#0BA6DF]/90 shadow-md hover:shadow-lg dark:bg-[#0BA6DF] dark:hover:bg-[#0BA6DF]/90'
+							colorClass='text-white bg-parent hover:bg-parent-hover shadow-md hover:shadow-lg dark:bg-parent dark:hover:bg-parent-hover'
 							compact={compactNav}
 						/>
 						<IconNavButton
 							href='/create'
 							icon={<Sparkles className='h-5 w-5' />}
 							label='Create'
-							colorClass='text-white bg-[#FAA533] hover:bg-[#FAA533]/90 shadow-md hover:shadow-lg dark:bg-[#EF7722] dark:hover:bg-[#EF7722]/90'
+							colorClass='text-white bg-student-secondary hover:bg-student-secondary/90 shadow-md hover:shadow-lg dark:bg-student dark:hover:bg-student-hover'
 							compact={compactNav}
 						/>
 						<IconNavButton
 							href='/progress'
 							icon={<Trophy className='h-5 w-5' />}
 							label='Progress'
-							colorClass='text-white bg-[#0BA6DF] hover:bg-[#0BA6DF]/90 shadow-md hover:shadow-lg dark:bg-[#FAA533] dark:hover:bg-[#FAA533]/90'
+							colorClass='text-white bg-parent hover:bg-parent-hover shadow-md hover:shadow-lg dark:bg-student-secondary dark:hover:bg-student-secondary/90'
 							compact={compactNav}
 						/>
 					</nav>
@@ -188,13 +188,13 @@ export const Header = memo(function Header() {
 													viewBox='0 0 36 36'
 												>
 													<path
-														className='stroke-[#EBEBEB]'
+														className='stroke-light-gray'
 														strokeWidth='4'
 														fill='transparent'
 														d='M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831'
 													/>
 													<path
-														className='stroke-[#0BA6DF]'
+														className='stroke-parent'
 														strokeWidth='4'
 														strokeDasharray={`${dailyProgress}, 100`}
 														strokeLinecap='round'
@@ -203,14 +203,14 @@ export const Header = memo(function Header() {
 													/>
 												</svg>
 											</div>
-											<span className='text-sm font-semibold text-[#0BA6DF] mr-3'>
+											<span className='text-sm font-semibold text-parent mr-3'>
 												{dailyProgress}%
 											</span>
-											<Flame className='h-4 w-4 text-[#EF7722] mr-1' />
-											<span className='text-sm font-bold text-[#EF7722] mr-3'>
+											<Flame className='h-4 w-4 text-student mr-1' />
+											<span className='text-sm font-bold text-student mr-3'>
 												{streakCount}
 											</span>
-											<Crown className='h-4 w-4 text-[#FAA533]' />
+											<Crown className='h-4 w-4 text-student-secondary' />
 										</div>
 										<div className='absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50'>
 											{dailyProgress}% Today • 🔥
@@ -233,7 +233,7 @@ export const Header = memo(function Header() {
 									onClick={() => setIsPinModalOpen(true)}
 									className={`hidden sm:flex items-center gap-2 ${
 										compactNav ? "h-10" : "h-12"
-									} px-3 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-gray-200/70 dark:border-slate-700 rounded-full shadow-sm transition-all duration-200 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200`}
+									} px-3 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-parent/30 dark:border-slate-700 rounded-full shadow-sm transition-all duration-200 text-xs font-medium text-parent dark:text-parent hover:text-parent-hover dark:hover:text-parent-hover`}
 									title="Parent/Teacher Access"
 								>
 									<Shield className="h-3.5 w-3.5" />
@@ -259,9 +259,9 @@ export const Header = memo(function Header() {
 							aria-expanded={isMenuOpen}
 						>
 							{isMenuOpen ? (
-								<X className='h-4 w-4' />
+								<X className='h-4 w-4 text-student' />
 							) : (
-								<Menu className='h-4 w-4' />
+								<Menu className='h-4 w-4 text-student' />
 							)}
 						</Button>
 					</div>
@@ -380,11 +380,11 @@ export const Header = memo(function Header() {
 											</div>
 											<div className='grid grid-cols-3 gap-2'>
 												<div className='text-center p-2 bg-white/70 rounded-lg'>
-													<Target className='h-5 w-5 text-[#0BA6DF] mx-auto mb-1' />
-													<div className='text-xs font-semibold text-[#0BA6DF]'>
+													<Target className='h-5 w-5 text-parent mx-auto mb-1' />
+													<div className='text-xs font-semibold text-parent'>
 														Today
 													</div>
-													<div className='text-sm font-bold text-[#0BA6DF]'>
+													<div className='text-sm font-bold text-parent'>
 														{
 															dailyProgress
 														}
@@ -392,22 +392,22 @@ export const Header = memo(function Header() {
 													</div>
 												</div>
 												<div className='text-center p-2 bg-white/70 rounded-lg'>
-													<Flame className='h-5 w-5 text-[#EF7722] mx-auto mb-1' />
-													<div className='text-xs font-semibold text-[#EF7722]'>
+													<Flame className='h-5 w-5 text-student mx-auto mb-1' />
+													<div className='text-xs font-semibold text-student'>
 														Streak
 													</div>
-													<div className='text-sm font-bold text-[#EF7722]'>
+													<div className='text-sm font-bold text-student'>
 														{
 															streakCount
 														}
 													</div>
 												</div>
 												<div className='text-center p-2 bg-white/70 rounded-lg'>
-													<Crown className='h-5 w-5 text-[#FAA533] mx-auto mb-1' />
-													<div className='text-xs font-semibold text-[#FAA533]'>
+													<Crown className='h-5 w-5 text-student-secondary mx-auto mb-1' />
+													<div className='text-xs font-semibold text-student-secondary'>
 														Level
 													</div>
-													<div className='text-sm font-bold text-[#FAA533]'>
+													<div className='text-sm font-bold text-student-secondary'>
 														3
 													</div>
 												</div>

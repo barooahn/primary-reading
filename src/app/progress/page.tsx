@@ -58,12 +58,12 @@ export default function ProgressPage() {
 					</div>
 
 					{/* Level Progress */}
-					<Card className='mb-8 bg-gradient-to-r from-[#EF7722]/10 to-[#FAA533]/10 border-[#EF7722]/30'>
+					<Card className='mb-8 bg-gradient-to-r from-student/10 to-student-secondary/10 border-student-border'>
 						<CardContent className='p-6'>
 							<div className='flex items-center justify-between mb-4'>
 								<div className='flex items-center space-x-4'>
-									<div className='p-3 bg-[#EF7722]/20 rounded-full'>
-										<Crown className='h-8 w-8 text-[#EF7722]' />
+									<div className='p-3 bg-student/20 rounded-full'>
+										<Crown className='h-8 w-8 text-student' />
 									</div>
 									<div>
 										<h2 className='text-2xl font-bold'>
@@ -94,7 +94,7 @@ export default function ProgressPage() {
 
 							<div className='w-full bg-muted/30 rounded-full h-3 mb-2'>
 								<div
-									className='bg-gradient-to-r from-[#EF7722] to-[#FAA533] h-3 rounded-full transition-all duration-500'
+									className='bg-gradient-to-r from-student to-student-secondary h-3 rounded-full transition-all duration-500'
 									style={{ width: `${xpProgress}%` }}
 								/>
 							</div>
@@ -145,7 +145,7 @@ export default function ProgressPage() {
 										}
 										className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
 											selectedTab === tab.key
-												? "bg-[#EF7722] text-white shadow-sm"
+												? "bg-student text-white shadow-sm"
 												: "text-muted hover:text-foreground"
 										}`}
 									>
@@ -162,11 +162,11 @@ export default function ProgressPage() {
 						<div className='space-y-8'>
 							{/* Key Stats */}
 							<div className='grid md:grid-cols-2 lg:grid-cols-4 gap-6'>
-								<Card className='bg-gradient-to-br from-[#EF7722]/10 to-[#EF7722]/5 border-[#EF7722]/30'>
+								<Card className='bg-gradient-to-br from-student/10 to-student/5 border-student-border'>
 									<CardContent className='p-6'>
 										<div className='flex items-center justify-between'>
 											<div>
-												<p className='text-sm font-medium text-[#EF7722]'>
+												<p className='text-sm font-medium text-student'>
 													Stories Read
 												</p>
 												<p className='text-3xl font-bold'>
@@ -175,16 +175,16 @@ export default function ProgressPage() {
 													}
 												</p>
 											</div>
-											<BookOpen className='h-12 w-12 text-[#EF7722]/60' />
+											<BookOpen className='h-12 w-12 text-student/60' />
 										</div>
 									</CardContent>
 								</Card>
 
-								<Card className='bg-gradient-to-br from-[#FAA533]/10 to-[#FAA533]/5 border-[#FAA533]/30'>
+								<Card className='bg-gradient-to-br from-student-secondary/10 to-student-secondary/5 border-student-secondary/30'>
 									<CardContent className='p-6'>
 										<div className='flex items-center justify-between'>
 											<div>
-												<p className='text-sm font-medium text-[#FAA533]'>
+												<p className='text-sm font-medium text-student-secondary'>
 													Reading Streak
 												</p>
 												<p className='text-3xl font-bold'>
@@ -196,7 +196,7 @@ export default function ProgressPage() {
 													days
 												</p>
 											</div>
-											<Flame className='h-12 w-12 text-[#FAA533]/60' />
+											<Flame className='h-12 w-12 text-student-secondary/60' />
 										</div>
 									</CardContent>
 								</Card>
@@ -220,11 +220,11 @@ export default function ProgressPage() {
 									</CardContent>
 								</Card>
 
-								<Card className='bg-gradient-to-br from-[#0BA6DF]/10 to-[#0BA6DF]/5 border-[#0BA6DF]/30'>
+								<Card className='bg-gradient-to-br from-parent/10 to-parent/5 border-parent-border'>
 									<CardContent className='p-6'>
 										<div className='flex items-center justify-between'>
 											<div>
-												<p className='text-sm font-medium text-[#0BA6DF]'>
+												<p className='text-sm font-medium text-parent'>
 													Time Reading
 												</p>
 												<p className='text-3xl font-bold'>
@@ -236,7 +236,7 @@ export default function ProgressPage() {
 													minutes
 												</p>
 											</div>
-											<Clock className='h-12 w-12 text-[#0BA6DF]/60' />
+											<Clock className='h-12 w-12 text-parent/60' />
 										</div>
 									</CardContent>
 								</Card>
@@ -245,9 +245,9 @@ export default function ProgressPage() {
 					)}
 
 					{/* Motivational Card */}
-					<Card className='mt-8 bg-gradient-to-r from-green-500/10 to-[#EF7722]/10 border-green-500/30'>
+					<Card className='mt-8 bg-gradient-to-r from-green-500/10 to-student/10 border-green-500/30'>
 						<CardContent className='p-6 text-center'>
-							<Star className='h-12 w-12 text-[#FAA533] mx-auto mb-4' />
+							<Star className='h-12 w-12 text-student-secondary mx-auto mb-4' />
 							<h3 className='text-xl font-semibold mb-2'>
 								You&apos;re An Amazing Reader! 🌟
 							</h3>

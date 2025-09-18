@@ -52,24 +52,24 @@ function MetricCard({
 	const getBackgroundColor = () => {
 		switch (type) {
 			case "excellent":
-				return "bg-[#EF7722]/50 border-2 border-[#EF7722]"; // Primary Orange - muted
+				return "bg-student/50 border-2 border-student"; // Student orange - muted
 			case "good":
-				return "bg-[#FAA533]/50 border-2 border-[#FAA533]"; // Secondary Orange - muted
+				return "bg-student-secondary/50 border-2 border-student-secondary"; // Student secondary orange - muted
 			case "needs-attention":
-				return "bg-[#0BA6DF]/50 border-2 border-[#0BA6DF]"; // Primary Blue - muted
+				return "bg-parent/50 border-2 border-parent"; // Parent blue - muted
 			default:
-				return "bg-[#EBEBEB] border-2 border-gray-300"; // Light Gray
+				return "bg-light-gray border-2 border-gray-300"; // Light Gray
 		}
 	};
 
 	const getIcon = () => {
 		switch (type) {
 			case "excellent":
-				return <CheckCircle className='h-6 w-6 text-[#EF7722]' />;
+				return <CheckCircle className='h-6 w-6 text-student' />;
 			case "good":
-				return <Star className='h-6 w-6 text-[#FAA533]' />;
+				return <Star className='h-6 w-6 text-student-secondary' />;
 			case "needs-attention":
-				return <AlertCircle className='h-6 w-6 text-[#0BA6DF]' />;
+				return <AlertCircle className='h-6 w-6 text-parent' />;
 			default:
 				return <Star className='h-6 w-6 text-gray-300' />;
 		}
@@ -171,9 +171,9 @@ export default function DashboardPage() {
 	if (isLoading) {
 		return (
 			<ProtectedRoute>
-				<div className='min-h-screen bg-[#EBEBEB]/50 flex items-center justify-center'>
+				<div className='min-h-screen bg-light-gray/50 flex items-center justify-center'>
 					<div className='bg-white/95 backdrop-blur-sm rounded-3xl p-8 max-w-md w-full mx-4 text-center shadow-lg'>
-						<div className='animate-spin rounded-full h-12 w-12 border-b-2 border-[#EF7722] mx-auto mb-4'></div>
+						<div className='animate-spin rounded-full h-12 w-12 border-b-2 border-student mx-auto mb-4'></div>
 						<p className='text-gray-700'>
 							Loading your reading adventure...
 						</p>
@@ -186,15 +186,15 @@ export default function DashboardPage() {
 	return (
 		<ProtectedRoute>
 			<div
-				className='bg-[#EBEBEB]/50 overflow-y-auto relative'
+				className='bg-light-gray/50 overflow-y-auto relative'
 				style={{ height: 'calc(100vh - 80px)' }}
 			>
 				{/* Background Decoration */}
 				<div className="absolute inset-0 overflow-hidden pointer-events-none">
-					<div className="absolute top-10 left-10 w-32 h-32 bg-[#EF7722]/20 rounded-full blur-3xl animate-pulse" />
-					<div className="absolute bottom-10 right-10 w-40 h-40 bg-[#FAA533]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
-					<div className="absolute top-1/2 left-1/4 w-24 h-24 bg-[#0BA6DF]/20 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "2s" }} />
-					<div className="absolute top-20 right-1/4 w-28 h-28 bg-[#FAA533]/15 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "0.5s" }} />
+					<div className="absolute top-10 left-10 w-32 h-32 bg-student/20 rounded-full blur-3xl animate-pulse" />
+					<div className="absolute bottom-10 right-10 w-40 h-40 bg-student-secondary/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+					<div className="absolute top-1/2 left-1/4 w-24 h-24 bg-parent/20 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "2s" }} />
+					<div className="absolute top-20 right-1/4 w-28 h-28 bg-student-secondary/15 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "0.5s" }} />
 				</div>
 
 				<div className='max-w-6xl mx-auto px-4 py-3 space-y-3 relative z-10'>
@@ -211,15 +211,15 @@ export default function DashboardPage() {
 							</div>
 
 							<div className='flex items-center gap-4'>
-								<div className='flex items-center gap-2 text-sm text-gray-700 bg-[#EF7722]/10 px-3 py-1 rounded-full'>
-									<Flame className='h-4 w-4 text-[#EF7722]' />
+								<div className='flex items-center gap-2 text-sm text-gray-700 bg-student-light px-3 py-1 rounded-full'>
+									<Flame className='h-4 w-4 text-student' />
 									<span className='font-semibold'>
 										{userProgress?.readingStreak || 7} Day Streak
 									</span>
 								</div>
 
-								<div className='flex items-center gap-2 text-sm text-gray-700 bg-[#FAA533]/10 px-3 py-1 rounded-full'>
-									<Crown className='h-4 w-4 text-[#FAA533]' />
+								<div className='flex items-center gap-2 text-sm text-gray-700 bg-student-secondary/10 px-3 py-1 rounded-full'>
+									<Crown className='h-4 w-4 text-student-secondary' />
 									<span className='font-semibold'>
 										Level {userProgress?.level || 3}
 									</span>
@@ -298,7 +298,7 @@ export default function DashboardPage() {
 							{/* Achievements & Badges */}
 							<div className='bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4'>
 								<h3 className='text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2'>
-									<Award className='h-5 w-5 text-[#EF7722]' />
+									<Award className='h-5 w-5 text-student' />
 									Recent Achievements
 								</h3>
 								<div className='space-y-3'>
@@ -341,7 +341,7 @@ export default function DashboardPage() {
 												</div>
 												{badge.earned && (
 													<div className='ml-auto'>
-														<CheckCircle className='h-5 w-5 text-[#0BA6DF]' />
+														<CheckCircle className='h-5 w-5 text-parent' />
 													</div>
 												)}
 											</div>
@@ -351,9 +351,9 @@ export default function DashboardPage() {
 							</div>
 
 							{/* Reading Goals & Progress */}
-							<div className='bg-[#0BA6DF]/10 rounded-xl p-4'>
+							<div className='bg-parent-light rounded-xl p-4'>
 								<h3 className='text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2'>
-									<Target className='h-5 w-5 text-[#0BA6DF]' />
+									<Target className='h-5 w-5 text-parent' />
 									Reading Goals
 								</h3>
 								<div className='space-y-4'>
@@ -369,7 +369,7 @@ export default function DashboardPage() {
 										</div>
 										<div className='w-full bg-gray-200 rounded-full h-2'>
 											<div
-												className='bg-[#0BA6DF] h-2 rounded-full'
+												className='bg-parent h-2 rounded-full'
 												style={{
 													width: "80%",
 												}}
@@ -389,7 +389,7 @@ export default function DashboardPage() {
 										</div>
 										<div className='w-full bg-gray-200 rounded-full h-2'>
 											<div
-												className='bg-[#EF7722] h-2 rounded-full'
+												className='bg-student h-2 rounded-full'
 												style={{
 													width: "60%",
 												}}
@@ -409,7 +409,7 @@ export default function DashboardPage() {
 										</div>
 										<div className='w-full bg-gray-200 rounded-full h-2'>
 											<div
-												className='bg-[#FAA533] h-2 rounded-full'
+												className='bg-student-secondary h-2 rounded-full'
 												style={{
 													width: "62.5%",
 												}}
@@ -428,7 +428,7 @@ export default function DashboardPage() {
 						</h2>
 						<div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
 							<Link href='/stories'>
-								<div className='bg-[#0BA6DF] hover:bg-[#0BA6DF]/90 rounded-xl p-4 text-white transition-all duration-200 hover:scale-105 cursor-pointer'>
+								<div className='bg-parent hover:bg-parent-hover rounded-xl p-4 text-white transition-all duration-200 hover:scale-105 cursor-pointer'>
 									<div className='flex items-center gap-3 mb-2'>
 										<BookOpen className='h-6 w-6' />
 										<span className='font-semibold'>
@@ -442,7 +442,7 @@ export default function DashboardPage() {
 							</Link>
 
 							<Link href='/create'>
-								<div className='bg-[#EF7722] hover:bg-[#EF7722]/90 rounded-xl p-4 text-white transition-all duration-200 hover:scale-105 cursor-pointer'>
+								<div className='bg-student hover:bg-student-hover rounded-xl p-4 text-white transition-all duration-200 hover:scale-105 cursor-pointer'>
 									<div className='flex items-center gap-3 mb-2'>
 										<Sparkles className='h-6 w-6' />
 										<span className='font-semibold'>
@@ -456,7 +456,7 @@ export default function DashboardPage() {
 							</Link>
 
 							<Link href='/progress'>
-								<div className='bg-[#FAA533] hover:bg-[#FAA533]/90 rounded-xl p-4 text-white transition-all duration-200 hover:scale-105 cursor-pointer'>
+								<div className='bg-student-secondary hover:bg-student-secondary/90 rounded-xl p-4 text-white transition-all duration-200 hover:scale-105 cursor-pointer'>
 									<div className='flex items-center gap-3 mb-2'>
 										<Trophy className='h-6 w-6' />
 										<span className='font-semibold'>

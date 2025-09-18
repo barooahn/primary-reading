@@ -61,10 +61,10 @@ export default function UpdatePasswordPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#EBEBEB]/50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center bg-light-gray/50 py-12 px-4 sm:px-6 lg:px-8">
         <Card className="w-full max-w-md">
           <CardContent className="p-6 text-center">
-            <div className="text-[#EF7722] text-4xl mb-4">✓</div>
+            <div className="text-student text-4xl mb-4">✓</div>
             <h2 className="text-xl font-semibold mb-2 text-gray-900">Password Updated Successfully!</h2>
             <p className="text-gray-600">Redirecting you to the dashboard...</p>
           </CardContent>
@@ -74,7 +74,7 @@ export default function UpdatePasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#EBEBEB]/50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-light-gray/50 py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-gray-900">Update Your Password</CardTitle>

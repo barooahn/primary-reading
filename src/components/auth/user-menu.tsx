@@ -118,7 +118,7 @@ export function UserMenu() {
 				aria-haspopup='menu'
 				aria-expanded={open}
 				onClick={() => setOpen((v) => !v)}
-				className='flex items-center gap-2 h-9 pl-2 pr-3 rounded-full bg-white/80 hover:bg-white hover:shadow-md border border-gray-200/70 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#EF7722]/30 text-slate-800 transition-all duration-200'
+				className='flex items-center gap-2 h-9 pl-2 pr-3 rounded-full bg-white/80 hover:bg-white hover:shadow-md border border-gray-200/70 shadow-sm focus:outline-none focus:ring-2 focus:ring-student/30 text-slate-800 transition-all duration-200'
 			>
 				{avatarUrl ? (
 					<Image
@@ -129,7 +129,7 @@ export function UserMenu() {
 						className='h-6 w-6 rounded-full object-cover'
 					/>
 				) : (
-					<span className='inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-[#EF7722] to-[#FAA533] text-gray-700 text-[10px] font-semibold'>
+					<span className='inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-student to-student-secondary text-gray-700 text-[10px] font-semibold'>
 						{displayName
 							.split(" ")
 							.map((s) => s[0])
@@ -156,7 +156,7 @@ export function UserMenu() {
 						role='menuitem'
 						tabIndex={-1}
 						ref={(el) => setItemRef(el, 0)}
-						className='flex items-center gap-2 px-3 py-2 text-sm hover:bg-[#0BA6DF]/10 hover:text-[#0BA6DF] text-gray-700 focus:bg-[#0BA6DF]/10 focus:text-[#0BA6DF] focus:outline-none transition-colors duration-150'
+						className='flex items-center gap-2 px-3 py-2 text-sm hover:bg-parent-light hover:text-parent text-gray-700 focus:bg-parent-light focus:text-parent focus:outline-none transition-colors duration-150'
 					>
 						<User className='h-4 w-4' />
 						Profile
@@ -167,7 +167,7 @@ export function UserMenu() {
 						role='menuitem'
 						tabIndex={-1}
 						ref={(el) => setItemRef(el, 1)}
-						className='flex items-center gap-2 px-3 py-2 text-sm hover:bg-[#0BA6DF]/10 hover:text-[#0BA6DF] text-gray-700 focus:bg-[#0BA6DF]/10 focus:text-[#0BA6DF] focus:outline-none transition-colors duration-150'
+						className='flex items-center gap-2 px-3 py-2 text-sm hover:bg-parent-light hover:text-parent text-gray-700 focus:bg-parent-light focus:text-parent focus:outline-none transition-colors duration-150'
 					>
 						<LayoutDashboard className='h-4 w-4' />
 						My Dashboard
@@ -178,7 +178,7 @@ export function UserMenu() {
 						role='menuitem'
 						tabIndex={-1}
 						ref={(el) => setItemRef(el, 2)}
-						className='flex items-center gap-2 px-3 py-2 text-sm hover:bg-[#0BA6DF]/10 hover:text-[#0BA6DF] text-gray-700 focus:bg-[#0BA6DF]/10 focus:text-[#0BA6DF] focus:outline-none transition-colors duration-150'
+						className='flex items-center gap-2 px-3 py-2 text-sm hover:bg-parent-light hover:text-parent text-gray-700 focus:bg-parent-light focus:text-parent focus:outline-none transition-colors duration-150'
 					>
 						<SettingsIcon className='h-4 w-4' />
 						Settings
@@ -189,7 +189,7 @@ export function UserMenu() {
 						role='menuitem'
 						tabIndex={-1}
 						ref={(el) => setItemRef(el, 3)}
-						className='flex items-center gap-2 px-3 py-2 text-sm hover:bg-[#0BA6DF]/10 hover:text-[#0BA6DF] text-gray-700 focus:bg-[#0BA6DF]/10 focus:text-[#0BA6DF] focus:outline-none transition-colors duration-150'
+						className='flex items-center gap-2 px-3 py-2 text-sm hover:bg-parent-light hover:text-parent text-gray-700 focus:bg-parent-light focus:text-parent focus:outline-none transition-colors duration-150'
 					>
 						<BookOpen className='h-4 w-4' />
 						Story Library
@@ -200,7 +200,7 @@ export function UserMenu() {
 						role='menuitem'
 						tabIndex={-1}
 						ref={(el) => setItemRef(el, 4)}
-						className='flex items-center gap-2 px-3 py-2 text-sm hover:bg-[#0BA6DF]/10 hover:text-[#0BA6DF] text-gray-700 focus:bg-[#0BA6DF]/10 focus:text-[#0BA6DF] focus:outline-none transition-colors duration-150'
+						className='flex items-center gap-2 px-3 py-2 text-sm hover:bg-parent-light hover:text-parent text-gray-700 focus:bg-parent-light focus:text-parent focus:outline-none transition-colors duration-150'
 					>
 						<BookOpen className='h-4 w-4' />
 						My Stories
@@ -211,7 +211,7 @@ export function UserMenu() {
 						role='menuitem'
 						tabIndex={-1}
 						ref={(el) => setItemRef(el, 5)}
-						className='flex items-center gap-2 px-3 py-2 text-sm hover:bg-[#0BA6DF]/10 hover:text-[#0BA6DF] text-gray-700 focus:bg-[#0BA6DF]/10 focus:text-[#0BA6DF] focus:outline-none transition-colors duration-150'
+						className='flex items-center gap-2 px-3 py-2 text-sm hover:bg-parent-light hover:text-parent text-gray-700 focus:bg-parent-light focus:text-parent focus:outline-none transition-colors duration-150'
 					>
 						<Sparkles className='h-4 w-4' />
 						Create Story
@@ -222,7 +222,7 @@ export function UserMenu() {
 						role='menuitem'
 						tabIndex={-1}
 						ref={(el) => setItemRef(el, 6)}
-						className='flex items-center gap-2 px-3 py-2 text-sm hover:bg-[#0BA6DF]/10 hover:text-[#0BA6DF] text-gray-700 focus:bg-[#0BA6DF]/10 focus:text-[#0BA6DF] focus:outline-none transition-colors duration-150'
+						className='flex items-center gap-2 px-3 py-2 text-sm hover:bg-parent-light hover:text-parent text-gray-700 focus:bg-parent-light focus:text-parent focus:outline-none transition-colors duration-150'
 					>
 						<Trophy className='h-4 w-4' />
 						My Progress
@@ -233,7 +233,7 @@ export function UserMenu() {
 						role='menuitem'
 						tabIndex={-1}
 						ref={(el) => setItemRef(el, 7)}
-						className='w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-[#EF7722]/10 hover:text-[#EF7722] text-[#EF7722] focus:bg-[#EF7722]/10 focus:text-[#EF7722] focus:outline-none transition-colors duration-150'
+						className='w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-student-light hover:text-student text-student focus:bg-student-light focus:text-student focus:outline-none transition-colors duration-150'
 					>
 						<LogOut className='h-4 w-4' />
 						Sign out

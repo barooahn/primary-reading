@@ -73,7 +73,7 @@ export default function ProfilePage() {
 					Profile
 				</h1>
 
-				<div className='rounded-xl border border-[#EF7722] bg-[#EF7722]/10 shadow-sm p-4 space-y-5 max-w-xl'>
+				<div className='rounded-xl border border-student bg-student-light shadow-sm p-4 space-y-5 max-w-xl'>
 					<div className='flex items-center gap-3'>
 						{avatarUrl ? (
 							<Image
@@ -84,7 +84,7 @@ export default function ProfilePage() {
 								className='h-12 w-12 rounded-full object-cover'
 							/>
 						) : (
-							<span className='inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#EF7722] text-white text-base font-semibold'>
+							<span className='inline-flex h-12 w-12 items-center justify-center rounded-full bg-student text-white text-base font-semibold'>
 								{initials}
 							</span>
 						)}
@@ -108,7 +108,7 @@ export default function ProfilePage() {
 								onChange={(e) =>
 									setDisplayName(e.target.value)
 								}
-								className='w-full h-9 rounded-md border border-[#EF7722] bg-white px-2 text-sm text-gray-900 focus:border-[#EF7722] focus:ring-1 focus:ring-[#EF7722] focus:outline-none'
+								className='w-full h-9 rounded-md border border-student bg-white px-2 text-sm text-gray-900 focus:border-student focus:ring-1 focus:ring-student focus:outline-none'
 								placeholder='Your name'
 							/>
 						</label>
@@ -122,7 +122,7 @@ export default function ProfilePage() {
 								onChange={(e) =>
 									setAvatarUrl(e.target.value)
 								}
-								className='w-full h-9 rounded-md border border-[#EF7722] bg-white px-2 text-sm text-gray-900 focus:border-[#EF7722] focus:ring-1 focus:ring-[#EF7722] focus:outline-none'
+								className='w-full h-9 rounded-md border border-student bg-white px-2 text-sm text-gray-900 focus:border-student focus:ring-1 focus:ring-student focus:outline-none'
 								placeholder='https://...'
 							/>
 							<div className='text-xs text-gray-500 mt-1'>
@@ -136,7 +136,7 @@ export default function ProfilePage() {
 								Upload avatar
 							</div>
 							<div className='flex items-center gap-3'>
-								<label className='inline-flex items-center justify-center h-9 px-4 rounded-md bg-[#EF7722]/10 border border-[#EF7722] text-gray-900 text-sm font-medium hover:bg-[#EF7722]/20 cursor-pointer transition-colors'>
+								<label className='inline-flex items-center justify-center h-9 px-4 rounded-md bg-student-light border border-student text-gray-900 text-sm font-medium hover:bg-student/20 cursor-pointer transition-colors'>
 									<Upload className='h-4 w-4 mr-2' />
 									Choose Image
 									<input
@@ -151,7 +151,7 @@ export default function ProfilePage() {
 									/>
 								</label>
 								{file && (
-									<div className='flex items-center text-sm text-[#EF7722]'>
+									<div className='flex items-center text-sm text-student'>
 										<Camera className='h-4 w-4 mr-1' />
 										{file.name}
 									</div>
@@ -168,7 +168,7 @@ export default function ProfilePage() {
 							type='button'
 							onClick={onSave}
 							disabled={saving}
-							className='inline-flex items-center justify-center h-9 px-4 rounded-md bg-[#EF7722] text-white text-sm disabled:opacity-60 hover:bg-[#FAA533] transition-colors'
+							className='inline-flex items-center justify-center h-9 px-4 rounded-md bg-student text-white text-sm disabled:opacity-60 hover:bg-student-secondary transition-colors'
 						>
 							{saving ? "Saving…" : "Save changes"}
 						</button>

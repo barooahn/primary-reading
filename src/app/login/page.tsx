@@ -27,7 +27,7 @@ function LoginContent() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-70px)]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#EF7722]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-student"></div>
       </div>
     );
   }
@@ -37,13 +37,13 @@ function LoginContent() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-70px)] min-h-[calc(100dvh-70px)] bg-[#EBEBEB]/50 relative overflow-hidden">
+    <div className="min-h-[calc(100vh-70px)] min-h-[calc(100dvh-70px)] bg-light-gray/50 relative overflow-hidden">
       {/* Enhanced Background Decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-[#EF7722]/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-10 right-10 w-40 h-40 bg-[#FAA533]/20 rounded-full blur-3xl animate-float-delayed" />
-        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-[#0BA6DF]/20 rounded-full blur-2xl animate-bounce-slow" />
-        <div className="absolute top-20 right-1/4 w-28 h-28 bg-[#FAA533]/15 rounded-full blur-2xl animate-float" />
+        <div className="absolute top-10 left-10 w-32 h-32 bg-student/20 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-10 right-10 w-40 h-40 bg-student-secondary/20 rounded-full blur-3xl animate-float-delayed" />
+        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-parent/20 rounded-full blur-2xl animate-bounce-slow" />
+        <div className="absolute top-20 right-1/4 w-28 h-28 bg-student-secondary/15 rounded-full blur-2xl animate-float" />
       </div>
 
       <div className="relative z-10 min-h-[calc(100vh-70px)] flex items-center justify-center p-3 sm:p-4">
@@ -70,10 +70,10 @@ function LoginContent() {
                   {role === 'student' ? (
                     <>
                       <span className="text-gray-900">{formMode === 'signin' ? 'Welcome Back, ' : 'Join the Reading '}</span>
-                      <span className="text-[#EF7722]">{formMode === 'signin' ? 'Reader! ✨' : 'Adventure! 🌟'}</span>
+                      <span className="text-student">{formMode === 'signin' ? 'Reader! ✨' : 'Adventure! 🌟'}</span>
                     </>
                   ) : (
-                    <span className="text-[#EF7722]">
+                    <span className="text-student">
                       {formMode === 'signin' ? 'Welcome Back' : 'Welcome to PrimaryReading'}
                     </span>
                   )}
@@ -92,8 +92,8 @@ function LoginContent() {
                 {/* Role-based Encouragement Badge */}
                 {role === 'student' && (
                   <div className="flex justify-center lg:justify-start">
-                    <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-2xl bg-[#EF7722]/10 border-2 border-[#EF7722]/30 shadow-sm">
-                      <span className="text-sm font-semibold text-[#EF7722]">🎯 Keep Reading, Keep Growing!</span>
+                    <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-2xl bg-student-light border-2 border-student/30 shadow-sm">
+                      <span className="text-sm font-semibold text-student">🎯 Keep Reading, Keep Growing!</span>
                     </div>
                   </div>
                 )}
@@ -102,7 +102,7 @@ function LoginContent() {
               {/* Feature Preview - Hidden on mobile and optimized for height */}
               <div className="hidden lg:block xl:block">
                 {role === 'student' ? (
-                  <div className="bg-white/80 backdrop-blur-sm border-2 border-[#EF7722]/20 rounded-2xl p-4 lg:p-6 shadow-sm">
+                  <div className="bg-white/80 backdrop-blur-sm border-2 border-student/20 rounded-2xl p-4 lg:p-6 shadow-sm">
                     <p className="text-sm text-gray-900 font-semibold mb-2 lg:mb-3">
                       🎮 After you sign in, you&apos;ll be able to:
                     </p>
@@ -122,7 +122,7 @@ function LoginContent() {
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-white/80 backdrop-blur-sm border-2 border-[#0BA6DF]/20 rounded-2xl p-4 lg:p-6 shadow-sm">
+                  <div className="bg-white/80 backdrop-blur-sm border-2 border-parent-border rounded-2xl p-4 lg:p-6 shadow-sm">
                     <p className="text-sm text-gray-900 font-semibold mb-2 lg:mb-3">
                       👨‍👩‍👧‍👦 Parent/Teacher Dashboard includes:
                     </p>
@@ -163,7 +163,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-[calc(100vh-70px)]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#EF7722]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-student"></div>
       </div>
     }>
       <LoginContent />

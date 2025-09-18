@@ -10,10 +10,10 @@ export default function AuthErrorPage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#EBEBEB]/50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-light-gray/50 py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="flex items-center justify-center gap-2 text-[#EF7722]">
+          <CardTitle className="flex items-center justify-center gap-2 text-student">
             <AlertCircle className="h-5 w-5" />
             Authentication Error
           </CardTitle>
