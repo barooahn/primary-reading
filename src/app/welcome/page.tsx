@@ -61,11 +61,11 @@ export default function WelcomePage() {
 											<span>Control age-appropriate content</span>
 										</div>
 										<div className="flex items-center space-x-2">
-											<Star className="h-4 w-4 text-[#FAA533]" />
+											<Star className="h-4 w-4 text-[#0BA6DF]" />
 											<span>Track reading progress</span>
 										</div>
 										<div className="flex items-center space-x-2">
-											<Heart className="h-4 w-4 text-[#EF7722]" />
+											<Heart className="h-4 w-4 text-[#0BA6DF]" />
 											<span>Create safe reading environment</span>
 										</div>
 									</div>
@@ -89,7 +89,7 @@ export default function WelcomePage() {
 								<CardContent className="space-y-3 px-6 pb-6">
 									<div className="space-y-2 text-sm text-gray-700">
 										<div className="flex items-center space-x-2">
-											<BookOpen className="h-4 w-4 text-[#0BA6DF]" />
+											<BookOpen className="h-4 w-4 text-[#EF7722]" />
 											<span>Fun interactive stories</span>
 										</div>
 										<div className="flex items-center space-x-2">
