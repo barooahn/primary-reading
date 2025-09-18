@@ -161,18 +161,36 @@ export default function WelcomePage() {
 											</div>
 										</div>
 										<div className="flex items-start space-x-3">
-											<Star className="h-5 w-5 text-[#FAA533] mt-0.5" />
+											<Star className="h-5 w-5 text-[#0BA6DF] mt-0.5" />
 											<div>
 												<p className="font-medium">Track Progress</p>
 												<p className="text-text-secondary">Monitor reading achievements and comprehension scores</p>
 											</div>
 										</div>
 										<div className="flex items-start space-x-3">
-											<Heart className="h-5 w-5 text-[#EF7722] mt-0.5" />
+											<Heart className="h-5 w-5 text-[#0BA6DF] mt-0.5" />
 											<div>
 												<p className="font-medium">Manage Multiple Children</p>
 												<p className="text-text-secondary">Create profiles for multiple students or children</p>
 											</div>
+										</div>
+									</div>
+								</div>
+
+								<div className="bg-[#0BA6DF]/10 p-4 rounded-lg border border-[#0BA6DF]/20">
+									<h3 className="font-semibold text-[#0BA6DF] mb-2">Professional Features:</h3>
+									<div className="space-y-2 text-sm text-gray-700">
+										<div className="flex items-center space-x-2">
+											<span className="text-lg">📊</span>
+											<span>Detailed progress analytics and reports</span>
+										</div>
+										<div className="flex items-center space-x-2">
+											<span className="text-lg">🔒</span>
+											<span>Safe, controlled reading environment</span>
+										</div>
+										<div className="flex items-center space-x-2">
+											<span className="text-lg">👥</span>
+											<span>Multi-child/student management dashboard</span>
 										</div>
 									</div>
 								</div>
