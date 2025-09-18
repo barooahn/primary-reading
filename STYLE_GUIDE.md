@@ -1,26 +1,24 @@
 # PrimaryReading Dashboard Style Guide
 
-Based on analysis of modern design patterns from Ello.com and existing design systems, this style guide creates a playful, child-friendly, and highly accessible dashboard that balances engagement with educational focus.
+Based on comprehensive design system updates, this style guide creates a modern, child-friendly, and highly accessible dashboard that balances engagement with educational focus using a cohesive 4-color palette.
 
-## 🎨 Kids Dashboard Design Patterns (Updated)
+## 🎨 Updated Dashboard Design System
 
 ### **Modern Educational Dashboard Language**
-- **Clean White Canvas**: Large white rounded container on colored background
-- **Bright Avatar Integration**: Student avatars prominently featured in cards
-- **Color-Coded Categories**: Green (excellent), Orange/Yellow (good), Red/Coral (needs attention)
-- **Large Number Display**: Bold, oversized numbers for key metrics
-- **Pill-Shaped Cards**: Rounded rectangular cards with generous padding
-- **Subtle Background Colors**: Soft colored backgrounds for different performance levels
-- **Clean Typography**: Simple, readable fonts with clear hierarchy
+- **Muted Metric Cards**: Soft colored backgrounds with full-color borders for clear definition
+- **Pill-Shaped Action Buttons**: Fully rounded interactive elements with clear visual hierarchy
+- **Color-Coded Performance**: Consistent color system across all interface elements
+- **High-Contrast Text**: Dark gray text for optimal readability
+- **Bordered Card Design**: Clear distinction between informational and interactive elements
+- **Consistent Spacing**: Uniform padding and alignment throughout
 
-### **Color System - Educational Dashboard Inspired**
-- **Success Green**: `#7DD55C` - Excellent performance and achievements
-- **Warning Orange**: `#FFB547` - Good performance, room for improvement
-- **Alert Coral**: `#FF7A6B` - Needs attention and support
-- **Background Green**: `#8BC34A` - Main dashboard background
-- **Card White**: `#FFFFFF` - Clean card backgrounds
-- **Text Dark**: `#2D3748` - Primary text color
-- **Text Gray**: `#718096` - Secondary text and labels
+### **Color System - 4-Color Brand Palette**
+- **Primary Orange**: `#EF7722` - Main brand color, excellent performance, primary actions
+- **Secondary Orange**: `#FAA533` - Secondary actions, good performance, level indicators
+- **Light Gray**: `#EBEBEB` - Background elements, neutral states
+- **Primary Blue**: `#0BA6DF` - Accent color, progress indicators, attention elements
+- **Text Primary**: `#111827` (text-gray-900) - High contrast text for readability
+- **Text Secondary**: `#374151` (text-gray-700) - Secondary text and labels
 
 ## 📊 Dashboard Redesign Specifications
 
@@ -157,107 +155,194 @@ body {
 - **Age-appropriate**: Matches children's preferences
 - **Cross-platform**: Works on all devices
 
-### **3. Card Design System - Educational Dashboard Style**
+### **3. Updated Metric Card System - Muted Backgrounds with Bold Borders**
 ```css
-/* Performance metric cards with color coding */
+/* Performance metric cards with muted backgrounds and colored borders */
 .metric-card {
-  border-radius: 24px;
-  padding: 2rem;
+  border-radius: 0.5rem; /* rounded-lg - less rounded than buttons */
+  padding: 0.75rem 1rem; /* Compact padding */
   text-align: center;
   position: relative;
-  transition: all 0.2s ease;
-  min-height: 160px;
+  min-height: 90px; /* Compact height */
   display: flex;
   flex-direction: column;
   justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  border-width: 2px; /* Bold border */
+  border-style: solid;
 }
 
 .metric-card--excellent {
-  background: #7DD55C; /* Green for excellent */
+  background: rgba(239, 119, 34, 0.5); /* #EF7722 at 50% opacity */
+  border-color: #EF7722; /* Full color border */
 }
 
 .metric-card--good {
-  background: #FFB547; /* Orange for good */
+  background: rgba(250, 165, 51, 0.5); /* #FAA533 at 50% opacity */
+  border-color: #FAA533; /* Full color border */
 }
 
 .metric-card--needs-attention {
-  background: #FF7A6B; /* Coral for needs attention */
+  background: rgba(11, 166, 223, 0.5); /* #0BA6DF at 50% opacity */
+  border-color: #0BA6DF; /* Full color border */
+}
+
+.metric-card--default {
+  background: #EBEBEB; /* Light gray */
+  border-color: #D1D5DB; /* Gray-300 border */
 }
 
 .metric-number {
-  font-size: 4rem;
-  font-weight: 800;
-  color: #2D3748;
+  font-size: 2rem; /* Responsive: sm:3rem lg:4rem */
+  font-weight: 900; /* font-black */
+  color: #111827; /* text-gray-900 for high contrast */
   line-height: 1;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* drop-shadow-lg */
 }
 
 .metric-label {
-  font-size: 1rem;
-  color: #2D3748;
+  font-size: 0.75rem; /* text-xs, responsive to sm:text-sm */
+  color: #111827; /* text-gray-900 */
   font-weight: 600;
-  opacity: 0.8;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* drop-shadow-md */
 }
 
-.student-avatar {
+.metric-sublabel {
+  font-size: 0.75rem; /* text-xs */
+  color: rgba(17, 24, 39, 0.9); /* text-gray-900/90 */
+  margin-top: 0.25rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* drop-shadow-sm */
+}
+
+.metric-icon {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 48px;
-  height: 48px;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 50%;
-  border: 3px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.metric-icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.metric-icon--excellent svg {
+  color: #EF7722;
+}
+
+.metric-icon--good svg {
+  color: #FAA533;
+}
+
+.metric-icon--needs-attention svg {
+  color: #0BA6DF;
 }
 ```
 
-### **4. Button System - Ello Inspired**
+### **4. Updated Button System - Pill-Shaped Action Buttons**
 ```css
-/* Friendly, rounded buttons with teal accent */
-.dashboard-button-primary {
-  background: #28B8B8;
-  color: white;
-  font-size: 1rem;           /* 16px - more moderate */
-  font-weight: 600;
-  padding: 0.75rem 1.5rem;   /* 12px 24px */
-  border-radius: 12px;
-  min-height: 48px;
-  border: none;
-  box-shadow:
-    0 2px 8px rgba(40, 184, 184, 0.2),
-    0 0 0 0 rgba(40, 184, 184, 0.1);
+/* Pill-shaped action buttons with brand colors */
+.action-button {
+  border-radius: 9999px; /* rounded-full - completely pill-shaped */
+  padding: 1rem 1.25rem; /* Generous padding */
   transition: all 0.2s ease;
-  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: #111827; /* text-gray-900 for high contrast */
+  font-weight: 600;
+  min-height: 80px;
+  position: relative;
 }
 
-.dashboard-button-primary:hover {
-  background: #20A6A6;
-  transform: translateY(-1px);
-  box-shadow:
-    0 4px 12px rgba(40, 184, 184, 0.3),
-    0 0 0 3px rgba(40, 184, 184, 0.1);
+.action-button:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
 }
 
-.dashboard-button-secondary {
-  background: white;
-  color: #4a5568;
-  border: 1.5px solid #e2e8f0;
-  font-weight: 500;
-  /* Same sizing as primary */
+.action-button--primary {
+  background: #0BA6DF; /* Primary Blue */
 }
 
-.dashboard-button-secondary:hover {
-  background: #f7fafc;
-  border-color: #28B8B8;
-  color: #28B8B8;
-  transform: translateY(-1px);
+.action-button--primary:hover {
+  background: rgba(11, 166, 223, 0.9);
 }
 
-.dashboard-button-playful {
-  background: linear-gradient(135deg, #48D0D0 0%, #28B8B8 100%);
-  border-radius: 20px;
-  padding: 1rem 2rem;
-  font-size: 1.125rem;
-  box-shadow: 0 4px 16px rgba(40, 184, 184, 0.25);
+.action-button--secondary {
+  background: #EF7722; /* Primary Orange */
+}
+
+.action-button--secondary:hover {
+  background: rgba(239, 119, 34, 0.9);
+}
+
+.action-button--tertiary {
+  background: #FAA533; /* Secondary Orange */
+}
+
+.action-button--tertiary:hover {
+  background: rgba(250, 165, 51, 0.9);
+}
+
+.action-button-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-left: 1rem; /* pl-4 */
+  margin-bottom: 0.5rem;
+}
+
+.action-button-header svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.action-button-title {
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 600;
+  color: inherit;
+}
+
+.action-button-description {
+  font-size: 0.75rem; /* text-xs */
+  color: rgba(17, 24, 39, 0.9); /* text-gray-900/90 */
+  padding-left: 1rem; /* pl-4 - aligns with icon */
+}
+
+/* Responsive sizing */
+@media (min-width: 640px) {
+  .action-button {
+    padding: 1.25rem;
+  }
+
+  .action-button-header {
+    padding-left: 1.25rem; /* pl-5 */
+  }
+
+  .action-button-header svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .action-button-title {
+    font-size: 1rem; /* text-base */
+  }
+
+  .action-button-description {
+    font-size: 0.875rem; /* text-sm */
+    padding-left: 1.25rem; /* pl-5 */
+  }
 }
 ```
 
@@ -347,24 +432,31 @@ body {
 }
 ```
 
-## 🎯 Child-Friendly Design Principles
+## 🎯 Updated Child-Friendly Design Principles
 
-### **Visual Hierarchy**
-1. **Large Numbers**: Stats use 4rem (64px) bold text
-2. **Clear Labels**: 1.25rem (20px) descriptive text
-3. **Generous Spacing**: 2rem (32px) minimum between elements
-4. **High Contrast**: 7:1 minimum contrast ratios
+### **Visual Hierarchy & Contrast**
+1. **High-Contrast Text**: All text uses `text-gray-900` (#111827) for optimal readability
+2. **Clear Component Distinction**: Metric cards (rectangular, bordered) vs Action buttons (pill-shaped)
+3. **Muted Backgrounds**: 50% opacity colored backgrounds with full-color borders
+4. **Consistent Spacing**: Compact padding for better viewport fit
 
-### **Touch Targets**
-- **Minimum Size**: 56px × 56px (larger than 44px requirement)
-- **Generous Padding**: 1rem (16px) minimum
-- **Clear Focus States**: 3px blue outline with 2px offset
+### **Interactive Elements**
+- **Pill-Shaped Buttons**: Fully rounded (`border-radius: 9999px`) for clear interactivity
+- **Hover Effects**: Scale transform (1.05) with opacity changes
+- **Aligned Content**: Icons and text consistently aligned with proper indentation
+- **Touch-Friendly**: Generous padding and clear interactive affordances
 
-### **Age-Appropriate Elements**
-- **Emojis**: Large (1.5rem) and meaningful
-- **Rounded Corners**: 24px for cards, 20px for buttons
-- **Soft Animations**: Gentle bounces and scales
-- **Bright Colors**: Saturated but not overwhelming
+### **Information Display**
+- **Bordered Cards**: 2px solid borders in brand colors for clear definition
+- **Icon Consistency**: Icons match their respective border colors
+- **Responsive Typography**: Scales appropriately across device sizes
+- **Performance Coding**: Color-coded system for excellent/good/needs-attention states
+
+### **Accessibility Standards**
+- **WCAG AA Compliance**: High contrast text against all backgrounds
+- **Clear Affordances**: Visual distinction between interactive and informational elements
+- **Consistent Patterns**: Repeated design language throughout interface
+- **Child-Friendly**: Age-appropriate color palette and spacing
 
 ## 📱 Responsive Breakpoints
 ```css
@@ -403,4 +495,24 @@ body {
 - **Roles**: `role="main"`, `role="button"`, etc.
 - **Live Regions**: For dynamic content updates
 
-This style guide will transform the dashboard into a visually stunning, child-friendly, and highly accessible interface that matches the quality and appeal of the home page.
+## 🚀 Key Updates Summary
+
+### **Design System Improvements**
+1. **Cohesive 4-Color Palette**: Strict adherence to #EF7722, #FAA533, #EBEBEB, #0BA6DF
+2. **Enhanced Readability**: All text uses high-contrast gray (#111827) instead of white
+3. **Clear Visual Hierarchy**: Distinct styling for informational cards vs interactive buttons
+4. **Improved Accessibility**: WCAG AA compliant contrast ratios throughout
+
+### **Component Updates**
+- **Metric Cards**: Muted backgrounds (50% opacity) with bold colored borders
+- **Action Buttons**: Pill-shaped design with proper content alignment
+- **Icon System**: Icons match their respective border/theme colors
+- **Spacing Optimization**: Compact layout for better viewport utilization
+
+### **User Experience Enhancements**
+- **Intuitive Interactions**: Clear distinction between viewable and clickable elements
+- **Consistent Alignment**: Proper indentation and spacing throughout
+- **Performance Feedback**: Color-coded system for different achievement levels
+- **Modern Aesthetics**: Clean, professional appearance suitable for educational use
+
+This updated style guide creates a cohesive, accessible, and visually appealing dashboard that maintains child-friendly design principles while ensuring optimal usability and readability.

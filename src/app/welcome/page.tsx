@@ -10,12 +10,12 @@ export default function WelcomePage() {
 	const [selectedRole, setSelectedRole] = useState<"parent" | "child" | null>(null);
 
 	return (
-		<div className="h-[calc(100vh-5rem)] bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center overflow-hidden p-4 md:p-6">
+		<div className="h-[calc(100vh-5rem)] bg-gradient-to-br from-[#EBEBEB]/30 via-[#EF7722]/5 to-[#FAA533]/10 flex items-center justify-center overflow-hidden p-4 md:p-6">
 			{/* Background decoration */}
 			<div className="absolute inset-0 overflow-hidden pointer-events-none">
-				<div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-yellow-200/20 to-orange-200/20 rounded-full blur-3xl" />
-				<div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-br from-purple-200/20 to-pink-200/20 rounded-full blur-3xl" />
-				<div className="absolute top-1/2 left-1/4 w-24 h-24 bg-gradient-to-br from-blue-200/20 to-cyan-200/20 rounded-full blur-2xl" />
+				<div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-[#FAA533]/20 to-[#EF7722]/20 rounded-full blur-3xl" />
+				<div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-br from-[#0BA6DF]/20 to-[#0BA6DF]/10 rounded-full blur-3xl" />
+				<div className="absolute top-1/2 left-1/4 w-24 h-24 bg-gradient-to-br from-[#0BA6DF]/20 to-[#0BA6DF]/10 rounded-full blur-2xl" />
 			</div>
 
 			<div className="container mx-auto max-w-6xl relative z-10 h-full flex flex-col justify-center">
@@ -25,8 +25,8 @@ export default function WelcomePage() {
 						{/* Header */}
 						<div className="space-y-3 mb-8">
 							<div className="flex items-center justify-center space-x-2 mb-4">
-								<BookOpen className="h-8 w-8 text-primary" />
-								<h1 className="text-3xl md:text-4xl font-black font-heading bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+								<BookOpen className="h-8 w-8 text-[#EF7722]" />
+								<h1 className="text-3xl md:text-4xl font-black font-heading bg-gradient-to-r from-[#EF7722] to-[#FAA533] bg-clip-text text-transparent">
 									PrimaryReading
 								</h1>
 							</div>
@@ -42,14 +42,14 @@ export default function WelcomePage() {
 						<div className="grid md:grid-cols-2 gap-4 md:gap-6 max-w-4xl mx-auto px-2 sm:px-0">
 							{/* Parent/Teacher Card */}
 							<Card
-								className="group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl border-2 hover:border-blue-300 bg-white/95 backdrop-blur-sm"
+								className="group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl border-2 hover:border-[#0BA6DF] bg-white/95 backdrop-blur-sm"
 								onClick={() => setSelectedRole("parent")}
 							>
 								<CardHeader className="text-center p-6">
-									<div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-3 group-hover:bg-blue-200 transition-colors">
-										<Users className="h-10 w-10 text-blue-600" />
+									<div className="mx-auto w-16 h-16 bg-[#0BA6DF]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#0BA6DF]/20 transition-colors">
+										<Users className="h-10 w-10 text-[#0BA6DF]" />
 									</div>
-									<CardTitle className="text-2xl text-blue-900 mb-2">I&apos;m a Parent/Teacher</CardTitle>
+									<CardTitle className="text-2xl text-[#0BA6DF] mb-2">I&apos;m a Parent/Teacher</CardTitle>
 									<CardDescription className="text-base text-text-secondary">
 										Set up reading levels and manage children&apos;s accounts
 									</CardDescription>
@@ -57,15 +57,15 @@ export default function WelcomePage() {
 								<CardContent className="space-y-3 px-6 pb-6">
 									<div className="space-y-2 text-sm text-gray-700">
 										<div className="flex items-center space-x-2">
-											<ShieldCheck className="h-4 w-4 text-green-600" />
+											<ShieldCheck className="h-4 w-4 text-[#0BA6DF]" />
 											<span>Control age-appropriate content</span>
 										</div>
 										<div className="flex items-center space-x-2">
-											<Star className="h-4 w-4 text-yellow-600" />
+											<Star className="h-4 w-4 text-[#FAA533]" />
 											<span>Track reading progress</span>
 										</div>
 										<div className="flex items-center space-x-2">
-											<Heart className="h-4 w-4 text-pink-600" />
+											<Heart className="h-4 w-4 text-[#EF7722]" />
 											<span>Create safe reading environment</span>
 										</div>
 									</div>
@@ -74,14 +74,14 @@ export default function WelcomePage() {
 
 							{/* Child Card */}
 							<Card
-								className="group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl border-2 hover:border-purple-300 bg-white/95 backdrop-blur-sm"
+								className="group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl border-2 hover:border-[#EF7722] bg-white/95 backdrop-blur-sm"
 								onClick={() => setSelectedRole("child")}
 							>
 								<CardHeader className="text-center p-6">
-									<div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-3 group-hover:bg-purple-200 transition-colors">
-										<Sparkles className="h-10 w-10 text-purple-600" />
+									<div className="mx-auto w-16 h-16 bg-[#EF7722]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#EF7722]/20 transition-colors">
+										<Sparkles className="h-10 w-10 text-[#EF7722]" />
 									</div>
-									<CardTitle className="text-2xl text-purple-900 mb-2">I&apos;m a Student</CardTitle>
+									<CardTitle className="text-2xl text-[#EF7722] mb-2">I&apos;m a Student</CardTitle>
 									<CardDescription className="text-base text-text-secondary">
 										Start reading amazing stories made just for you!
 									</CardDescription>
@@ -89,15 +89,15 @@ export default function WelcomePage() {
 								<CardContent className="space-y-3 px-6 pb-6">
 									<div className="space-y-2 text-sm text-gray-700">
 										<div className="flex items-center space-x-2">
-											<BookOpen className="h-4 w-4 text-blue-600" />
+											<BookOpen className="h-4 w-4 text-[#0BA6DF]" />
 											<span>Fun interactive stories</span>
 										</div>
 										<div className="flex items-center space-x-2">
-											<Star className="h-4 w-4 text-yellow-600" />
+											<Star className="h-4 w-4 text-[#FAA533]" />
 											<span>Reading games & rewards</span>
 										</div>
 										<div className="flex items-center space-x-2">
-											<Sparkles className="h-4 w-4 text-pink-600" />
+											<Sparkles className="h-4 w-4 text-[#EF7722]" />
 											<span>AI-generated adventures</span>
 										</div>
 									</div>
@@ -133,8 +133,8 @@ export default function WelcomePage() {
 					/* Parent/Teacher Setup Screen */
 					<div className="max-w-2xl mx-auto text-center space-y-6 px-4 sm:px-0">
 						<div className="space-y-3">
-							<div className="mx-auto w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-3">
-								<Users className="h-8 w-8 text-blue-600" />
+							<div className="mx-auto w-14 h-14 bg-[#0BA6DF]/10 rounded-full flex items-center justify-center mb-3">
+								<Users className="h-8 w-8 text-[#0BA6DF]" />
 							</div>
 							<h2 className="text-2xl font-bold text-gray-900">Parent/Teacher Setup</h2>
 							<p className="text-base text-text-secondary">

@@ -19,7 +19,7 @@ export function SimpleLoginForm({ onModeChange }: SimpleLoginFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const [mode, setMode] = useState<'signin' | 'signup'>('signup'); // Default to signup
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin'); // Default to signin
   const [showPassword, setShowPassword] = useState(false);
   const [emailTouched, setEmailTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
@@ -99,18 +99,28 @@ export function SimpleLoginForm({ onModeChange }: SimpleLoginFormProps) {
         </Card>
       }
     >
-      <Card className="w-full max-w-md mx-auto bg-white/95 backdrop-blur-xl border-2 border-gray-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.15)] transition-all duration-500 hover:scale-[1.02]">
+      <Card className="w-full max-w-md mx-auto bg-white/95 backdrop-blur-xl border-2 border-[#EF7722]/20 shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.15)] transition-all duration-500 hover:scale-[1.02]">
       <CardHeader className="text-center space-y-3 pb-4">
         {/* Brand Icon */}
-        <div className="mx-auto w-14 h-14 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center shadow-lg">
-          <BookOpen className="h-7 w-7 text-primary" />
+        <div className="mx-auto w-14 h-14 bg-[#EF7722] rounded-2xl flex items-center justify-center shadow-lg">
+          <BookOpen className="h-7 w-7 text-white" />
         </div>
 
-        <CardTitle className="text-xl font-bold text-text-primary">
-          {mode === 'signin' ? 'Sign In' : 'Create Account'}
+        <CardTitle className="text-2xl font-black">
+          {mode === 'signin' ? (
+            <>
+              <span className="text-gray-900">Welcome to the Reading </span>
+              <span className="text-[#EF7722]">Adventure! 🌟</span>
+            </>
+          ) : (
+            <>
+              <span className="text-gray-900">Join the Reading </span>
+              <span className="text-[#EF7722]">Adventure! 🌟</span>
+            </>
+          )}
         </CardTitle>
 
-        <CardDescription className="text-sm text-text-secondary leading-relaxed">
+        <CardDescription className="text-sm text-gray-600 leading-relaxed">
           {mode === 'signin'
             ? 'Ready to continue your reading adventure?'
             : 'Create your account to start your magical reading journey'
@@ -130,9 +140,9 @@ export function SimpleLoginForm({ onModeChange }: SimpleLoginFormProps) {
           <div className="space-y-2">
             <Label
               htmlFor="email"
-              className="text-sm font-semibold text-text-primary flex items-center gap-2"
+              className="text-sm font-semibold text-gray-900 flex items-center gap-2"
             >
-              <Mail className="h-4 w-4 text-primary" />
+              <Mail className="h-4 w-4 text-[#EF7722]" />
               Email Address
             </Label>
             <div className="relative">
@@ -146,10 +156,10 @@ export function SimpleLoginForm({ onModeChange }: SimpleLoginFormProps) {
                 required
                 aria-describedby={showEmailError ? "email-error" : undefined}
                 aria-invalid={showEmailError ? "true" : "false"}
-                className={`h-12 pl-4 pr-4 text-base rounded-xl border-2 transition-all duration-300 bg-white/80 backdrop-blur-sm hover:bg-white/90 focus:bg-white placeholder:text-placeholder focus:ring-0 ${
+                className={`h-12 pl-4 pr-4 text-base rounded-xl border-2 transition-all duration-300 bg-white/80 backdrop-blur-sm hover:bg-white/90 focus:bg-white placeholder:text-gray-400 focus:ring-0 ${
                   showEmailError
                     ? 'border-red-300 focus:border-red-400'
-                    : 'border-gray-200 focus:border-primary'
+                    : 'border-gray-200 focus:border-[#EF7722]'
                 }`}
               />
               {showEmailError && (
@@ -165,9 +175,9 @@ export function SimpleLoginForm({ onModeChange }: SimpleLoginFormProps) {
           <div className="space-y-2">
             <Label
               htmlFor="password"
-              className="text-sm font-semibold text-text-primary flex items-center gap-2"
+              className="text-sm font-semibold text-gray-900 flex items-center gap-2"
             >
-              <Lock className="h-4 w-4 text-primary" />
+              <Lock className="h-4 w-4 text-[#EF7722]" />
               Password
             </Label>
             <div className="relative">
@@ -185,13 +195,13 @@ export function SimpleLoginForm({ onModeChange }: SimpleLoginFormProps) {
                 className={`h-12 pl-4 pr-12 text-base rounded-xl border-2 transition-all duration-300 bg-white/80 backdrop-blur-sm hover:bg-white/90 focus:bg-white placeholder:text-placeholder focus:ring-0 ${
                   showPasswordError
                     ? 'border-red-300 focus:border-red-400'
-                    : 'border-gray-200 focus:border-primary'
+                    : 'border-gray-200 focus:border-[#EF7722]'
                 }`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors p-1 rounded-lg hover:bg-gray-100/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100/50 focus:outline-none focus:ring-2 focus:ring-[#EF7722]/20"
                 aria-label={showPassword ? "Hide password" : "Show password"}
                 tabIndex={0}
               >
@@ -199,8 +209,8 @@ export function SimpleLoginForm({ onModeChange }: SimpleLoginFormProps) {
               </button>
             </div>
             {mode === 'signup' && !showPasswordError && (
-              <p className="text-xs text-text-muted mt-1 flex items-center gap-1">
-                <span className="text-primary">💡</span>
+              <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                <span className="text-[#EF7722]">💡</span>
                 Password should be at least 6 characters long
               </p>
             )}
@@ -214,7 +224,7 @@ export function SimpleLoginForm({ onModeChange }: SimpleLoginFormProps) {
 
           {/* Enhanced Error Messages */}
           {error && (
-            <div className="relative bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-200 rounded-xl p-4 shadow-sm" role="alert" aria-live="polite" aria-atomic="true">
+            <div className="relative bg-red-50 border-2 border-red-200 rounded-xl p-4 shadow-sm" role="alert" aria-live="polite" aria-atomic="true">
               <div className="flex items-start space-x-3">
                 <div className="text-red-500 text-lg" aria-hidden="true">😔</div>
                 <div className="flex-1">
@@ -235,7 +245,7 @@ export function SimpleLoginForm({ onModeChange }: SimpleLoginFormProps) {
 
           {/* Enhanced Success Messages */}
           {message && (
-            <div className="relative bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-4 shadow-sm" role="status" aria-live="polite" aria-atomic="true">
+            <div className="relative bg-green-50 border-2 border-green-200 rounded-xl p-4 shadow-sm" role="status" aria-live="polite" aria-atomic="true">
               <div className="flex items-start space-x-3">
                 <div className="text-green-600 text-lg" aria-hidden="true">🎉</div>
                 <div className="flex-1">
@@ -249,7 +259,7 @@ export function SimpleLoginForm({ onModeChange }: SimpleLoginFormProps) {
           {/* Enhanced Submit Button */}
           <Button
             type="submit"
-            className="w-full h-12 text-base font-semibold rounded-xl bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            className="w-full h-12 text-base font-semibold rounded-xl bg-[#EF7722] hover:bg-[#EF7722]/90 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-white"
             disabled={loading}
           >
             {loading ? (
@@ -276,7 +286,7 @@ export function SimpleLoginForm({ onModeChange }: SimpleLoginFormProps) {
 
           {/* Enhanced Mode Toggle */}
           <div className="text-center pt-4 border-t border-gray-200">
-            <p className="text-sm text-text-secondary mb-2">
+            <p className="text-sm text-gray-600 mb-2">
               {mode === 'signin'
                 ? "New to PrimaryReading?"
                 : "Already part of our reading family?"
@@ -290,7 +300,7 @@ export function SimpleLoginForm({ onModeChange }: SimpleLoginFormProps) {
                 setMode(newMode);
                 onModeChange?.(newMode);
               }}
-              className="text-primary hover:text-primary/80 font-semibold hover:bg-primary/5 rounded-xl px-6 py-2 transition-all duration-300 hover:scale-105"
+              className="text-[#EF7722] hover:text-[#EF7722]/80 font-semibold hover:bg-[#EF7722]/5 rounded-xl px-6 py-2 transition-all duration-300 hover:scale-105"
             >
               {mode === 'signin'
                 ? "Create your account →"

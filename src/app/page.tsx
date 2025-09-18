@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	BookOpen,
@@ -103,7 +103,7 @@ export default function Home() {
 		}
 	}, [featuredStories.length]);
 
-	const StoryCard = ({
+	const StoryCard = useCallback(({
 		story,
 		size = "normal",
 	}: {
@@ -136,7 +136,7 @@ export default function Home() {
 
 				{/* Ello-Style Featured Badge */}
 				{story.is_featured && (
-					<div className='absolute top-4 left-4 bg-gradient-to-r from-teal-400 to-teal-500 text-white px-4 py-2 rounded-2xl text-xs font-bold flex items-center gap-1.5 shadow-lg backdrop-blur-sm border border-teal-300/30'>
+					<div className='absolute top-4 left-4 bg-gradient-to-r from-[#EF7722] to-[#FAA533] text-white px-4 py-2 rounded-2xl text-xs font-bold flex items-center gap-1.5 shadow-lg backdrop-blur-sm border border-[#EF7722]/30'>
 						<Star className='h-3 w-3 fill-current' />
 						FEATURED
 					</div>
@@ -145,7 +145,7 @@ export default function Home() {
 				{/* Ello-Style Action Button */}
 				<div className='absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0'>
 					<Link href={`/read/${story.id}`}>
-						<div className='w-14 h-14 bg-teal-500/90 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-xl hover:bg-teal-500 hover:scale-110 transition-all duration-200 border-2 border-teal-400/50'>
+						<div className='w-14 h-14 bg-[#0BA6DF]/90 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-xl hover:bg-[#0BA6DF] hover:scale-110 transition-all duration-200 border-2 border-[#0BA6DF]/50'>
 							<Play className='h-6 w-6 text-white ml-0.5' />
 						</div>
 					</Link>
@@ -154,14 +154,14 @@ export default function Home() {
 
 			{/* Content */}
 			<div className='p-5'>
-				<h3 className='font-bold text-lg mb-3 text-gray-900 line-clamp-2 group-hover:text-teal-600 transition-colors duration-300 leading-tight font-heading'>
+				<h3 className='font-bold text-lg mb-3 text-gray-900 line-clamp-2 group-hover:text-[#0BA6DF] transition-colors duration-300 leading-tight font-heading'>
 					{story.title?.replace(/\*\*/g, "") || "Untitled Story"}
 				</h3>
 
 				{/* Meta Info */}
 				<div className='flex items-center justify-between mb-4'>
 					{story.genre && (
-						<span className='bg-gradient-to-r from-teal-100/80 to-cyan-100/80 text-teal-700 px-3 py-1.5 rounded-2xl text-xs font-bold border border-teal-200/60'>
+						<span className='bg-[#0BA6DF]/10 text-[#0BA6DF] px-3 py-1.5 rounded-2xl text-xs font-bold border border-[#0BA6DF]/30'>
 							{story.genre}
 						</span>
 					)}
@@ -198,9 +198,9 @@ export default function Home() {
 			</div>
 
 			{/* Subtle bottom border accent */}
-			<div className='absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/20 via-purple-500/20 to-pink-500/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left' />
+			<div className='absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#EF7722]/20 to-[#FAA533]/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left' />
 		</div>
-	);
+	), []);
 
 	return (
 		<>
@@ -291,9 +291,9 @@ export default function Home() {
 						>
 							{/* Brand-Aligned Badge */}
 							<div className='inline-flex items-center space-x-3 px-8 py-4 rounded-3xl bg-white/80 backdrop-blur-xl border-2 border-gray-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.1)] mb-8 hover:scale-105 transition-all duration-300 hover:shadow-[0_20px_60px_rgba(0,0,0,0.15)]'>
-								<div className='w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-600 rounded-full animate-pulse' />
-								<Sparkles className='h-5 w-5 text-blue-600' />
-								<span className='text-sm font-bold bg-gradient-to-r from-blue-600 to-purple-700 bg-clip-text text-transparent'>
+								<div className='w-2 h-2 bg-[#EF7722] rounded-full animate-pulse' />
+								<Sparkles className='h-5 w-5 text-[#0BA6DF]' />
+								<span className='text-sm font-bold text-[#EF7722]'>
 									AI-Powered Reading Adventures
 								</span>
 							</div>
@@ -304,9 +304,9 @@ export default function Home() {
 									Reading Made
 								</span>
 								<br />
-								<span className='bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 bg-clip-text text-transparent relative'>
+								<span className='bg-gradient-to-r from-[#EF7722] to-[#FAA533] bg-clip-text text-transparent relative'>
 									Fun & Exciting!
-									<div className='absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-blue-400/30 via-purple-500/30 to-pink-500/30 rounded-full' />
+									<div className='absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-[#EF7722]/30 to-[#FAA533]/30 rounded-full' />
 								</span>
 							</h1>
 
@@ -326,8 +326,8 @@ export default function Home() {
 									}
 									aria-label={user ? "Continue to your reading dashboard" : "Get started with PrimaryReading"}
 								>
-									<button className='group relative px-10 py-5 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold text-lg rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 overflow-hidden border-2 border-blue-400/30' aria-describedby="primary-cta-description">
-										<div className='absolute inset-0 bg-gradient-to-r from-blue-400/50 to-purple-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
+									<button className='group relative px-10 py-5 bg-gradient-to-r from-[#EF7722] to-[#FAA533] text-white font-bold text-lg rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 overflow-hidden border-2 border-[#EF7722]/30' aria-describedby="primary-cta-description">
+										<div className='absolute inset-0 bg-gradient-to-r from-[#EF7722]/50 to-[#FAA533]/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
 										<div className='relative flex items-center gap-3'>
 											<Play className='h-6 w-6 group-hover:scale-110 transition-transform duration-200' aria-hidden="true" />
 											{user
@@ -338,9 +338,9 @@ export default function Home() {
 								</Link>
 
 								<Link href='/stories' aria-label="Browse our library of reading adventures">
-									<button className='group px-10 py-5 bg-white/80 backdrop-blur-xl border-2 border-gray-200/60 text-blue-700 font-bold text-lg rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.15)] transition-all duration-300 hover:scale-105 hover:-translate-y-1 hover:bg-white/90 hover:border-gray-300/70' aria-describedby="browse-library-description">
+									<button className='group px-10 py-5 bg-white/80 backdrop-blur-xl border-2 border-gray-200/60 text-[#0BA6DF] font-bold text-lg rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.15)] transition-all duration-300 hover:scale-105 hover:-translate-y-1 hover:bg-white/90 hover:border-gray-300/70' aria-describedby="browse-library-description">
 										<div className='flex items-center gap-3'>
-											<BookOpen className='h-6 w-6 group-hover:scale-110 transition-transform duration-200 text-blue-600' aria-hidden="true" />
+											<BookOpen className='h-6 w-6 group-hover:scale-110 transition-transform duration-200 text-[#0BA6DF]' aria-hidden="true" />
 											Browse Library
 										</div>
 									</button>
@@ -470,7 +470,7 @@ export default function Home() {
 										}
 										className={`h-2 rounded-full transition-all duration-300 ${
 											currentSlide === index
-												? "w-8 bg-gradient-to-r from-primary to-purple-500 shadow-lg"
+												? "w-8 bg-gradient-to-r from-[#EF7722] to-[#FAA533] shadow-lg"
 												: "w-3 bg-gray-300 hover:bg-gray-400"
 										}`}
 									/>
@@ -483,9 +483,9 @@ export default function Home() {
 
 			{/* Latest Stories Section */}
 			{!loading && latestStories.length > 0 && (
-				<section className='py-16 px-4 bg-gradient-to-br from-slate-50 via-blue-50/50 to-indigo-50/30 relative overflow-hidden'>
+				<section className='py-16 px-4 bg-gradient-to-br from-[#EBEBEB]/30 via-[#0BA6DF]/5 to-[#0BA6DF]/10 relative overflow-hidden'>
 					{/* Background Pattern */}
-					<div className='absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(59,130,246,0.05),transparent_70%)]' />
+					<div className='absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(11,166,223,0.05),transparent_70%)]' />
 
 					<div className='container mx-auto max-w-7xl relative z-10'>
 						<div className='flex items-center justify-between mb-12'>
@@ -518,9 +518,9 @@ export default function Home() {
 
 			{/* Trending Stories Section */}
 			{!loading && trendingStories.length > 0 && (
-				<section className='py-16 px-4 bg-gradient-to-br from-slate-50 via-emerald-50/50 to-teal-50/30 relative overflow-hidden'>
+				<section className='py-16 px-4 bg-gradient-to-br from-[#EBEBEB]/30 via-[#EF7722]/5 to-[#FAA533]/10 relative overflow-hidden'>
 					{/* Background Pattern */}
-					<div className='absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(16,185,129,0.05),transparent_70%)]' />
+					<div className='absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(239,119,34,0.05),transparent_70%)]' />
 
 					<div className='container mx-auto max-w-7xl relative z-10'>
 						<div className='flex items-center justify-between mb-12'>
@@ -553,11 +553,11 @@ export default function Home() {
 			)}
 
 			{/* Modern Features Section */}
-			<section className='py-20 px-4 bg-gradient-to-br from-slate-50 via-orange-50/30 to-yellow-50/20 relative overflow-hidden'>
+			<section className='py-20 px-4 bg-gradient-to-br from-[#EBEBEB]/50 via-[#FAA533]/10 to-[#EF7722]/20 relative overflow-hidden'>
 				{/* Background Elements */}
-				<div className='absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(251,191,36,0.05),transparent_70%)]' />
-				<div className='absolute top-10 right-10 w-32 h-32 bg-gradient-to-br from-yellow-200/20 to-orange-200/20 rounded-full blur-3xl' />
-				<div className='absolute bottom-10 left-10 w-40 h-40 bg-gradient-to-br from-orange-200/20 to-red-200/20 rounded-full blur-3xl' />
+				<div className='absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(250,165,51,0.05),transparent_70%)]' />
+				<div className='absolute top-10 right-10 w-32 h-32 bg-gradient-to-br from-[#FAA533]/20 to-[#EF7722]/20 rounded-full blur-3xl' />
+				<div className='absolute bottom-10 left-10 w-40 h-40 bg-gradient-to-br from-[#EF7722]/20 to-[#FAA533]/20 rounded-full blur-3xl' />
 
 				<div className='container mx-auto max-w-6xl relative z-10'>
 					<div className='text-center mb-16'>
@@ -573,39 +573,39 @@ export default function Home() {
 						{[
 							{
 								icon: (
-									<Sparkles className='h-10 w-10 text-primary' />
+									<Sparkles className='h-10 w-10 text-[#EF7722]' />
 								),
 								title: "✨ AI Story Magic",
 								description:
 									"Create personalized stories about dragons, space adventures, detective mysteries, and anything you can imagine!",
 								gradient:
-									"from-primary/10 to-purple-500/10",
+									"from-[#EF7722]/10 to-[#FAA533]/10",
 								borderGradient:
-									"from-primary/20 to-purple-500/20",
+									"from-[#EF7722]/20 to-[#FAA533]/20",
 							},
 							{
 								icon: (
-									<Trophy className='h-10 w-10 text-emerald-600' />
+									<Trophy className='h-10 w-10 text-[#FAA533]' />
 								),
 								title: "🏆 Reading Rewards",
 								description:
 									"Earn badges, build reading streaks, level up, and unlock new adventures. Reading becomes as fun as your favorite games!",
 								gradient:
-									"from-emerald-500/10 to-green-500/10",
+									"from-[#FAA533]/10 to-[#EF7722]/10",
 								borderGradient:
-									"from-emerald-500/20 to-green-500/20",
+									"from-[#FAA533]/20 to-[#EF7722]/20",
 							},
 							{
 								icon: (
-									<Heart className='h-10 w-10 text-pink-600' />
+									<Heart className='h-10 w-10 text-[#0BA6DF]' />
 								),
 								title: "❤️ Interactive Fun",
 								description:
 									"Answer questions, play mini-games, and explore interactive activities that make learning stick and keep you engaged!",
 								gradient:
-									"from-pink-500/10 to-rose-500/10",
+									"from-[#0BA6DF]/10 to-[#0BA6DF]/5",
 								borderGradient:
-									"from-pink-500/20 to-rose-500/20",
+									"from-[#0BA6DF]/20 to-[#0BA6DF]/30",
 							},
 						].map((feature, index) => (
 							<div
@@ -645,13 +645,13 @@ export default function Home() {
 			</section>
 
 			{/* Popular Themes Section */}
-			<section className='py-16 px-4 bg-gradient-to-br from-purple-50 to-pink-50'>
+			<section className='py-16 px-4 bg-white'>
 				<div className='container mx-auto max-w-6xl'>
 					<div className='text-center space-y-4 mb-12'>
 						<h2 className='text-3xl md:text-4xl font-bold'>
 							🎯 Choose Your Adventure!
 						</h2>
-						<p className='text-lg text-text-secondary max-w-2xl mx-auto'>
+						<p className='text-lg text-gray-600 max-w-2xl mx-auto'>
 							What kind of story adventure sounds exciting
 							to you?
 						</p>
@@ -661,35 +661,35 @@ export default function Home() {
 						{[
 							{
 								name: "🔍 Mystery Detective",
-								color: "bg-gradient-to-br from-purple-100 to-purple-50 border-purple-200 hover:from-purple-200 hover:to-purple-100",
+								color: "bg-[#0BA6DF]/10 border-[#0BA6DF]/30 hover:bg-[#0BA6DF]/20 text-[#0BA6DF]",
 							},
 							{
 								name: "🦕 Dinosaur Adventures",
-								color: "bg-gradient-to-br from-green-100 to-green-50 border-green-200 hover:from-green-200 hover:to-green-100",
+								color: "bg-[#EF7722]/10 border-[#EF7722]/30 hover:bg-[#EF7722]/20 text-[#EF7722]",
 							},
 							{
 								name: "🏰 Fantasy & Magic",
-								color: "bg-gradient-to-br from-blue-100 to-blue-50 border-blue-200 hover:from-blue-200 hover:to-blue-100",
+								color: "bg-[#FAA533]/10 border-[#FAA533]/30 hover:bg-[#FAA533]/20 text-[#FAA533]",
 							},
 							{
 								name: "😂 Comedy & Humor",
-								color: "bg-gradient-to-br from-yellow-100 to-yellow-50 border-yellow-200 hover:from-yellow-200 hover:to-yellow-100",
+								color: "bg-[#EBEBEB]/80 border-[#EBEBEB] hover:bg-[#EBEBEB] text-gray-900",
 							},
 							{
 								name: "🚀 Space Exploration",
-								color: "bg-gradient-to-br from-indigo-100 to-indigo-50 border-indigo-200 hover:from-indigo-200 hover:to-indigo-100",
+								color: "bg-[#0BA6DF]/10 border-[#0BA6DF]/30 hover:bg-[#0BA6DF]/20 text-[#0BA6DF]",
 							},
 							{
 								name: "🐾 Animal Rescue",
-								color: "bg-gradient-to-br from-emerald-100 to-emerald-50 border-emerald-200 hover:from-emerald-200 hover:to-emerald-100",
+								color: "bg-[#EF7722]/10 border-[#EF7722]/30 hover:bg-[#EF7722]/20 text-[#EF7722]",
 							},
 							{
 								name: "🎮 Gaming Quests",
-								color: "bg-gradient-to-br from-pink-100 to-pink-50 border-pink-200 hover:from-pink-200 hover:to-pink-100",
+								color: "bg-[#FAA533]/10 border-[#FAA533]/30 hover:bg-[#FAA533]/20 text-[#FAA533]",
 							},
 							{
 								name: "🤖 Robot Adventures",
-								color: "bg-gradient-to-br from-slate-100 to-slate-50 border-slate-200 hover:from-slate-200 hover:to-slate-100",
+								color: "bg-[#EBEBEB]/80 border-[#EBEBEB] hover:bg-[#EBEBEB] text-gray-900",
 							},
 						].map((theme, index) => (
 							<div
@@ -704,26 +704,26 @@ export default function Home() {
 			</section>
 
 			{/* Stats Section */}
-			<section className='py-20 px-4'>
+			<section className='py-20 px-4 bg-white'>
 				<div className='container mx-auto max-w-4xl'>
 					<div className='grid md:grid-cols-3 gap-8 text-center'>
 						<div className='space-y-2'>
-							<div className='text-4xl font-bold text-primary'>
+							<div className='text-4xl font-bold text-[#EF7722]'>
 								10,000+
 							</div>
-							<p className='text-muted'>Stories Created</p>
+							<p className='text-text-muted'>Stories Created</p>
 						</div>
 						<div className='space-y-2'>
-							<div className='text-4xl font-bold text-success'>
+							<div className='text-4xl font-bold text-[#FAA533]'>
 								95%
 							</div>
-							<p className='text-muted'>Kids Want More</p>
+							<p className='text-text-muted'>Kids Want More</p>
 						</div>
 						<div className='space-y-2'>
-							<div className='text-4xl font-bold text-secondary'>
+							<div className='text-4xl font-bold text-[#0BA6DF]'>
 								2x
 							</div>
-							<p className='text-muted'>
+							<p className='text-text-muted'>
 								Reading Improvement
 							</p>
 						</div>
@@ -732,7 +732,7 @@ export default function Home() {
 			</section>
 
 			{/* Call to Action */}
-			<section className='py-16 px-4 bg-gradient-to-br from-primary/10 via-purple-50 to-pink-50'>
+			<section className='py-16 px-4 bg-gradient-to-br from-[#EF7722]/10 to-[#FAA533]/20'>
 				<div className='container mx-auto max-w-4xl text-center space-y-6'>
 					<h2 className='text-3xl md:text-4xl font-bold text-gray-800'>
 						🌟 Ready for Your Next Adventure?
@@ -745,7 +745,7 @@ export default function Home() {
 					<div className='flex flex-col sm:flex-row gap-4 justify-center'>
 						<Button
 							size='lg'
-							className='text-lg px-8 py-4 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg hover:shadow-xl transition-all duration-300'
+							className='text-lg px-8 py-4 bg-gradient-to-r from-[#EF7722] to-[#FAA533] hover:from-[#EF7722]/90 hover:to-[#FAA533]/90 shadow-lg hover:shadow-xl transition-all duration-300'
 							asChild
 						>
 							<Link href={user ? "/dashboard" : "/welcome"}>
@@ -758,7 +758,7 @@ export default function Home() {
 						<Button
 							variant='outline'
 							size='lg'
-							className='text-lg px-8 py-4 border-2 hover:bg-primary/5'
+							className='text-lg px-8 py-4 border-2 hover:bg-[#EF7722]/5'
 							asChild
 						>
 							<Link href='/create'>
@@ -775,38 +775,38 @@ export default function Home() {
 				<div className='container mx-auto max-w-6xl'>
 					<div className='text-center space-y-4'>
 						<div className='flex items-center justify-center space-x-2'>
-							<BookOpen className='h-6 w-6 text-primary' />
-							<span className='text-xl font-bold text-primary'>
+							<BookOpen className='h-6 w-6 text-[#EF7722]' />
+							<span className='text-xl font-bold text-[#EF7722]'>
 								PrimaryReading
 							</span>
 						</div>
-						<p className='text-muted max-w-2xl mx-auto'>
+						<p className='text-text-muted max-w-2xl mx-auto'>
 							Making reading fun, exciting, and accessible
 							for every child. Built with love for young
 							learners everywhere.
 						</p>
-						<div className='flex justify-center space-x-6 text-sm text-muted'>
+						<div className='flex justify-center space-x-6 text-sm text-text-muted'>
 							<Link
 								href='/privacy'
-								className='hover:text-primary transition-colors'
+								className='hover:text-[#EF7722] transition-colors'
 							>
 								Privacy
 							</Link>
 							<Link
 								href='/terms'
-								className='hover:text-primary transition-colors'
+								className='hover:text-[#EF7722] transition-colors'
 							>
 								Terms
 							</Link>
 							<Link
 								href='/support'
-								className='hover:text-primary transition-colors'
+								className='hover:text-[#EF7722] transition-colors'
 							>
 								Support
 							</Link>
 							<Link
 								href='/educators'
-								className='hover:text-primary transition-colors'
+								className='hover:text-[#EF7722] transition-colors'
 							>
 								For Educators
 							</Link>

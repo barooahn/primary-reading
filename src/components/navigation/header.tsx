@@ -103,31 +103,31 @@ export const Header = memo(function Header() {
 	return (
 		<header
 			ref={menuRef}
-			className='sticky top-0 z-50 w-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 border-b border-purple-200/30 shadow-sm dark:bg-gradient-to-r dark:from-indigo-900 dark:via-purple-900 dark:to-fuchsia-900 dark:border-purple-900/40 text-text-primary dark:text-white'
-			style={{ height: "70px", boxSizing: "border-box" }}
+			className='sticky top-0 z-50 w-full bg-white shadow-lg border-b-2 border-[#EF7722] dark:bg-slate-900 dark:border-[#FAA533] text-gray-800 dark:text-white'
+			style={{ height: "80px", boxSizing: "border-box" }}
 		>
-			<div className='mx-auto px-4 sm:px-6 md:px-8 py-2 sm:py-2 w-full h-full'>
-				<div className='flex h-full items-center justify-between gap-4 min-w-0 xl:grid xl:grid-cols-[1fr_auto_1fr]'>
-					{/* Compact Logo */}
+			<div className='mx-auto px-6 sm:px-8 md:px-12 py-3 w-full h-full'>
+				<div className='flex h-full items-center justify-between gap-6 min-w-0 xl:grid xl:grid-cols-[1fr_auto_1fr]'>
+					{/* Modern Logo */}
 					<Link
 						href='/'
-						className='group flex items-center space-x-1.5 sm:space-x-2 hover:scale-105 transition-all duration-300 flex-shrink-0 min-h-[44px] xl:justify-self-start'
+						className='group flex items-center space-x-3 hover:scale-105 transition-all duration-300 flex-shrink-0 xl:justify-self-start'
 						data-testid='logo'
 						aria-label='PrimaryReading Home'
 					>
 						<div className='relative'>
-							<div className='bg-gradient-to-br from-blue-500 to-purple-600 p-1.5 rounded-lg shadow-lg'>
-								<BookOpen className='h-5 w-5 text-white' />
-								<Sparkles className='h-2.5 w-2.5 text-yellow-300 absolute -top-0.5 -right-0.5 animate-pulse' />
+							<div className='bg-gradient-to-br from-[#EF7722] to-[#FAA533] p-2.5 rounded-xl shadow-xl'>
+								<BookOpen className='h-7 w-7 text-white' />
+								<Sparkles className='h-3 w-3 text-yellow-200 absolute -top-1 -right-1 animate-pulse' />
 							</div>
 						</div>
-						<div className='flex flex-col hidden sm:flex'>
-							<span className='text-lg font-bold text-text-primary dark:text-white leading-none'>
-								Primary
-							</span>
-							<span className='text-lg font-bold text-text-primary dark:text-white leading-none'>
-								Reading
-							</span>
+						<div className='hidden sm:block'>
+							<h1 className='text-2xl font-black bg-gradient-to-r from-[#EF7722] to-[#FAA533] bg-clip-text text-transparent'>
+								PrimaryReading
+							</h1>
+							<p className='text-xs text-gray-500 font-medium tracking-wide uppercase'>
+								Learn • Read • Grow
+							</p>
 						</div>
 					</Link>
 
@@ -139,127 +139,132 @@ export const Header = memo(function Header() {
 					>
 						<IconNavButton
 							href='/dashboard'
-							icon={<Rocket className='h-4 w-4' />}
-							label='Adventures'
-							colorClass='text-orange-800 bg-orange-100 hover:bg-orange-200 hover:text-orange-900 dark:text-orange-100 dark:bg-orange-900/40 dark:hover:bg-orange-800/60 dark:hover:text-white'
+							icon={<Rocket className='h-5 w-5' />}
+							label='Dashboard'
+							colorClass='text-white bg-[#EF7722] hover:bg-[#EF7722]/90 shadow-md hover:shadow-lg dark:bg-[#FAA533] dark:hover:bg-[#FAA533]/90'
 							compact={compactNav}
 						/>
 						<IconNavButton
 							href='/stories'
-							icon={<BookOpen className='h-4 w-4' />}
+							icon={<BookOpen className='h-5 w-5' />}
 							label='Stories'
-							colorClass='text-blue-800 bg-blue-100 hover:bg-blue-200 hover:text-blue-900 dark:text-blue-100 dark:bg-blue-900/40 dark:hover:bg-blue-800/60 dark:hover:text-white'
+							colorClass='text-white bg-[#0BA6DF] hover:bg-[#0BA6DF]/90 shadow-md hover:shadow-lg dark:bg-[#0BA6DF] dark:hover:bg-[#0BA6DF]/90'
 							compact={compactNav}
 						/>
 						<IconNavButton
 							href='/create'
-							icon={<Sparkles className='h-4 w-4' />}
+							icon={<Sparkles className='h-5 w-5' />}
 							label='Create'
-							colorClass='text-purple-800 bg-purple-100 hover:bg-purple-200 hover:text-purple-900 dark:text-purple-100 dark:bg-purple-900/40 dark:hover:bg-purple-800/60 dark:hover:text-white'
+							colorClass='text-white bg-[#FAA533] hover:bg-[#FAA533]/90 shadow-md hover:shadow-lg dark:bg-[#EF7722] dark:hover:bg-[#EF7722]/90'
 							compact={compactNav}
 						/>
 						<IconNavButton
 							href='/progress'
-							icon={<Trophy className='h-4 w-4' />}
+							icon={<Trophy className='h-5 w-5' />}
 							label='Progress'
-							colorClass='text-green-800 bg-green-100 hover:bg-green-200 hover:text-green-900 dark:text-green-100 dark:bg-green-900/40 dark:hover:bg-green-800/60 dark:hover:text-white'
+							colorClass='text-white bg-[#0BA6DF] hover:bg-[#0BA6DF]/90 shadow-md hover:shadow-lg dark:bg-[#FAA533] dark:hover:bg-[#FAA533]/90'
 							compact={compactNav}
 						/>
 					</nav>
 
-					{/* Right Actions */}
+					{/* Right Side Container - Groups all right elements together */}
 					<div className='flex items-center gap-2 flex-shrink-0 xl:justify-self-end'>
-						{user && showStats && (
-							<div className='hidden xl:flex items-center gap-3'>
-								{/* Combined Stats */}
-								<div className='group relative'>
-									<div
-										className={`flex items-center ${
-											compactNav
-												? "px-2.5 py-1 h-8"
-												: "px-3 py-1.5 h-9"
-										} bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-gray-200/70 dark:border-slate-700 rounded-full shadow-sm transition-all duration-200 cursor-default`}
-									>
-										<div className='relative w-4 h-4 mr-2'>
-											<svg
-												className='w-4 h-4 transform -rotate-90'
-												viewBox='0 0 36 36'
-											>
-												<path
-													className='stroke-emerald-200'
-													strokeWidth='4'
-													fill='transparent'
-													d='M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831'
-												/>
-												<path
-													className='stroke-emerald-500'
-													strokeWidth='4'
-													strokeDasharray={`${dailyProgress}, 100`}
-													strokeLinecap='round'
-													fill='transparent'
-													d='M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831'
-												/>
-											</svg>
+						{/* Right Actions */}
+						<div className='flex items-center gap-2'>
+							{user && showStats && (
+								<div className='hidden xl:flex items-center gap-3'>
+									{/* Combined Stats */}
+									<div className='group relative'>
+										<div
+											className={`flex items-center ${
+												compactNav
+													? "px-2.5 py-1 h-10"
+													: "px-3 py-1.5 h-12"
+											} bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-gray-200/70 dark:border-slate-700 rounded-full shadow-sm transition-all duration-200 cursor-default`}
+										>
+											<div className='relative w-4 h-4 mr-2'>
+												<svg
+													className='w-4 h-4 transform -rotate-90'
+													viewBox='0 0 36 36'
+												>
+													<path
+														className='stroke-[#EBEBEB]'
+														strokeWidth='4'
+														fill='transparent'
+														d='M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831'
+													/>
+													<path
+														className='stroke-[#0BA6DF]'
+														strokeWidth='4'
+														strokeDasharray={`${dailyProgress}, 100`}
+														strokeLinecap='round'
+														fill='transparent'
+														d='M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831'
+													/>
+												</svg>
+											</div>
+											<span className='text-sm font-semibold text-[#0BA6DF] mr-3'>
+												{dailyProgress}%
+											</span>
+											<Flame className='h-4 w-4 text-[#EF7722] mr-1' />
+											<span className='text-sm font-bold text-[#EF7722] mr-3'>
+												{streakCount}
+											</span>
+											<Crown className='h-4 w-4 text-[#FAA533]' />
 										</div>
-										<span className='text-sm font-semibold text-emerald-900 mr-3'>
-											{dailyProgress}%
-										</span>
-										<Flame className='h-4 w-4 text-orange-600 mr-1' />
-										<span className='text-sm font-bold text-orange-900 mr-3'>
-											{streakCount}
-										</span>
-										<Crown className='h-4 w-4 text-yellow-700' />
-									</div>
-									<div className='absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50'>
-										{dailyProgress}% Today • 🔥
-										{streakCount} • 👑L3
+										<div className='absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50'>
+											{dailyProgress}% Today • 🔥
+											{streakCount} • 👑L3
+										</div>
 									</div>
 								</div>
+							)}
+
+							{/* Divider between stats and user menu on desktop */}
+							{user && showStats && (
+								<div className='hidden xl:block h-6 w-px bg-gray-200/70 mx-2' />
+							)}
+
+							{/* Parent/Teacher Access */}
+							{user && (
+								<Button
+									variant="outline"
+									size="sm"
+									onClick={() => setIsPinModalOpen(true)}
+									className={`hidden sm:flex items-center gap-2 ${
+										compactNav ? "h-10" : "h-12"
+									} px-3 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-gray-200/70 dark:border-slate-700 rounded-full shadow-sm transition-all duration-200 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200`}
+									title="Parent/Teacher Access"
+								>
+									<Shield className="h-3.5 w-3.5" />
+									{isParentMode ? "Exit" : "Parent"}
+								</Button>
+							)}
+
+							{/* User Menu */}
+							<div className='flex items-center justify-center'>
+								<UserMenu />
 							</div>
-						)}
-
-						{/* Divider between stats and user menu on desktop */}
-						{user && showStats && (
-							<div className='hidden xl:block h-6 w-px bg-gray-200/70 mx-2' />
-						)}
-
-						{/* Parent/Teacher Access */}
-						{user && (
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={() => setIsPinModalOpen(true)}
-								className="hidden sm:flex items-center gap-2 h-8 px-3 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-gray-200/70 dark:border-slate-700 rounded-full shadow-sm transition-all duration-200 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-								title="Parent/Teacher Access"
-							>
-								<Shield className="h-3.5 w-3.5" />
-								{isParentMode ? "Exit" : "Parent"}
-							</Button>
-						)}
-
-						{/* User Menu */}
-						<div className='flex items-center justify-center'>
-							<UserMenu />
 						</div>
-					</div>
 
-					{/* Mobile/Tablet Menu Button */}
-					<Button
-						variant='ghost'
-						size='icon'
-						className='xl:hidden bg-white/80 hover:bg-white active:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700 dark:active:bg-slate-600 rounded-lg shadow-sm min-h-[44px] min-w-[44px] h-10 w-10 touch-manipulation'
-						onClick={() => setIsMenuOpen(!isMenuOpen)}
-						onTouchStart={() => {}} // Enable :active pseudo-class on iOS
-						data-testid='mobile-menu'
-						aria-label='Toggle mobile menu'
-						aria-expanded={isMenuOpen}
-					>
-						{isMenuOpen ? (
-							<X className='h-4 w-4' />
-						) : (
-							<Menu className='h-4 w-4' />
-						)}
-					</Button>
+						{/* Mobile/Tablet Menu Button */}
+						<Button
+							variant='ghost'
+							size='icon'
+							className='xl:hidden bg-white/80 hover:bg-white active:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700 dark:active:bg-slate-600 rounded-lg shadow-sm min-h-[44px] min-w-[44px] h-10 w-10 touch-manipulation'
+							onClick={() => setIsMenuOpen(!isMenuOpen)}
+							onTouchStart={() => {}} // Enable :active pseudo-class on iOS
+							data-testid='mobile-menu'
+							aria-label='Toggle mobile menu'
+							aria-expanded={isMenuOpen}
+						>
+							{isMenuOpen ? (
+								<X className='h-4 w-4' />
+							) : (
+								<Menu className='h-4 w-4' />
+							)}
+						</Button>
+					</div>
 				</div>
 
 				{/* Mobile/Tablet Navigation */}
@@ -375,11 +380,11 @@ export const Header = memo(function Header() {
 											</div>
 											<div className='grid grid-cols-3 gap-2'>
 												<div className='text-center p-2 bg-white/70 rounded-lg'>
-													<Target className='h-5 w-5 text-emerald-600 mx-auto mb-1' />
-													<div className='text-xs font-semibold text-emerald-800'>
+													<Target className='h-5 w-5 text-[#0BA6DF] mx-auto mb-1' />
+													<div className='text-xs font-semibold text-[#0BA6DF]'>
 														Today
 													</div>
-													<div className='text-sm font-bold text-emerald-900'>
+													<div className='text-sm font-bold text-[#0BA6DF]'>
 														{
 															dailyProgress
 														}
@@ -387,22 +392,22 @@ export const Header = memo(function Header() {
 													</div>
 												</div>
 												<div className='text-center p-2 bg-white/70 rounded-lg'>
-													<Flame className='h-5 w-5 text-orange-600 mx-auto mb-1' />
-													<div className='text-xs font-semibold text-orange-800'>
+													<Flame className='h-5 w-5 text-[#EF7722] mx-auto mb-1' />
+													<div className='text-xs font-semibold text-[#EF7722]'>
 														Streak
 													</div>
-													<div className='text-sm font-bold text-orange-900'>
+													<div className='text-sm font-bold text-[#EF7722]'>
 														{
 															streakCount
 														}
 													</div>
 												</div>
 												<div className='text-center p-2 bg-white/70 rounded-lg'>
-													<Crown className='h-5 w-5 text-yellow-700 mx-auto mb-1' />
-													<div className='text-xs font-semibold text-yellow-800'>
+													<Crown className='h-5 w-5 text-[#FAA533] mx-auto mb-1' />
+													<div className='text-xs font-semibold text-[#FAA533]'>
 														Level
 													</div>
-													<div className='text-sm font-bold text-yellow-900'>
+													<div className='text-sm font-bold text-[#FAA533]'>
 														3
 													</div>
 												</div>
@@ -462,17 +467,16 @@ function IconNavButton({
 	compact,
 }: IconNavButtonProps) {
 	const sizeClass = compact
-		? "p-1.5 min-w-[68px] h-10"
-		: "p-2 min-w-[80px] h-12";
-	const iconMargin = compact ? "mb-0.5" : "mb-1";
+		? "px-4 py-2 h-10"
+		: "px-6 py-2.5 h-12";
 	return (
 		<Link
 			href={href}
-			className={`group relative flex flex-col items-center justify-center ${sizeClass} rounded-lg ${colorClass} transition-all duration-200 hover:scale-105 hover:shadow-sm flex-shrink-0`}
+			className={`group relative flex items-center gap-2 ${sizeClass} rounded-xl ${colorClass} transition-all duration-300 hover:scale-105 hover:-translate-y-1 flex-shrink-0 font-semibold text-sm`}
 			aria-label={label}
 		>
-			<div className={`flex-shrink-0 ${iconMargin}`}>{icon}</div>
-			<span className='text-xs font-medium text-center leading-tight whitespace-nowrap'>
+			<div className='flex-shrink-0'>{icon}</div>
+			<span className='whitespace-nowrap'>
 				{label}
 			</span>
 		</Link>

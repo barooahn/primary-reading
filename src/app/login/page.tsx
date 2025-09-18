@@ -10,7 +10,7 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [role, setRole] = useState<string | null>(null);
-  const [formMode, setFormMode] = useState<'signin' | 'signup'>('signup');
+  const [formMode, setFormMode] = useState<'signin' | 'signup'>('signin');
 
   useEffect(() => {
     const roleParam = searchParams.get('role');
@@ -27,7 +27,7 @@ function LoginContent() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-70px)]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#EF7722]"></div>
       </div>
     );
   }
@@ -37,13 +37,13 @@ function LoginContent() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-70px)] min-h-[calc(100dvh-70px)] bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 relative overflow-hidden">
+    <div className="min-h-[calc(100vh-70px)] min-h-[calc(100dvh-70px)] bg-[#EBEBEB]/50 relative overflow-hidden">
       {/* Enhanced Background Decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-yellow-200/20 to-orange-200/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-br from-purple-200/20 to-pink-200/20 rounded-full blur-3xl animate-float-delayed" />
-        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-gradient-to-br from-blue-200/20 to-cyan-200/20 rounded-full blur-2xl animate-bounce-slow" />
-        <div className="absolute top-20 right-1/4 w-28 h-28 bg-gradient-to-br from-green-200/20 to-emerald-200/20 rounded-full blur-2xl animate-float" />
+        <div className="absolute top-10 left-10 w-32 h-32 bg-[#EF7722]/20 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-10 right-10 w-40 h-40 bg-[#FAA533]/20 rounded-full blur-3xl animate-float-delayed" />
+        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-[#0BA6DF]/20 rounded-full blur-2xl animate-bounce-slow" />
+        <div className="absolute top-20 right-1/4 w-28 h-28 bg-[#FAA533]/15 rounded-full blur-2xl animate-float" />
       </div>
 
       <div className="relative z-10 min-h-[calc(100vh-70px)] flex items-center justify-center p-3 sm:p-4">
@@ -55,9 +55,9 @@ function LoginContent() {
             <div className="space-y-3 sm:space-y-4 lg:space-y-6 text-center lg:text-left">
               {/* Role-based Icon and Animation - Hidden on mobile */}
               <div className="hidden lg:flex justify-center lg:justify-start">
-                <div className="w-20 h-20 bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg flex items-center justify-center backdrop-blur-sm border border-white/20 hover:scale-110 transition-all duration-500">
+                <div className="w-20 h-20 flex items-center justify-center hover:scale-110 transition-all duration-500">
                   {role === 'student' ? (
-                    <div className="text-4xl animate-bounce">🌟</div>
+                    <div className="text-4xl">🌟</div>
                   ) : (
                     <div className="text-4xl">📚</div>
                   )}
@@ -68,17 +68,18 @@ function LoginContent() {
               <div className="space-y-3 sm:space-y-4">
                 <h2 className="text-2xl sm:text-3xl lg:text-5xl font-black text-gray-900 font-heading leading-tight">
                   {role === 'student' ? (
-                    <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-                      {formMode === 'signin' ? 'Welcome Back, Reader! ✨' : 'Join the Reading Adventure! 🌟'}
-                    </span>
+                    <>
+                      <span className="text-gray-900">{formMode === 'signin' ? 'Welcome Back, ' : 'Join the Reading '}</span>
+                      <span className="text-[#EF7722]">{formMode === 'signin' ? 'Reader! ✨' : 'Adventure! 🌟'}</span>
+                    </>
                   ) : (
-                    <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    <span className="text-[#EF7722]">
                       {formMode === 'signin' ? 'Welcome Back' : 'Welcome to PrimaryReading'}
                     </span>
                   )}
                 </h2>
 
-                <p className="text-base sm:text-lg lg:text-xl text-text-secondary font-medium leading-relaxed max-w-lg mx-auto lg:mx-0">
+                <p className="text-base sm:text-lg lg:text-xl text-gray-600 font-medium leading-relaxed max-w-lg mx-auto lg:mx-0">
                   {role === 'student'
                     ? formMode === 'signin'
                       ? 'Ready for your next amazing reading adventure? Your stories are waiting!'
@@ -91,8 +92,8 @@ function LoginContent() {
                 {/* Role-based Encouragement Badge */}
                 {role === 'student' && (
                   <div className="flex justify-center lg:justify-start">
-                    <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-2xl bg-gradient-to-r from-purple-100 to-pink-100 border border-purple-200/50 shadow-sm">
-                      <span className="text-sm font-semibold text-purple-800">🎯 Keep Reading, Keep Growing!</span>
+                    <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-2xl bg-[#EF7722]/10 border-2 border-[#EF7722]/30 shadow-sm">
+                      <span className="text-sm font-semibold text-[#EF7722]">🎯 Keep Reading, Keep Growing!</span>
                     </div>
                   </div>
                 )}
@@ -101,11 +102,11 @@ function LoginContent() {
               {/* Feature Preview - Hidden on mobile and optimized for height */}
               <div className="hidden lg:block xl:block">
                 {role === 'student' ? (
-                  <div className="bg-white/60 backdrop-blur-sm border border-white/30 rounded-2xl p-4 lg:p-6 shadow-sm">
-                    <p className="text-sm text-gray-700 font-semibold mb-2 lg:mb-3">
+                  <div className="bg-white/80 backdrop-blur-sm border-2 border-[#EF7722]/20 rounded-2xl p-4 lg:p-6 shadow-sm">
+                    <p className="text-sm text-gray-900 font-semibold mb-2 lg:mb-3">
                       🎮 After you sign in, you&apos;ll be able to:
                     </p>
-                    <div className="text-sm text-text-secondary space-y-1 lg:space-y-2">
+                    <div className="text-sm text-gray-600 space-y-1 lg:space-y-2">
                       <div className="flex items-center gap-3">
                         <span>📖 Read personalized stories</span>
                       </div>
@@ -121,11 +122,11 @@ function LoginContent() {
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-white/60 backdrop-blur-sm border border-white/30 rounded-2xl p-4 lg:p-6 shadow-sm">
-                    <p className="text-sm text-gray-700 font-semibold mb-2 lg:mb-3">
+                  <div className="bg-white/80 backdrop-blur-sm border-2 border-[#0BA6DF]/20 rounded-2xl p-4 lg:p-6 shadow-sm">
+                    <p className="text-sm text-gray-900 font-semibold mb-2 lg:mb-3">
                       👨‍👩‍👧‍👦 Parent/Teacher Dashboard includes:
                     </p>
-                    <div className="text-sm text-text-secondary space-y-1 lg:space-y-2">
+                    <div className="text-sm text-gray-600 space-y-1 lg:space-y-2">
                       <div className="flex items-center gap-3">
                         <span>📊 Progress tracking</span>
                       </div>
@@ -162,7 +163,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-[calc(100vh-70px)]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#EF7722]"></div>
       </div>
     }>
       <LoginContent />

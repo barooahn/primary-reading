@@ -12,22 +12,28 @@ body:has(.netflix-reading-container.fullscreen-mode) header[class*="sticky top-0
 }
 
 :root {
-	/* PrimaryReading Brand Colors - Design System Aligned */
-	--education-blue: #3b82f6;
-	--education-purple: #8b5cf6;
-	--education-pink: #ec4899;
-	--education-indigo: #6366f1;
-	--warm-orange: #ff8c42;
-	--soft-yellow: #ffd93d;
-	--sage-green: #6ee7b7;
-	--coral-pink: #ff7b9d;
+	/* PrimaryReading New Brand Colors */
+	--primary-orange: #EF7722;
+	--secondary-orange: #FAA533;
+	--light-gray: #EBEBEB;
+	--primary-blue: #0BA6DF;
+
+	/* Legacy color mapping for compatibility */
+	--education-blue: var(--primary-blue);
+	--education-purple: var(--primary-orange);
+	--education-pink: var(--secondary-orange);
+	--education-indigo: var(--primary-blue);
+	--warm-orange: var(--primary-orange);
+	--soft-yellow: var(--secondary-orange);
+	--sage-green: var(--primary-blue);
+	--coral-pink: var(--secondary-orange);
 
 	/* Enhanced Neutrals - WCAG AA Compliant */
-	--background: #fafbfc;
+	--background: var(--light-gray);
 	--foreground: #0f172a; /* Improved contrast from #1f2937 */
 	--muted: #1e293b; /* Improved contrast from #374151 for better readability */
 	--muted-foreground: #475569; /* WCAG AA compliant muted text */
-	--border: #e5e7eb;
+	--border: #d1d5db;
 	--card: #ffffff;
 	--card-hover: #f9fafb;
 
@@ -38,12 +44,12 @@ body:has(.netflix-reading-container.fullscreen-mode) header[class*="sticky top-0
 	--placeholder: #64748b; /* Enhanced placeholder contrast */
 
 	/* Semantic Colors - Brand Aligned */
-	--primary: var(--education-blue);
-	--primary-hover: var(--education-purple);
-	--secondary: var(--education-pink);
-	--success: var(--sage-green);
-	--warning: var(--soft-yellow);
-	--error: var(--coral-pink);
+	--primary: var(--primary-orange);
+	--primary-hover: var(--secondary-orange);
+	--secondary: var(--primary-blue);
+	--success: var(--primary-blue);
+	--warning: var(--secondary-orange);
+	--error: var(--primary-orange);
 
 	/* Child-Friendly Typography System */
 	--font-primary: 'Comic Neue', 'Quicksand', 'Nunito', 'Inter', sans-serif;

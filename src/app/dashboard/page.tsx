@@ -34,7 +34,6 @@ interface UserProgress {
 	}>;
 }
 
-
 interface MetricCardProps {
 	number: string | number;
 	label: string;
@@ -43,45 +42,61 @@ interface MetricCardProps {
 	avatar?: string;
 }
 
-function MetricCard({ number, label, sublabel, type, avatar }: MetricCardProps) {
+function MetricCard({
+	number,
+	label,
+	sublabel,
+	type,
+	avatar,
+}: MetricCardProps) {
 	const getBackgroundColor = () => {
 		switch (type) {
-			case "excellent": return "bg-green-400";
-			case "good": return "bg-orange-400";
-			case "needs-attention": return "bg-red-400";
-			default: return "bg-gray-400";
+			case "excellent":
+				return "bg-[#EF7722]/50 border-2 border-[#EF7722]"; // Primary Orange - muted
+			case "good":
+				return "bg-[#FAA533]/50 border-2 border-[#FAA533]"; // Secondary Orange - muted
+			case "needs-attention":
+				return "bg-[#0BA6DF]/50 border-2 border-[#0BA6DF]"; // Primary Blue - muted
+			default:
+				return "bg-[#EBEBEB] border-2 border-gray-300"; // Light Gray
 		}
 	};
 
 	const getIcon = () => {
 		switch (type) {
-			case "excellent": return <CheckCircle className="h-6 w-6 text-white" />;
-			case "good": return <Star className="h-6 w-6 text-white" />;
-			case "needs-attention": return <AlertCircle className="h-6 w-6 text-white" />;
-			default: return <Star className="h-6 w-6 text-white" />;
+			case "excellent":
+				return <CheckCircle className='h-6 w-6 text-[#EF7722]' />;
+			case "good":
+				return <Star className='h-6 w-6 text-[#FAA533]' />;
+			case "needs-attention":
+				return <AlertCircle className='h-6 w-6 text-[#0BA6DF]' />;
+			default:
+				return <Star className='h-6 w-6 text-gray-300' />;
 		}
 	};
 
 	return (
-		<div className={`${getBackgroundColor()} rounded-2xl p-3 sm:p-4 text-center relative min-h-[100px] sm:min-h-[120px] flex flex-col justify-center transition-all duration-200 hover:scale-105`}>
+		<div
+			className={`${getBackgroundColor()} rounded-lg p-3 sm:p-4 text-center relative min-h-[90px] sm:min-h-[100px] flex flex-col justify-center shadow-sm`}
+		>
 			{avatar && (
-				<div className="absolute top-3 right-3">
-					<div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/40">
+				<div className='absolute top-3 right-3'>
+					<div className='w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/40'>
 						{getIcon()}
 					</div>
 				</div>
 			)}
 
-			<div className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-1 drop-shadow-lg">
+			<div className='text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 mb-1 drop-shadow-lg'>
 				{number}
 			</div>
 
-			<div className="text-white font-semibold text-xs sm:text-sm drop-shadow-md">
+			<div className='text-gray-900 font-semibold text-xs sm:text-sm drop-shadow-md'>
 				{label}
 			</div>
 
 			{sublabel && (
-				<div className="text-white/90 text-xs drop-shadow-sm mt-1">
+				<div className='text-gray-900/90 text-xs drop-shadow-sm mt-1'>
 					{sublabel}
 				</div>
 			)}
@@ -89,10 +104,11 @@ function MetricCard({ number, label, sublabel, type, avatar }: MetricCardProps) 
 	);
 }
 
-
 export default function DashboardPage() {
 	const { user } = useAuth();
-	const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
+	const [userProgress, setUserProgress] = useState<UserProgress | null>(
+		null
+	);
 	const [isLoading, setIsLoading] = useState(true);
 
 	const displayName =
@@ -115,9 +131,27 @@ export default function DashboardPage() {
 					questionsAnswered: 89,
 					correctAnswers: 73,
 					badges: [
-						{ id: "1", name: "First Story", icon: "📖", color: "blue", earned: true },
-						{ id: "2", name: "Week Streak", icon: "🔥", color: "orange", earned: true },
-						{ id: "3", name: "Quiz Master", icon: "🏆", color: "gold", earned: false },
+						{
+							id: "1",
+							name: "First Story",
+							icon: "📖",
+							color: "blue",
+							earned: true,
+						},
+						{
+							id: "2",
+							name: "Week Streak",
+							icon: "🔥",
+							color: "orange",
+							earned: true,
+						},
+						{
+							id: "3",
+							name: "Quiz Master",
+							icon: "🏆",
+							color: "gold",
+							earned: false,
+						},
 					],
 				};
 
@@ -137,10 +171,12 @@ export default function DashboardPage() {
 	if (isLoading) {
 		return (
 			<ProtectedRoute>
-				<div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
-					<div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 text-center">
-						<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-						<p className="text-gray-600">Loading your reading adventure...</p>
+				<div className='min-h-screen bg-[#EBEBEB]/50 flex items-center justify-center'>
+					<div className='bg-white/95 backdrop-blur-sm rounded-3xl p-8 max-w-md w-full mx-4 text-center shadow-lg'>
+						<div className='animate-spin rounded-full h-12 w-12 border-b-2 border-[#EF7722] mx-auto mb-4'></div>
+						<p className='text-gray-700'>
+							Loading your reading adventure...
+						</p>
 					</div>
 				</div>
 			</ProtectedRoute>
@@ -149,154 +185,235 @@ export default function DashboardPage() {
 
 	return (
 		<ProtectedRoute>
-			<div className="overflow-y-auto bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50" style={{ height: 'calc(100vh - 70px)' }}>
-				<div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-4 space-y-4 sm:space-y-6">
-					{/* Header */}
-					<div className="flex flex-col sm:flex-row sm:items-center justify-between bg-white/60 backdrop-blur-sm rounded-xl p-4 sm:p-6 shadow-sm gap-3 sm:gap-4">
-						<div>
-							<h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">My Reading Dashboard</h1>
-							<p className="text-gray-600 text-sm sm:text-base">
-								Welcome back, {displayName}! 🌟
-								<br className="sm:hidden" />
-								<span className="hidden sm:inline"> </span>
-								Keep up the great reading!
-							</p>
-						</div>
+			<div
+				className='bg-[#EBEBEB]/50 overflow-y-auto relative'
+				style={{ height: 'calc(100vh - 80px)' }}
+			>
+				{/* Background Decoration */}
+				<div className="absolute inset-0 overflow-hidden pointer-events-none">
+					<div className="absolute top-10 left-10 w-32 h-32 bg-[#EF7722]/20 rounded-full blur-3xl animate-pulse" />
+					<div className="absolute bottom-10 right-10 w-40 h-40 bg-[#FAA533]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+					<div className="absolute top-1/2 left-1/4 w-24 h-24 bg-[#0BA6DF]/20 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "2s" }} />
+					<div className="absolute top-20 right-1/4 w-28 h-28 bg-[#FAA533]/15 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "0.5s" }} />
+				</div>
 
-						<div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-							<div className="flex items-center gap-2 text-sm text-gray-600">
-								<Flame className="h-4 w-4 text-orange-500" />
-								<span className="font-semibold">{userProgress?.readingStreak || 7} Day Streak</span>
+				<div className='max-w-6xl mx-auto px-4 py-3 space-y-3 relative z-10'>
+					{/* Header */}
+					<div className='bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-sm'>
+						<div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3'>
+							<div>
+								<h1 className='text-2xl font-bold text-gray-900'>
+									My Reading Dashboard
+								</h1>
+								<p className='text-gray-600 text-sm'>
+									Welcome back, {displayName}! 🌟 Keep up the great reading!
+								</p>
 							</div>
 
-							<div className="flex items-center gap-2 text-sm text-gray-600">
-								<Crown className="h-4 w-4 text-yellow-500" />
-								<span className="font-semibold">Level {userProgress?.level || 3}</span>
+							<div className='flex items-center gap-4'>
+								<div className='flex items-center gap-2 text-sm text-gray-700 bg-[#EF7722]/10 px-3 py-1 rounded-full'>
+									<Flame className='h-4 w-4 text-[#EF7722]' />
+									<span className='font-semibold'>
+										{userProgress?.readingStreak || 7} Day Streak
+									</span>
+								</div>
+
+								<div className='flex items-center gap-2 text-sm text-gray-700 bg-[#FAA533]/10 px-3 py-1 rounded-full'>
+									<Crown className='h-4 w-4 text-[#FAA533]' />
+									<span className='font-semibold'>
+										Level {userProgress?.level || 3}
+									</span>
+								</div>
 							</div>
 						</div>
 					</div>
 
 					{/* Stats Overview */}
-					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
+					<div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3'>
 						<MetricCard
 							number={userProgress?.storiesRead || 15}
-							label="Stories Read"
-							sublabel="This month"
-							type="excellent"
-							avatar="true"
+							label='Stories Read'
+							sublabel='This month'
+							type='excellent'
+							avatar='true'
 						/>
 
 						<MetricCard
-							number={Math.round(((userProgress?.correctAnswers || 73) / (userProgress?.questionsAnswered || 89)) * 100)}
-							label="Accuracy Rate"
-							sublabel={`${userProgress?.correctAnswers || 73}/${userProgress?.questionsAnswered || 89} correct`}
-							type="good"
-							avatar="true"
+							number={Math.round(
+								((userProgress?.correctAnswers || 73) /
+									(userProgress?.questionsAnswered ||
+										89)) *
+									100
+							)}
+							label='Accuracy Rate'
+							sublabel={`${
+								userProgress?.correctAnswers || 73
+							}/${
+								userProgress?.questionsAnswered || 89
+							} correct`}
+							type='good'
+							avatar='true'
 						/>
 
 						<MetricCard
 							number={userProgress?.readingStreak || 7}
-							label="Reading Streak"
-							sublabel="Days in a row"
-							type="excellent"
-							avatar="true"
+							label='Reading Streak'
+							sublabel='Days in a row'
+							type='excellent'
+							avatar='true'
 						/>
 
 						<MetricCard
-							number={userProgress?.experiencePoints || 1250}
-							label="XP Points"
-							sublabel="Experience earned"
-							type="good"
-							avatar="true"
+							number={
+								userProgress?.experiencePoints || 1250
+							}
+							label='XP Points'
+							sublabel='Experience earned'
+							type='good'
+							avatar='true'
 						/>
 
 						<MetricCard
 							number={userProgress?.level || 3}
-							label="Reading Level"
-							sublabel="Keep growing!"
-							type="excellent"
-							avatar="true"
+							label='Reading Level'
+							sublabel='Keep growing!'
+							type='excellent'
+							avatar='true'
 						/>
 					</div>
 
 					{/* Recent Activity & Achievements */}
-					<div className="bg-white/40 backdrop-blur-sm rounded-xl p-4 sm:p-6 shadow-sm">
-						<div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
-							<h2 className="text-lg sm:text-xl font-bold text-gray-800">Recent Activity</h2>
-							<div className="flex items-center gap-2 text-sm text-gray-600">
-								<Clock className="h-4 w-4" />
+					<div className='bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-sm'>
+						<div className='flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2'>
+							<h2 className='text-lg sm:text-xl font-bold text-gray-700'>
+								Recent Activity
+							</h2>
+							<div className='flex items-center gap-2 text-sm text-gray-700'>
+								<Clock className='h-4 w-4' />
 								Last 7 days
 							</div>
 						</div>
 
-						<div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+						<div className='grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6'>
 							{/* Achievements & Badges */}
-							<div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4">
-								<h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-									<Award className="h-5 w-5 text-purple-600" />
+							<div className='bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4'>
+								<h3 className='text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2'>
+									<Award className='h-5 w-5 text-[#EF7722]' />
 									Recent Achievements
 								</h3>
-								<div className="space-y-3">
-									{userProgress?.badges?.map((badge) => (
-										<div key={badge.id} className={`flex items-center gap-3 p-3 rounded-xl ${badge.earned ? 'bg-white/80' : 'bg-gray-100/50'}`}>
-											<div className={`text-2xl ${badge.earned ? '' : 'grayscale opacity-50'}`}>
-												{badge.icon}
+								<div className='space-y-3'>
+									{userProgress?.badges?.map(
+										(badge) => (
+											<div
+												key={badge.id}
+												className={`flex items-center gap-3 p-3 rounded-xl ${
+													badge.earned
+														? "bg-white/90 backdrop-blur-sm"
+														: "bg-gray-100/70 backdrop-blur-sm"
+												}`}
+											>
+												<div
+													className={`text-2xl ${
+														badge.earned
+															? ""
+															: "grayscale opacity-50"
+													}`}
+												>
+													{badge.icon}
+												</div>
+												<div>
+													<div
+														className={`font-medium ${
+															badge.earned
+																? "text-gray-700"
+																: "text-gray-700"
+														}`}
+													>
+														{
+															badge.name
+														}
+													</div>
+													<div className='text-sm text-gray-700'>
+														{badge.earned
+															? "Completed!"
+															: "In progress..."}
+													</div>
+												</div>
+												{badge.earned && (
+													<div className='ml-auto'>
+														<CheckCircle className='h-5 w-5 text-[#0BA6DF]' />
+													</div>
+												)}
 											</div>
-											<div>
-												<div className={`font-medium ${badge.earned ? 'text-gray-800' : 'text-gray-500'}`}>
-													{badge.name}
-												</div>
-												<div className="text-sm text-gray-600">
-													{badge.earned ? 'Completed!' : 'In progress...'}
-												</div>
-											</div>
-											{badge.earned && (
-												<div className="ml-auto">
-													<CheckCircle className="h-5 w-5 text-green-500" />
-												</div>
-											)}
-										</div>
-									))}
+										)
+									)}
 								</div>
 							</div>
 
 							{/* Reading Goals & Progress */}
-							<div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4">
-								<h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-									<Target className="h-5 w-5 text-blue-600" />
+							<div className='bg-[#0BA6DF]/10 rounded-xl p-4'>
+								<h3 className='text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2'>
+									<Target className='h-5 w-5 text-[#0BA6DF]' />
 									Reading Goals
 								</h3>
-								<div className="space-y-4">
+								<div className='space-y-4'>
 									{/* Daily Goal */}
-									<div className="bg-white/80 rounded-xl p-4">
-										<div className="flex items-center justify-between mb-2">
-											<span className="font-medium text-gray-800">Daily Reading</span>
-											<span className="text-sm text-gray-600">12/15 min</span>
+									<div className='bg-white/90 backdrop-blur-sm rounded-xl p-3'>
+										<div className='flex items-center justify-between mb-2'>
+											<span className='font-medium text-gray-700'>
+												Daily Reading
+											</span>
+											<span className='text-sm text-gray-700'>
+												12/15 min
+											</span>
 										</div>
-										<div className="w-full bg-gray-200 rounded-full h-2">
-											<div className="bg-blue-500 h-2 rounded-full" style={{width: '80%'}}></div>
+										<div className='w-full bg-gray-200 rounded-full h-2'>
+											<div
+												className='bg-[#0BA6DF] h-2 rounded-full'
+												style={{
+													width: "80%",
+												}}
+											></div>
 										</div>
 									</div>
 
 									{/* Weekly Goal */}
-									<div className="bg-white/80 rounded-xl p-4">
-										<div className="flex items-center justify-between mb-2">
-											<span className="font-medium text-gray-800">Weekly Stories</span>
-											<span className="text-sm text-gray-600">3/5 stories</span>
+									<div className='bg-white/90 backdrop-blur-sm rounded-xl p-3'>
+										<div className='flex items-center justify-between mb-2'>
+											<span className='font-medium text-gray-700'>
+												Weekly Stories
+											</span>
+											<span className='text-sm text-gray-700'>
+												3/5 stories
+											</span>
 										</div>
-										<div className="w-full bg-gray-200 rounded-full h-2">
-											<div className="bg-green-500 h-2 rounded-full" style={{width: '60%'}}></div>
+										<div className='w-full bg-gray-200 rounded-full h-2'>
+											<div
+												className='bg-[#EF7722] h-2 rounded-full'
+												style={{
+													width: "60%",
+												}}
+											></div>
 										</div>
 									</div>
 
 									{/* Monthly Goal */}
-									<div className="bg-white/80 rounded-xl p-4">
-										<div className="flex items-center justify-between mb-2">
-											<span className="font-medium text-gray-800">Monthly XP</span>
-											<span className="text-sm text-gray-600">1250/2000 XP</span>
+									<div className='bg-white/90 backdrop-blur-sm rounded-xl p-3'>
+										<div className='flex items-center justify-between mb-2'>
+											<span className='font-medium text-gray-700'>
+												Monthly XP
+											</span>
+											<span className='text-sm text-gray-700'>
+												1250/2000 XP
+											</span>
 										</div>
-										<div className="w-full bg-gray-200 rounded-full h-2">
-											<div className="bg-purple-500 h-2 rounded-full" style={{width: '62.5%'}}></div>
+										<div className='w-full bg-gray-200 rounded-full h-2'>
+											<div
+												className='bg-[#FAA533] h-2 rounded-full'
+												style={{
+													width: "62.5%",
+												}}
+											></div>
 										</div>
 									</div>
 								</div>
@@ -305,38 +422,52 @@ export default function DashboardPage() {
 					</div>
 
 					{/* Quick Actions */}
-					<div className="bg-white/40 backdrop-blur-sm rounded-xl p-4 sm:p-6 shadow-sm">
-						<h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4">Quick Actions</h2>
-						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-						<Link href="/stories">
-							<div className="bg-blue-500 hover:bg-blue-600 rounded-xl p-4 sm:p-5 text-white transition-all duration-200 hover:scale-105 cursor-pointer">
-								<div className="flex items-center gap-3 mb-2">
-									<BookOpen className="h-5 w-5 sm:h-6 sm:w-6" />
-									<span className="font-semibold text-sm sm:text-base">Read New Story</span>
+					<div className='bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-sm'>
+						<h2 className='text-xl font-bold text-gray-900 mb-4'>
+							Quick Actions
+						</h2>
+						<div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
+							<Link href='/stories'>
+								<div className='bg-[#0BA6DF] hover:bg-[#0BA6DF]/90 rounded-xl p-4 text-white transition-all duration-200 hover:scale-105 cursor-pointer'>
+									<div className='flex items-center gap-3 mb-2'>
+										<BookOpen className='h-6 w-6' />
+										<span className='font-semibold'>
+											Read New Story
+										</span>
+									</div>
+									<p className='text-white/90 text-sm'>
+										Discover amazing adventures
+									</p>
 								</div>
-								<p className="text-blue-100 text-xs sm:text-sm">Discover amazing adventures</p>
-							</div>
-						</Link>
+							</Link>
 
-						<Link href="/create">
-							<div className="bg-purple-500 hover:bg-purple-600 rounded-xl p-4 sm:p-5 text-white transition-all duration-200 hover:scale-105 cursor-pointer">
-								<div className="flex items-center gap-3 mb-2">
-									<Sparkles className="h-5 w-5 sm:h-6 sm:w-6" />
-									<span className="font-semibold text-sm sm:text-base">Create Story</span>
+							<Link href='/create'>
+								<div className='bg-[#EF7722] hover:bg-[#EF7722]/90 rounded-xl p-4 text-white transition-all duration-200 hover:scale-105 cursor-pointer'>
+									<div className='flex items-center gap-3 mb-2'>
+										<Sparkles className='h-6 w-6' />
+										<span className='font-semibold'>
+											Create Story
+										</span>
+									</div>
+									<p className='text-white/90 text-sm'>
+										Write your own adventure
+									</p>
 								</div>
-								<p className="text-purple-100 text-xs sm:text-sm">Write your own adventure</p>
-							</div>
-						</Link>
+							</Link>
 
-						<Link href="/progress">
-							<div className="bg-green-500 hover:bg-green-600 rounded-xl p-4 sm:p-5 text-white transition-all duration-200 hover:scale-105 cursor-pointer">
-								<div className="flex items-center gap-3 mb-2">
-									<Trophy className="h-5 w-5 sm:h-6 sm:w-6" />
-									<span className="font-semibold text-sm sm:text-base">View Progress</span>
+							<Link href='/progress'>
+								<div className='bg-[#FAA533] hover:bg-[#FAA533]/90 rounded-xl p-4 text-white transition-all duration-200 hover:scale-105 cursor-pointer'>
+									<div className='flex items-center gap-3 mb-2'>
+										<Trophy className='h-6 w-6' />
+										<span className='font-semibold'>
+											View Progress
+										</span>
+									</div>
+									<p className='text-white/90 text-sm'>
+										See your achievements
+									</p>
 								</div>
-								<p className="text-green-100 text-xs sm:text-sm">See your achievements</p>
-							</div>
-						</Link>
+							</Link>
 						</div>
 					</div>
 				</div>

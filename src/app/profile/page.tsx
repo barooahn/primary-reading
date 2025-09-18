@@ -69,11 +69,11 @@ export default function ProfilePage() {
 	return (
 		<ProtectedRoute>
 			<div className='container mx-auto px-4 py-8'>
-				<h1 className='text-2xl font-bold tracking-tight mb-4'>
+				<h1 className='text-2xl font-bold tracking-tight mb-4 text-gray-900'>
 					Profile
 				</h1>
 
-				<div className='rounded-xl border border-gray-200 bg-white/70 shadow-sm p-4 space-y-5 max-w-xl'>
+				<div className='rounded-xl border border-[#EF7722] bg-[#EF7722]/10 shadow-sm p-4 space-y-5 max-w-xl'>
 					<div className='flex items-center gap-3'>
 						{avatarUrl ? (
 							<Image
@@ -84,12 +84,12 @@ export default function ProfilePage() {
 								className='h-12 w-12 rounded-full object-cover'
 							/>
 						) : (
-							<span className='inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white text-base font-semibold'>
+							<span className='inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#EF7722] text-white text-base font-semibold'>
 								{initials}
 							</span>
 						)}
 						<div>
-							<div className='text-base font-semibold'>
+							<div className='text-base font-semibold text-gray-900'>
 								{displayName}
 							</div>
 							<div className='text-sm text-gray-600'>
@@ -100,7 +100,7 @@ export default function ProfilePage() {
 
 					<div className='space-y-3'>
 						<label className='block'>
-							<div className='text-sm font-medium mb-1'>
+							<div className='text-sm font-medium mb-1 text-gray-900'>
 								Display name
 							</div>
 							<input
@@ -108,13 +108,13 @@ export default function ProfilePage() {
 								onChange={(e) =>
 									setDisplayName(e.target.value)
 								}
-								className='w-full h-9 rounded-md border border-gray-300 bg-white px-2 text-sm'
+								className='w-full h-9 rounded-md border border-[#EF7722] bg-white px-2 text-sm text-gray-900 focus:border-[#EF7722] focus:ring-1 focus:ring-[#EF7722] focus:outline-none'
 								placeholder='Your name'
 							/>
 						</label>
 
 						<label className='block'>
-							<div className='text-sm font-medium mb-1'>
+							<div className='text-sm font-medium mb-1 text-gray-900'>
 								Avatar URL
 							</div>
 							<input
@@ -122,7 +122,7 @@ export default function ProfilePage() {
 								onChange={(e) =>
 									setAvatarUrl(e.target.value)
 								}
-								className='w-full h-9 rounded-md border border-gray-300 bg-white px-2 text-sm'
+								className='w-full h-9 rounded-md border border-[#EF7722] bg-white px-2 text-sm text-gray-900 focus:border-[#EF7722] focus:ring-1 focus:ring-[#EF7722] focus:outline-none'
 								placeholder='https://...'
 							/>
 							<div className='text-xs text-gray-500 mt-1'>
@@ -132,11 +132,11 @@ export default function ProfilePage() {
 						</label>
 
 						<div className='block'>
-							<div className='text-sm font-medium mb-2'>
+							<div className='text-sm font-medium mb-2 text-gray-900'>
 								Upload avatar
 							</div>
 							<div className='flex items-center gap-3'>
-								<label className='inline-flex items-center justify-center h-9 px-4 rounded-md bg-gray-100 border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-50 cursor-pointer transition-colors'>
+								<label className='inline-flex items-center justify-center h-9 px-4 rounded-md bg-[#EF7722]/10 border border-[#EF7722] text-gray-900 text-sm font-medium hover:bg-[#EF7722]/20 cursor-pointer transition-colors'>
 									<Upload className='h-4 w-4 mr-2' />
 									Choose Image
 									<input
@@ -151,7 +151,7 @@ export default function ProfilePage() {
 									/>
 								</label>
 								{file && (
-									<div className='flex items-center text-sm text-green-600'>
+									<div className='flex items-center text-sm text-[#EF7722]'>
 										<Camera className='h-4 w-4 mr-1' />
 										{file.name}
 									</div>
@@ -168,12 +168,12 @@ export default function ProfilePage() {
 							type='button'
 							onClick={onSave}
 							disabled={saving}
-							className='inline-flex items-center justify-center h-9 px-4 rounded-md bg-purple-600 text-white text-sm disabled:opacity-60'
+							className='inline-flex items-center justify-center h-9 px-4 rounded-md bg-[#EF7722] text-white text-sm disabled:opacity-60 hover:bg-[#FAA533] transition-colors'
 						>
 							{saving ? "Saving…" : "Save changes"}
 						</button>
 						{message && (
-							<span className='text-sm text-gray-700'>
+							<span className='text-sm text-gray-900'>
 								{message}
 							</span>
 						)}
