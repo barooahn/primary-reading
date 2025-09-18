@@ -154,21 +154,21 @@ export default function WelcomePage() {
 									<h3 className="font-semibold">What you can do:</h3>
 									<div className="space-y-2 text-sm">
 										<div className="flex items-start space-x-3">
-											<ShieldCheck className="h-5 w-5 text-green-600 mt-0.5" />
+											<ShieldCheck className="h-5 w-5 text-[#0BA6DF] mt-0.5" />
 											<div>
 												<p className="font-medium">Set Reading Levels</p>
 												<p className="text-text-secondary">Control what content is appropriate for each child&apos;s age and ability</p>
 											</div>
 										</div>
 										<div className="flex items-start space-x-3">
-											<Star className="h-5 w-5 text-yellow-600 mt-0.5" />
+											<Star className="h-5 w-5 text-[#FAA533] mt-0.5" />
 											<div>
 												<p className="font-medium">Track Progress</p>
 												<p className="text-text-secondary">Monitor reading achievements and comprehension scores</p>
 											</div>
 										</div>
 										<div className="flex items-start space-x-3">
-											<Heart className="h-5 w-5 text-pink-600 mt-0.5" />
+											<Heart className="h-5 w-5 text-[#EF7722] mt-0.5" />
 											<div>
 												<p className="font-medium">Manage Multiple Children</p>
 												<p className="text-text-secondary">Create profiles for multiple students or children</p>
@@ -187,7 +187,7 @@ export default function WelcomePage() {
 									</Button>
 									<Button
 										asChild
-										className="flex-1 bg-blue-600 hover:bg-blue-700"
+										className="flex-1 bg-[#0BA6DF] hover:bg-[#0BA6DF]/90"
 									>
 										<Link href="/parent-setup">Continue Setup</Link>
 									</Button>
@@ -199,8 +199,8 @@ export default function WelcomePage() {
 					/* Child Login Screen */
 					<div className="max-w-2xl mx-auto text-center space-y-6 px-4 sm:px-0">
 						<div className="space-y-3">
-							<div className="mx-auto w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center mb-3">
-								<Sparkles className="h-8 w-8 text-purple-600" />
+							<div className="mx-auto w-14 h-14 bg-[#EF7722]/10 rounded-full flex items-center justify-center mb-3">
+								<Sparkles className="h-8 w-8 text-[#EF7722]" />
 							</div>
 							<h2 className="text-2xl font-bold text-gray-900">Ready to Read! 📚</h2>
 							<p className="text-base text-text-secondary">
@@ -219,9 +219,9 @@ export default function WelcomePage() {
 								</CardDescription>
 							</CardHeader>
 							<CardContent className="space-y-4">
-								<div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-									<h3 className="font-semibold text-purple-900 mb-2">What&apos;s waiting for you:</h3>
-									<div className="space-y-2 text-sm text-purple-800">
+								<div className="bg-[#EF7722]/10 p-4 rounded-lg border border-[#EF7722]/20">
+									<h3 className="font-semibold text-[#EF7722] mb-2">What&apos;s waiting for you:</h3>
+									<div className="space-y-2 text-sm text-gray-700">
 										<div className="flex items-center space-x-2">
 											<span className="text-lg">🎨</span>
 											<span>Beautiful illustrated stories</span>
@@ -247,7 +247,7 @@ export default function WelcomePage() {
 									</Button>
 									<Button
 										asChild
-										className="flex-1 bg-purple-600 hover:bg-purple-700"
+										className="flex-1 bg-[#EF7722] hover:bg-[#EF7722]/90"
 									>
 										<Link href="/login?role=student">Start Reading!</Link>
 									</Button>
