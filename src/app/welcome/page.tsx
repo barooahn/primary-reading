@@ -199,7 +199,7 @@ export default function WelcomePage() {
 									<Button
 										variant="outline"
 										onClick={() => setSelectedRole(null)}
-										className="flex-1"
+										className="flex-1 border-[#0BA6DF] text-[#0BA6DF] hover:bg-[#0BA6DF] hover:text-white"
 									>
 										← Back
 									</Button>
