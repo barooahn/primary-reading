@@ -205,7 +205,7 @@ export default function WelcomePage() {
 									</Button>
 									<Button
 										asChild
-										className="flex-1 bg-[#0BA6DF] hover:bg-[#0BA6DF]/90"
+										className="flex-1 bg-[#0BA6DF] hover:bg-[#0BA6DF]/90 active:bg-[#0BA6DF]/80 focus:bg-[#0BA6DF] focus:ring-[#0BA6DF]/50 text-white border-[#0BA6DF]"
 									>
 										<Link href="/parent-setup">Continue Setup</Link>
 									</Button>
@@ -265,7 +265,7 @@ export default function WelcomePage() {
 									</Button>
 									<Button
 										asChild
-										className="flex-1 bg-[#EF7722] hover:bg-[#EF7722]/90"
+										className="flex-1 bg-[#EF7722] hover:bg-[#EF7722]/90 active:bg-[#EF7722]/80 focus:bg-[#EF7722] focus:ring-[#EF7722]/50 text-white border-[#EF7722]"
 									>
 										<Link href="/login?role=student">Start Reading!</Link>
 									</Button>
