@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* Only hide navigation when reading interface is in fullscreen mode */
-body:has(.netflix-reading-container.fullscreen-mode) header[class*="sticky top-0 z-[100000]"] {
+body:has(.netflix-reading-container.fullscreen-mode) header[class*="sticky top-0 z-50"] {
 	visibility: hidden !important;
 	z-index: -1 !important;
 }
@@ -138,39 +138,9 @@ body {
 	font-family: var(--font-primary);
 	line-height: 1.6;
 	overflow-x: hidden; /* Prevent horizontal scrollbars */
+	max-width: 100vw; /* Ensure content doesn't exceed viewport width */
 	box-sizing: border-box;
 	letter-spacing: 0.01em; /* Slight letter spacing for better readability */
-	margin: 0;
-	padding: 0;
-}
-
-/* Prevent radix components from affecting layout */
-[data-radix-select-content],
-[data-radix-popper-content-wrapper] {
-	position: fixed !important;
-	z-index: 9999 !important;
-	will-change: auto !important;
-}
-
-/* Prevent body style changes when select is open */
-body:has([data-radix-select-content]) {
-	overflow-y: auto;
-}
-
-/* Force all major containers to account for scrollbar */
-.sticky,
-header,
-main,
-.container,
-.mx-auto {
-	box-sizing: border-box !important;
-}
-
-/* Specific fix for parent settings */
-.parent-settings-container {
-	width: 100%;
-	overflow-x: hidden;
-	box-sizing: border-box;
 }
 
 /* Apply child-friendly fonts to all text elements */

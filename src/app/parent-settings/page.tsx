@@ -46,6 +46,7 @@ function ParentSettingsContent() {
     grade: "2",
     readingLevel: "intermediate",
     dailyGoal: "15",
+    parentEmail: user?.email || "",
     pin: "1234",
     allowedTopics: "all",
     difficultyMode: "adaptive",
@@ -82,142 +83,8 @@ function ParentSettingsContent() {
   }, [searchParams]);
 
   return (
-    <>
-      {/* Custom styling for parent theme on this page */}
-      <style jsx global>{`
-        /* Target all select dropdown options specifically */
-        .parent-settings-container [role="option"] {
-          transition: all 0.2s ease !important;
-        }
-
-        /* Override hover and focus states for select options */
-        .parent-settings-container [role="option"]:hover,
-        .parent-settings-container [role="option"][data-highlighted],
-        .parent-settings-container [role="option"].focus\\:bg-accent:focus {
-          background-color: rgb(11 166 223 / 0.1) !important;
-          color: rgb(11 166 223) !important;
-        }
-
-        /* Additional specificity to override any accent colors */
-        .parent-settings-container [data-radix-select-item]:hover,
-        .parent-settings-container [data-radix-select-item][data-highlighted=""],
-        .parent-settings-container [data-radix-collection-item][data-highlighted=""],
-        .parent-settings-container [data-radix-collection-item][data-highlighted] {
-          background-color: rgb(11 166 223 / 0.1) !important;
-          color: rgb(11 166 223) !important;
-        }
-
-        /* Override checked/selected state */
-        .parent-settings-container [role="option"][data-state="checked"],
-        .parent-settings-container [role="option"][aria-selected="true"] {
-          background-color: rgb(11 166 223 / 0.15) !important;
-          color: rgb(11 166 223) !important;
-        }
-
-        /* Override checked + hover combination */
-        .parent-settings-container [role="option"][data-state="checked"]:hover,
-        .parent-settings-container [role="option"][data-state="checked"][data-highlighted] {
-          background-color: rgb(11 166 223 / 0.2) !important;
-          color: rgb(11 166 223) !important;
-        }
-
-        /* Override specific Tailwind classes that might be causing orange */
-        .parent-settings-container .focus\\:bg-accent:focus {
-          background-color: rgb(11 166 223 / 0.1) !important;
-        }
-
-        .parent-settings-container .focus\\:text-accent-foreground:focus {
-          color: rgb(11 166 223) !important;
-        }
-
-        /* Target select triggers */
-        .parent-settings-container [data-radix-select-trigger] {
-          border-color: rgb(11 166 223 / 0.2) !important;
-        }
-        .parent-settings-container [data-radix-select-trigger]:focus {
-          border-color: rgb(11 166 223) !important;
-          box-shadow: 0 0 0 3px rgb(11 166 223 / 0.2) !important;
-        }
-
-        /* Target select content */
-        .parent-settings-container [data-radix-select-content] {
-          border-color: rgb(11 166 223 / 0.2) !important;
-        }
-
-        /* Target input and textarea focus states */
-        .parent-settings-container input:focus {
-          border-color: rgb(11 166 223) !important;
-          box-shadow: 0 0 0 3px rgb(11 166 223 / 0.2) !important;
-        }
-        .parent-settings-container textarea:focus {
-          border-color: rgb(11 166 223) !important;
-          box-shadow: 0 0 0 3px rgb(11 166 223 / 0.2) !important;
-        }
-
-        /* Nuclear option - override any potential orange colors */
-        .parent-settings-container [class*="text-student"],
-        .parent-settings-container [style*="239, 119, 34"] {
-          color: rgb(11 166 223) !important;
-        }
-        .parent-settings-container [class*="bg-student"],
-        .parent-settings-container [style*="background-color: rgb(239, 119, 34)"],
-        .parent-settings-container [style*="background: rgb(239, 119, 34)"] {
-          background-color: rgb(11 166 223 / 0.1) !important;
-        }
-        .parent-settings-container [class*="border-student"] {
-          border-color: rgb(11 166 223 / 0.2) !important;
-        }
-
-        /* Override accent/orange from global CSS variables */
-        .parent-settings-container * {
-          --color-accent: rgb(11 166 223) !important;
-          --accent: rgb(11 166 223) !important;
-        }
-
-        /* Catch all Radix Select variants and states */
-        .parent-settings-container [data-radix-collection-item]:hover,
-        .parent-settings-container [data-radix-collection-item][data-highlighted],
-        .parent-settings-container .bg-accent,
-        .parent-settings-container .hover\\:bg-accent:hover,
-        .parent-settings-container .focus\\:bg-accent:focus {
-          background-color: rgb(11 166 223 / 0.1) !important;
-          color: rgb(11 166 223) !important;
-        }
-
-        /* Override any orange (#EF7722) colors specifically */
-        .parent-settings-container [style*="#EF7722"],
-        .parent-settings-container [style*="rgb(239, 119, 34)"] {
-          background-color: rgb(11 166 223 / 0.1) !important;
-          color: rgb(11 166 223) !important;
-        }
-
-        /* Most specific fix for the exact data-highlighted pattern found */
-        .parent-settings-container [role="option"][data-highlighted=""],
-        .parent-settings-container [role="option"][data-highlighted],
-        .parent-settings-container div[role="option"][data-highlighted=""],
-        .parent-settings-container div[role="option"][data-highlighted] {
-          background-color: rgb(11 166 223 / 0.1) !important;
-          color: rgb(11 166 223) !important;
-        }
-
-        /* Ultra-specific override for Tailwind's focus:bg-accent class */
-        .parent-settings-container div[role="option"].focus\\:bg-accent[data-highlighted],
-        .parent-settings-container div[role="option"].focus\\:bg-accent[data-highlighted=""],
-        .parent-settings-container .relative.flex.focus\\:bg-accent[data-highlighted],
-        .parent-settings-container .relative.flex.focus\\:bg-accent[data-highlighted=""] {
-          background-color: rgb(11 166 223 / 0.1) !important;
-          color: rgb(11 166 223) !important;
-        }
-
-        /* Force override with data-state and more specific targeting */
-        .parent-settings-container div[role="option"][data-state="unchecked"][data-highlighted],
-        .parent-settings-container div[role="option"][data-state="unchecked"][data-highlighted=""] {
-          background-color: rgb(11 166 223 / 0.1) !important;
-          color: rgb(11 166 223) !important;
-        }
-      `}</style>
-      <div className="parent-settings-container min-h-screen bg-gradient-to-br from-parent-light to-blue-50 dark:from-slate-900 dark:via-blue-900 dark:to-slate-900">
-      <div className="mx-auto px-4 py-8 max-w-4xl" style={{ width: '100%', maxWidth: 'min(1024px, calc(100vw - 2rem))' }}>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Link
@@ -227,11 +94,11 @@ function ParentSettingsContent() {
             <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-400" />
           </Link>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-parent-light rounded-lg">
-              <Shield className="h-6 w-6 text-parent" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
+              <Shield className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-parent dark:text-white">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                 Parent Settings
               </h1>
               <p className="text-gray-600 dark:text-gray-400">
@@ -253,10 +120,10 @@ function ParentSettingsContent() {
 
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Child Information */}
-          <Card className="dashboard-card border-parent-border bg-white shadow-lg">
+          <Card className="dashboard-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5 text-parent" />
+                <User className="h-5 w-5 text-blue-600" />
                 Child Information
               </CardTitle>
               <CardDescription>
@@ -320,10 +187,10 @@ function ParentSettingsContent() {
           </Card>
 
           {/* Reading Settings */}
-          <Card className="dashboard-card border-parent-border bg-white shadow-lg">
+          <Card className="dashboard-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-parent" />
+                <BookOpen className="h-5 w-5 text-green-600" />
                 Reading Settings
               </CardTitle>
               <CardDescription>
@@ -387,10 +254,10 @@ function ParentSettingsContent() {
           </Card>
 
           {/* Security Settings */}
-          <Card className="dashboard-card border-parent-border bg-white shadow-lg">
+          <Card className="dashboard-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5 text-parent" />
+                <Settings className="h-5 w-5 text-purple-600" />
                 Security & Access
               </CardTitle>
               <CardDescription>
@@ -403,14 +270,10 @@ function ParentSettingsContent() {
                 <Input
                   id="parentEmail"
                   type="email"
-                  value={user?.email || ""}
-                  readOnly
-                  className="bg-gray-50 cursor-not-allowed"
+                  value={childSettings.parentEmail}
+                  onChange={(e) => handleInputChange("parentEmail", e.target.value)}
                   placeholder="parent@email.com"
                 />
-                <p className="text-xs text-gray-500">
-                  This is the email you used to sign in
-                </p>
               </div>
 
               <div className="space-y-2">
@@ -431,10 +294,10 @@ function ParentSettingsContent() {
           </Card>
 
           {/* Additional Notes */}
-          <Card className="dashboard-card border-parent-border bg-white shadow-lg">
+          <Card className="dashboard-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-parent" />
+                <Target className="h-5 w-5 text-orange-600" />
                 Additional Notes
               </CardTitle>
               <CardDescription>
@@ -461,7 +324,7 @@ function ParentSettingsContent() {
           <Button
             onClick={handleSave}
             disabled={isLoading}
-            className="bg-parent hover:bg-parent-hover text-white px-8 py-2 text-lg font-medium min-w-[200px]"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 text-lg font-medium min-w-[200px]"
           >
             {isLoading ? (
               <div className="flex items-center gap-2">
@@ -470,7 +333,7 @@ function ParentSettingsContent() {
               </div>
             ) : isSaved ? (
               <div className="flex items-center gap-2">
-                <div className="h-4 w-4 bg-parent rounded-full flex items-center justify-center">
+                <div className="h-4 w-4 bg-green-500 rounded-full flex items-center justify-center">
                   <div className="h-2 w-2 bg-white rounded-full" />
                 </div>
                 Settings Saved!
@@ -484,16 +347,15 @@ function ParentSettingsContent() {
           </Button>
         </div>
       </div>
-      </div>
-    </>
+    </div>
   );
 }
 
 export default function ParentSettingsPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-parent-light to-blue-50 dark:from-slate-900 dark:via-blue-900 dark:to-slate-900 flex items-center justify-center">
-        <div className="h-8 w-8 border-2 border-parent border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 flex items-center justify-center">
+        <div className="h-8 w-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
       </div>
     }>
       <ParentSettingsContent />

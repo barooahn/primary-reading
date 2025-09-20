@@ -52,13 +52,13 @@ function MetricCard({
 	const getBackgroundColor = () => {
 		switch (type) {
 			case "excellent":
-				return "bg-white/90 backdrop-blur-sm border-2 border-student/30"; // Clean white with student border
+				return "bg-student/50 border-2 border-student"; // Student orange - muted
 			case "good":
-				return "bg-white/90 backdrop-blur-sm border-2 border-student-secondary/30"; // Clean white with secondary border
+				return "bg-student-secondary/50 border-2 border-student-secondary"; // Student secondary orange - muted
 			case "needs-attention":
-				return "bg-white/90 backdrop-blur-sm border-2 border-parent/30"; // Clean white with parent border
+				return "bg-parent/50 border-2 border-parent"; // Parent blue - muted
 			default:
-				return "bg-white/90 backdrop-blur-sm border-2 border-gray-300/50"; // Clean white with neutral border
+				return "bg-light-gray border-2 border-gray-300"; // Light Gray
 		}
 	};
 
@@ -87,16 +87,16 @@ function MetricCard({
 				</div>
 			)}
 
-			<div className='text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 mb-1'>
+			<div className='text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 mb-1 drop-shadow-lg'>
 				{number}
 			</div>
 
-			<div className='text-gray-900 font-semibold text-xs sm:text-sm'>
+			<div className='text-gray-900 font-semibold text-xs sm:text-sm drop-shadow-md'>
 				{label}
 			</div>
 
 			{sublabel && (
-				<div className='text-gray-700 text-xs mt-1'>
+				<div className='text-gray-900/90 text-xs drop-shadow-sm mt-1'>
 					{sublabel}
 				</div>
 			)}
@@ -191,10 +191,10 @@ export default function DashboardPage() {
 			>
 				{/* Background Decoration */}
 				<div className="absolute inset-0 overflow-hidden pointer-events-none">
-					<div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-student/15 to-student-secondary/10 rounded-full blur-3xl animate-pulse" />
-					<div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-br from-parent/15 to-student-secondary/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
-					<div className="absolute top-1/2 left-1/4 w-24 h-24 bg-gradient-to-br from-student-secondary/15 to-parent/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "2s" }} />
-					<div className="absolute top-20 right-1/4 w-28 h-28 bg-gradient-to-br from-parent/12 to-student/8 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "0.5s" }} />
+					<div className="absolute top-10 left-10 w-32 h-32 bg-student/20 rounded-full blur-3xl animate-pulse" />
+					<div className="absolute bottom-10 right-10 w-40 h-40 bg-student-secondary/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+					<div className="absolute top-1/2 left-1/4 w-24 h-24 bg-parent/20 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "2s" }} />
+					<div className="absolute top-20 right-1/4 w-28 h-28 bg-student-secondary/15 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "0.5s" }} />
 				</div>
 
 				<div className='max-w-6xl mx-auto px-4 py-3 space-y-3 relative z-10'>
@@ -296,8 +296,8 @@ export default function DashboardPage() {
 
 						<div className='grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6'>
 							{/* Achievements & Badges */}
-							<div className='bg-gradient-to-br from-student/10 to-student-secondary/15 rounded-xl p-4 border border-student/20'>
-								<h3 className='text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2'>
+							<div className='bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4'>
+								<h3 className='text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2'>
 									<Award className='h-5 w-5 text-student' />
 									Recent Achievements
 								</h3>
@@ -308,8 +308,8 @@ export default function DashboardPage() {
 												key={badge.id}
 												className={`flex items-center gap-3 p-3 rounded-xl ${
 													badge.earned
-														? "bg-white/90 backdrop-blur-sm border border-student/20"
-														: "bg-white/50 backdrop-blur-sm border border-gray-300/50"
+														? "bg-white/90 backdrop-blur-sm"
+														: "bg-gray-100/70 backdrop-blur-sm"
 												}`}
 											>
 												<div
@@ -351,25 +351,25 @@ export default function DashboardPage() {
 							</div>
 
 							{/* Reading Goals & Progress */}
-							<div className='bg-gradient-to-br from-parent/10 to-parent/20 rounded-xl p-4 border border-parent/25'>
-								<h3 className='text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2'>
+							<div className='bg-parent-light rounded-xl p-4'>
+								<h3 className='text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2'>
 									<Target className='h-5 w-5 text-parent' />
 									Reading Goals
 								</h3>
 								<div className='space-y-4'>
 									{/* Daily Goal */}
-									<div className='bg-white/90 backdrop-blur-sm rounded-xl p-3 border border-parent/15'>
+									<div className='bg-white/90 backdrop-blur-sm rounded-xl p-3'>
 										<div className='flex items-center justify-between mb-2'>
-											<span className='font-medium text-gray-800'>
+											<span className='font-medium text-gray-700'>
 												Daily Reading
 											</span>
-											<span className='text-sm text-gray-600'>
+											<span className='text-sm text-gray-700'>
 												12/15 min
 											</span>
 										</div>
-										<div className='w-full bg-gray-200/70 rounded-full h-3 border border-gray-300/50'>
+										<div className='w-full bg-gray-200 rounded-full h-2'>
 											<div
-												className='bg-gradient-to-r from-parent to-parent/80 h-3 rounded-full shadow-sm'
+												className='bg-parent h-2 rounded-full'
 												style={{
 													width: "80%",
 												}}
@@ -378,18 +378,18 @@ export default function DashboardPage() {
 									</div>
 
 									{/* Weekly Goal */}
-									<div className='bg-white/90 backdrop-blur-sm rounded-xl p-3 border border-student/15'>
+									<div className='bg-white/90 backdrop-blur-sm rounded-xl p-3'>
 										<div className='flex items-center justify-between mb-2'>
-											<span className='font-medium text-gray-800'>
+											<span className='font-medium text-gray-700'>
 												Weekly Stories
 											</span>
-											<span className='text-sm text-gray-600'>
+											<span className='text-sm text-gray-700'>
 												3/5 stories
 											</span>
 										</div>
-										<div className='w-full bg-gray-200/70 rounded-full h-3 border border-gray-300/50'>
+										<div className='w-full bg-gray-200 rounded-full h-2'>
 											<div
-												className='bg-gradient-to-r from-student to-student/80 h-3 rounded-full shadow-sm'
+												className='bg-student h-2 rounded-full'
 												style={{
 													width: "60%",
 												}}
@@ -398,18 +398,18 @@ export default function DashboardPage() {
 									</div>
 
 									{/* Monthly Goal */}
-									<div className='bg-white/90 backdrop-blur-sm rounded-xl p-3 border border-student-secondary/15'>
+									<div className='bg-white/90 backdrop-blur-sm rounded-xl p-3'>
 										<div className='flex items-center justify-between mb-2'>
-											<span className='font-medium text-gray-800'>
+											<span className='font-medium text-gray-700'>
 												Monthly XP
 											</span>
-											<span className='text-sm text-gray-600'>
+											<span className='text-sm text-gray-700'>
 												1250/2000 XP
 											</span>
 										</div>
-										<div className='w-full bg-gray-200/70 rounded-full h-3 border border-gray-300/50'>
+										<div className='w-full bg-gray-200 rounded-full h-2'>
 											<div
-												className='bg-gradient-to-r from-student-secondary to-student-secondary/80 h-3 rounded-full shadow-sm'
+												className='bg-student-secondary h-2 rounded-full'
 												style={{
 													width: "62.5%",
 												}}
@@ -428,7 +428,7 @@ export default function DashboardPage() {
 						</h2>
 						<div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
 							<Link href='/stories'>
-								<div className='bg-gradient-to-br from-parent to-parent/90 hover:from-parent-hover hover:to-parent-hover/90 rounded-xl p-4 text-white transition-all duration-200 hover:scale-105 cursor-pointer shadow-lg hover:shadow-xl border border-parent/20'>
+								<div className='bg-parent hover:bg-parent-hover rounded-xl p-4 text-white transition-all duration-200 hover:scale-105 cursor-pointer'>
 									<div className='flex items-center gap-3 mb-2'>
 										<BookOpen className='h-6 w-6' />
 										<span className='font-semibold'>
@@ -442,7 +442,7 @@ export default function DashboardPage() {
 							</Link>
 
 							<Link href='/create'>
-								<div className='bg-gradient-to-br from-student to-student/90 hover:from-student-hover hover:to-student-hover/90 rounded-xl p-4 text-white transition-all duration-200 hover:scale-105 cursor-pointer shadow-lg hover:shadow-xl border border-student/20'>
+								<div className='bg-student hover:bg-student-hover rounded-xl p-4 text-white transition-all duration-200 hover:scale-105 cursor-pointer'>
 									<div className='flex items-center gap-3 mb-2'>
 										<Sparkles className='h-6 w-6' />
 										<span className='font-semibold'>
@@ -456,7 +456,7 @@ export default function DashboardPage() {
 							</Link>
 
 							<Link href='/progress'>
-								<div className='bg-gradient-to-br from-student-secondary to-student-secondary/90 hover:from-student-secondary/90 hover:to-student-secondary/80 rounded-xl p-4 text-white transition-all duration-200 hover:scale-105 cursor-pointer shadow-lg hover:shadow-xl border border-student-secondary/20'>
+								<div className='bg-student-secondary hover:bg-student-secondary/90 rounded-xl p-4 text-white transition-all duration-200 hover:scale-105 cursor-pointer'>
 									<div className='flex items-center gap-3 mb-2'>
 										<Trophy className='h-6 w-6' />
 										<span className='font-semibold'>

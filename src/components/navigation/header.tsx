@@ -103,7 +103,7 @@ export const Header = memo(function Header() {
 	return (
 		<header
 			ref={menuRef}
-			className='sticky top-0 z-[100000] w-full bg-white shadow-lg border-b-2 border-student dark:bg-slate-900 dark:border-student-secondary text-gray-800 dark:text-white'
+			className='sticky top-0 z-50 w-full bg-white shadow-lg border-b-2 border-student dark:bg-slate-900 dark:border-student-secondary text-gray-800 dark:text-white'
 			style={{ height: "80px", boxSizing: "border-box" }}
 		>
 			<div className='mx-auto px-6 sm:px-8 md:px-12 py-3 w-full h-full'>
@@ -212,7 +212,7 @@ export const Header = memo(function Header() {
 											</span>
 											<Crown className='h-4 w-4 text-student-secondary' />
 										</div>
-										<div className='absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[100001]'>
+										<div className='absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50'>
 											{dailyProgress}% Today • 🔥
 											{streakCount} • 👑L3
 										</div>
@@ -272,12 +272,12 @@ export const Header = memo(function Header() {
 					<>
 						{/* Overlay */}
 						<div
-							className='xl:hidden fixed inset-0 top-[70px] bg-black/20 dark:bg-black/40 z-[99998]'
+							className='xl:hidden fixed inset-0 top-[70px] bg-black/20 dark:bg-black/40 z-40'
 							onClick={() => setIsMenuOpen(false)}
 						/>
 						{/* Menu */}
 						<div
-							className='xl:hidden absolute top-full left-0 right-0 bg-white dark:bg-slate-900 border-b border-purple-200/30 dark:border-purple-900/30 shadow-lg z-[99999] max-h-[calc(100vh-70px)] overflow-y-auto'
+							className='xl:hidden absolute top-full left-0 right-0 bg-white dark:bg-slate-900 border-b border-purple-200/30 dark:border-purple-900/30 shadow-lg z-50 max-h-[calc(100vh-70px)] overflow-y-auto'
 							data-testid='mobile-nav'
 						>
 							<nav className='p-3 space-y-1'>

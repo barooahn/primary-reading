@@ -16,8 +16,6 @@ import { DeleteStoryButton } from "@/components/stories/delete-story-button";
 import { useAuth } from "@/contexts/auth-context";
 import { ProtectedRoute } from "@/components/auth/protected-route";
 import { StoryWithMetadata } from "@/types/api";
-import { useChildProfiles } from "@/hooks/use-child-profiles";
-import { GRADE_LEVEL_CONFIGS } from "@/config/grade-levels";
 
 // Tiny base64 placeholder for blur-up effect
 const BLUR_DATA_URL =
@@ -64,16 +62,13 @@ const MOCK_STORIES_DATA = [
 
 export default function StoriesPage() {
 	const { user } = useAuth();
-	const { fetchChildProfiles } = useChildProfiles();
 	const [selectedGenre, setSelectedGenre] = useState("All");
 	const [selectedLevel, setSelectedLevel] = useState("All");
-	const [selectedYear, setSelectedYear] = useState("All");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [dbStories, setDbStories] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [ownerFilter, setOwnerFilter] = useState<"all" | "mine">("all");
 	const [message, setMessage] = useState<string | null>(null);
-	const [, setChildProfiles] = useState<any[]>([]);
 
 	const loadStoriesFromDatabase = useCallback(async () => {
 		try {
@@ -105,32 +100,10 @@ export default function StoriesPage() {
 		}
 	}, [ownerFilter]);
 
-	// Load child profiles and set default year
-	const loadChildProfiles = useCallback(async () => {
-		try {
-			if (user) {
-				const profiles = await fetchChildProfiles();
-				setChildProfiles(profiles);
-
-				// If there are child profiles and no year is selected yet, select the first child's year
-				if (profiles.length > 0 && selectedYear === "All") {
-					setSelectedYear(profiles[0].year_level.toString());
-				}
-			}
-		} catch (error) {
-			console.error("Failed to load child profiles:", error);
-		}
-	}, [user, fetchChildProfiles, selectedYear]);
-
 	// Load stories from database
 	useEffect(() => {
 		loadStoriesFromDatabase();
 	}, [loadStoriesFromDatabase]);
-
-	// Load child profiles
-	useEffect(() => {
-		loadChildProfiles();
-	}, [loadChildProfiles]);
 
 	// Build display list: prefer DB stories; for "All", fallback to mock data
 	const mapDb = (arr: any[]) =>
@@ -177,26 +150,13 @@ export default function StoriesPage() {
 		const matchesLevel =
 			selectedLevel === "All" ||
 			story.readingLevel === selectedLevel.toLowerCase();
-
-		// Year filtering: match story reading level to selected year's appropriate reading level
-		const matchesYear = (() => {
-			if (selectedYear === "All") return true;
-
-			const year = parseInt(selectedYear);
-			if (year >= 1 && year <= 6) {
-				const expectedReadingLevel = GRADE_LEVEL_CONFIGS[year].readingLevel;
-				return story.readingLevel === expectedReadingLevel;
-			}
-			return true;
-		})();
-
 		const matchesSearch =
 			story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
 			String(story.description || "")
 				.toLowerCase()
 				.includes(searchQuery.toLowerCase());
 
-		return matchesGenre && matchesLevel && matchesYear && matchesSearch;
+		return matchesGenre && matchesLevel && matchesSearch;
 	});
 
 	return (
@@ -258,21 +218,6 @@ export default function StoriesPage() {
 								className='w-full px-4 py-2 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-student focus:border-student'
 							/>
 						</div>
-						<select
-							value={selectedYear}
-							onChange={(e) =>
-								setSelectedYear(e.target.value)
-							}
-							className='px-4 py-2 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-student focus:border-student'
-						>
-							<option value='All'>All Years</option>
-							<option value='1'>Year 1 (Beginner)</option>
-							<option value='2'>Year 2 (Beginner)</option>
-							<option value='3'>Year 3 (Intermediate)</option>
-							<option value='4'>Year 4 (Intermediate)</option>
-							<option value='5'>Year 5 (Advanced)</option>
-							<option value='6'>Year 6 (Advanced)</option>
-						</select>
 						<select
 							value={selectedGenre}
 							onChange={(e) =>
@@ -453,9 +398,6 @@ export default function StoriesPage() {
 													"All"
 												);
 												setSelectedLevel(
-													"All"
-												);
-												setSelectedYear(
 													"All"
 												);
 											}}

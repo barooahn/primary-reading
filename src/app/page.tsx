@@ -279,9 +279,9 @@ export default function Home() {
 					</div>
 				</div>
 
-				{/* Text Content - Positioned 2/3 down on desktop, centered on mobile */}
-				<div className='absolute inset-0 flex md:items-end md:justify-center items-center justify-center pt-16 z-10'>
-					<div className='px-4 pb-20 md:pb-32'>
+				{/* Text Content - Bottom positioned */}
+				<div className='absolute inset-0 flex items-center justify-center pt-16 z-10'>
+					<div className='px-4 pb-20'>
 						<div
 							className='text-center transform transition-all duration-1000 ease-out bg-white/70 backdrop-blur-md border-2 border-gray-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.1)] rounded-3xl px-6 py-8 md:px-8 md:py-10 max-w-2xl mx-auto'
 							style={{
@@ -300,7 +300,7 @@ export default function Home() {
 
 							{/* Brand-Aligned Typography */}
 							<h1 className='text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6 leading-[1.1] font-heading'>
-								<span className='text-parent'>
+								<span className='text-gray-900'>
 									Reading Made
 								</span>
 								<br />
@@ -338,7 +338,7 @@ export default function Home() {
 								</Link>
 
 								<Link href='/stories' aria-label="Browse our library of reading adventures">
-									<button className='group px-10 py-5 bg-parent/10 backdrop-blur-xl border-2 border-parent/30 text-parent font-bold text-lg rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.15)] transition-all duration-300 hover:scale-105 hover:-translate-y-1 hover:bg-parent/20 hover:border-parent/50' aria-describedby="browse-library-description">
+									<button className='group px-10 py-5 bg-white/80 backdrop-blur-xl border-2 border-gray-200/60 text-parent font-bold text-lg rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.15)] transition-all duration-300 hover:scale-105 hover:-translate-y-1 hover:bg-white/90 hover:border-gray-300/70' aria-describedby="browse-library-description">
 										<div className='flex items-center gap-3'>
 											<BookOpen className='h-6 w-6 group-hover:scale-110 transition-transform duration-200 text-parent' aria-hidden="true" />
 											Browse Library

@@ -148,7 +148,7 @@ export function UserMenu() {
 					role='menu'
 					aria-label='User menu'
 					onKeyDown={handleMenuKeyDown}
-					className='absolute right-0 mt-2 w-48 rounded-md border border-gray-200 bg-white shadow-lg z-[100002] overflow-hidden'
+					className='absolute right-0 mt-2 w-48 rounded-md border border-gray-200 bg-white shadow-lg z-50 overflow-hidden'
 				>
 					<Link
 						href='/profile'

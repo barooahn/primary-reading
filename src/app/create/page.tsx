@@ -21,7 +21,6 @@ import {
 	Lightbulb,
 	RefreshCw,
 	Play,
-	Settings,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -698,35 +697,12 @@ export default function CreatePage() {
 		isGenerating: false,
 	});
 	const [regeneratingImages, setRegeneratingImages] = useState<Set<string>>(new Set());
-	const [showPinModal, setShowPinModal] = useState(false);
-	const [pinInput, setPinInput] = useState("");
-	const [pinError, setPinError] = useState("");
 
 	const handleThemeSelect = (theme: string) => {
 		setSettings({ ...settings, theme });
 		if (!customPromptMode) {
 			setCurrentStep("details");
 		}
-	};
-
-	const handlePinSubmit = () => {
-		// In a real app, this would verify against a stored PIN
-		// For now, using a simple check - you'd want to implement proper PIN storage/verification
-		if (pinInput === "1234") { // Replace with actual PIN verification
-			setShowPinModal(false);
-			setPinInput("");
-			setPinError("");
-			// Navigate to parent settings page
-			window.location.href = "/parent-settings";
-		} else {
-			setPinError("Incorrect PIN. Please try again.");
-			setPinInput("");
-		}
-	};
-
-	const handleEditProfile = () => {
-		setShowPinModal(true);
-		setPinError("");
 	};
 
 	const saveStoryToDatabase = async (): Promise<string | null> => {
@@ -1223,10 +1199,10 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 			<div className='container mx-auto px-4 py-8 max-w-4xl'>
 				{/* Header */}
 				<div className='text-center mb-8'>
-					<h1 className='text-3xl font-bold text-student mb-2'>
+					<h1 className='text-3xl font-bold text-foreground mb-2'>
 						Create Your Own Story ✨
 					</h1>
-					<p className='text-gray-600 text-lg'>
+					<p className='text-text-secondary text-lg'>
 						Let AI help you create an amazing, personalized
 						adventure story!
 					</p>
@@ -1248,11 +1224,11 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 								<div className='text-base font-semibold text-student mb-2'>
 									{stepNames[currentIndex] || stepNames[0]}
 								</div>
-								<div className='w-64 max-w-[calc(100vw-2rem)] bg-gray-200 rounded-full h-2'>
-									<div
+								<div className='w-64 max-w-[calc(100vw-2rem)] bg-muted/30 rounded-full h-2'>
+									<div 
 										className='bg-gradient-to-r from-student to-student-secondary h-2 rounded-full transition-all duration-500'
-										style={{
-											width: `${((currentIndex + 1) / 4) * 100}%`
+										style={{ 
+											width: `${((currentIndex + 1) / 4) * 100}%` 
 										}}
 									/>
 								</div>
@@ -1269,8 +1245,8 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 													isActive
 														? "bg-student scale-125"
 														: isCompleted
-														? "bg-student-secondary"
-														: "bg-gray-300"
+														? "bg-success"
+														: "bg-muted"
 												}`}
 											/>
 										);
@@ -1310,8 +1286,8 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 										isActive
 											? "bg-student text-white"
 											: isCompleted
-											? "bg-student-secondary text-white"
-											: "bg-gray-300 text-gray-600"
+											? "bg-success text-white"
+											: "bg-muted text-text-muted"
 									}`}
 								>
 									{index + 1}
@@ -1319,8 +1295,8 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 								<span
 									className={`ml-2 text-sm ${
 										isActive
-											? "text-student font-medium"
-											: "text-gray-500"
+											? "text-foreground font-medium"
+											: "text-muted"
 									}`}
 								>
 									{step}
@@ -1339,20 +1315,9 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 						{/* Reading Level Display - No longer editable */}
 						<Card className="bg-parent-light border-parent-border">
 							<CardHeader>
-								<CardTitle className='flex items-center justify-between'>
-									<div className='flex items-center space-x-2'>
-										<BookOpen className='h-5 w-5 text-parent' />
-										<span>Your Reading Level</span>
-									</div>
-									<Button
-										variant="outline"
-										size="sm"
-										onClick={handleEditProfile}
-										className="border-parent text-parent hover:bg-parent-light"
-									>
-										<Settings className='h-4 w-4 mr-1' />
-										Edit
-									</Button>
+								<CardTitle className='flex items-center space-x-2'>
+									<BookOpen className='h-5 w-5 text-parent' />
+									<span>Your Reading Level</span>
 								</CardTitle>
 								<CardDescription>
 									Your parent/teacher has set up the perfect reading level for you!
@@ -1396,7 +1361,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 							</CardHeader>
 							<CardContent>
 								<div className='flex justify-center mb-6'>
-									<div className='flex space-x-1 bg-student-light p-1 rounded-lg'>
+									<div className='flex space-x-1 bg-muted/20 p-1 rounded-lg'>
 										<button
 											onClick={() =>
 												setCustomPromptMode(
@@ -1406,7 +1371,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 											className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
 												!customPromptMode
 													? "bg-student text-white shadow-sm"
-													: "text-gray-600 hover:text-student"
+													: "text-muted hover:text-foreground"
 											}`}
 										>
 											Choose Theme
@@ -1420,7 +1385,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 											className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
 												customPromptMode
 													? "bg-student text-white shadow-sm"
-													: "text-gray-600 hover:text-student"
+													: "text-muted hover:text-foreground"
 											}`}
 										>
 											Custom Idea
@@ -1443,14 +1408,14 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 												}
 												className={`
 													min-h-[4rem] sm:min-h-[4.5rem] p-4 sm:p-5
-													rounded-lg sm:rounded-xl border-2 text-left
-													transition-all duration-200
+													rounded-lg sm:rounded-xl border-2 text-left 
+													transition-all duration-200 
 													hover:scale-105 active:scale-95
 													touch-manipulation
 													${
 														settings.theme === theme.name
-															? "border-student bg-student-light shadow-md"
-															: "border-gray-200 hover:border-student/50 hover:bg-student-light/50"
+															? "border-student bg-student/10 shadow-md"
+															: "border-light-gray hover:border-student/50 hover:bg-student/5"
 													}
 												`}
 											>
@@ -1470,7 +1435,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 												Your Story Idea
 											</label>
 											<textarea
-												className='w-full p-4 sm:p-3 border-2 border-gray-200 rounded-lg sm:rounded-xl
+												className='w-full p-4 sm:p-3 border-2 border-border rounded-lg sm:rounded-xl 
 												focus:outline-none focus:ring-3 focus:ring-student/20 focus:border-student
 												text-base leading-relaxed touch-manipulation resize-none'
 												style={{ fontSize: '16px' }} /* Prevents zoom on iOS */
@@ -1523,7 +1488,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 																	}
 																)
 															}
-															className='p-3 text-left rounded-lg border border-gray-200 hover:border-student/50 hover:bg-student-light/50 transition-all'
+															className='p-3 text-left rounded-lg border border-light-gray hover:border-student/50 hover:bg-student/5 transition-all'
 														>
 															<p className='text-sm'>
 																{
@@ -1662,14 +1627,14 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 											}
 											className={`
 												min-h-[4.5rem] p-4 sm:p-5
-												rounded-lg sm:rounded-xl border-2 text-center
-												transition-all duration-200
+												rounded-lg sm:rounded-xl border-2 text-center 
+												transition-all duration-200 
 												hover:scale-105 active:scale-95
 												touch-manipulation
 												${
 													settings.storyType === "fiction"
-														? "border-student bg-student-light shadow-md"
-														: "border-gray-200 hover:border-student/50 hover:bg-student-light/50"
+														? "border-student bg-student/10 shadow-md"
+														: "border-light-gray hover:border-student/50 hover:bg-student/5"
 												}
 											`}
 										>
@@ -1694,14 +1659,14 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 											}
 											className={`
 												min-h-[4.5rem] p-4 sm:p-5
-												rounded-lg sm:rounded-xl border-2 text-center
-												transition-all duration-200
+												rounded-lg sm:rounded-xl border-2 text-center 
+												transition-all duration-200 
 												hover:scale-105 active:scale-95
 												touch-manipulation
 												${
 													settings.storyType === "non_fiction"
-														? "border-student bg-student-light shadow-md"
-														: "border-gray-200 hover:border-student/50 hover:bg-student-light/50"
+														? "border-student bg-student/10 shadow-md"
+														: "border-light-gray hover:border-student/50 hover:bg-student/5"
 												}
 											`}
 										>
@@ -1777,7 +1742,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 										data-testid="generate-story-btn"
 										onClick={generateStory}
 										className='w-full sm:flex-1 h-14 sm:h-10 text-lg sm:text-sm font-semibold
-										bg-gradient-to-r from-student to-student-secondary hover:from-student-hover hover:to-student-secondary/90
+										bg-gradient-to-r from-student to-student-secondary hover:from-student/90 hover:to-student-secondary/90
 										shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95'
 									>
 										<Sparkles className='h-5 w-5 sm:h-4 sm:w-4 mr-2' />
@@ -1803,8 +1768,8 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 										<span>{generationProgress.progress}%</span>
 									</div>
 									<div className='w-full bg-gray-200 rounded-full h-2'>
-										<div
-											className='bg-gradient-to-r from-student to-student-secondary h-2 rounded-full transition-all duration-500'
+										<div 
+											className='bg-student h-2 rounded-full transition-all duration-500'
 											style={{ width: `${generationProgress.progress}%` }}
 										></div>
 									</div>
@@ -1878,16 +1843,16 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 								{/* Step Indicators */}
 								<div className='flex justify-center space-x-8 text-sm'>
 									<div className={`flex items-center space-x-2 ${
-										generationProgress.step === "story" ? "text-student font-medium" :
-										generationProgress.progress >= 30 ? "text-student-secondary" : "text-gray-500"
+										generationProgress.step === "story" ? "text-student font-medium" : 
+										generationProgress.progress >= 30 ? "text-green-600" : "text-muted"
 									}`}>
 										<BookOpen className='h-4 w-4' />
 										<span>Story</span>
 									</div>
 									{settings.includeImages && (
 										<div className={`flex items-center space-x-2 ${
-											generationProgress.step === "images" ? "text-student font-medium" :
-											generationProgress.progress >= 95 ? "text-student-secondary" : "text-gray-500"
+											generationProgress.step === "images" ? "text-student font-medium" : 
+											generationProgress.progress >= 95 ? "text-green-600" : "text-muted"
 										}`}>
 											<Sparkles className='h-4 w-4' />
 											<span>Images ({generatedImages.length}/5)</span>
@@ -1905,7 +1870,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 						<Card>
 							<CardHeader>
 								<CardTitle className='flex items-center space-x-2'>
-									<BookOpen className='h-5 w-5 text-student' />
+									<BookOpen className='h-5 w-5 text-success' />
 									<span>
 										Your Story is Ready! 🎉
 									</span>
@@ -1917,8 +1882,8 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 							</CardHeader>
 							<CardContent>
 								<div className='space-y-4'>
-									<div className='text-center p-6 bg-gradient-to-br from-student-light to-student-secondary/20 rounded-lg border border-student/20'>
-										<h2 className='text-2xl font-bold text-student mb-2'>
+									<div className='text-center p-6 bg-gradient-to-br from-success/10 to-primary/10 rounded-lg border border-success/20'>
+										<h2 className='text-2xl font-bold text-foreground mb-2'>
 											{generatedStory.title.replace(/\*\*/g, '')}
 										</h2>
 										<div className='flex items-center justify-center space-x-4 text-sm text-muted'>
@@ -2039,7 +2004,7 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 													}
 												}}
 												disabled={isSaving}
-												className='w-full h-12 text-lg font-semibold bg-gradient-to-r from-student to-student-secondary hover:from-student-hover hover:to-student-secondary/90'
+												className='w-full h-12 text-lg font-semibold bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600'
 											>
 												{isSaving ? (
 													<>
@@ -2064,14 +2029,14 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 										</div>
 									) : (
 										<div className='space-y-4'>
-											<div className='p-4 bg-student-light rounded-lg border border-student/30'>
+											<div className='p-4 bg-green-50 rounded-lg border border-green-200'>
 												<div className='flex items-center space-x-2'>
-													<div className='w-6 h-6 bg-student rounded-full flex items-center justify-center'>
+													<div className='w-6 h-6 bg-green-500 rounded-full flex items-center justify-center'>
 														<span className='text-white text-sm'>✓</span>
 													</div>
 													<div>
-														<h3 className='font-medium text-student'>Story Saved!</h3>
-														<p className='text-sm text-gray-600'>Your story is now available in the library.</p>
+														<h3 className='font-medium text-green-900'>Story Saved!</h3>
+														<p className='text-sm text-green-700'>Your story is now available in the library.</p>
 													</div>
 												</div>
 											</div>
@@ -2199,63 +2164,6 @@ And that's how Emma and Pixel became the best programming team in Bitburg, creat
 								showDownload={true}
 							/>
 						)}
-					</div>
-				)}
-
-				{/* PIN Modal */}
-				{showPinModal && (
-					<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-						<div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-							<div className="text-center mb-6">
-								<div className="w-16 h-16 bg-parent-light rounded-full flex items-center justify-center mx-auto mb-4">
-									<Settings className="h-8 w-8 text-parent" />
-								</div>
-								<h2 className="text-xl font-bold text-parent mb-2">Parent Access Required</h2>
-								<p className="text-gray-600 text-sm">
-									Please enter your PIN to access profile settings
-								</p>
-							</div>
-
-							<div className="space-y-4">
-								<div>
-									<label className="block text-sm font-medium mb-2">PIN</label>
-									<input
-										type="password"
-										value={pinInput}
-										onChange={(e) => setPinInput(e.target.value)}
-										onKeyPress={(e) => e.key === 'Enter' && handlePinSubmit()}
-										className="w-full p-3 border-2 border-gray-200 rounded-lg text-center text-lg tracking-widest focus:outline-none focus:ring-3 focus:ring-parent/20 focus:border-parent"
-										placeholder="Enter 4-digit PIN"
-										maxLength={4}
-										autoFocus
-									/>
-									{pinError && (
-										<p className="text-red-500 text-sm mt-2">{pinError}</p>
-									)}
-								</div>
-
-								<div className="flex space-x-3">
-									<Button
-										variant="outline"
-										onClick={() => {
-											setShowPinModal(false);
-											setPinInput("");
-											setPinError("");
-										}}
-										className="flex-1"
-									>
-										Cancel
-									</Button>
-									<Button
-										onClick={handlePinSubmit}
-										disabled={pinInput.length !== 4}
-										className="flex-1 bg-parent hover:bg-parent-hover text-white"
-									>
-										Continue
-									</Button>
-								</div>
-							</div>
-						</div>
 					</div>
 				)}
 			</div>

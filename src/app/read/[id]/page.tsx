@@ -848,7 +848,7 @@ export default function ReadStoryPage() {
 					isFullscreenMode ? "fullscreen-mode" : ""
 				} ${
 					isFullscreenMode
-						? "fixed top-0 left-0 right-0 bottom-0 z-[9000] min-h-screen"
+						? "fixed top-0 left-0 right-0 bottom-0 z-[99999] min-h-screen"
 						: "relative h-[calc(100vh-70px)] max-h-[calc(100vh-70px)]"
 				} flex flex-col overflow-hidden`}
 				style={{
@@ -866,7 +866,7 @@ export default function ReadStoryPage() {
 				<div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 pointer-events-none' />
 
 				{/* Story Header - Relative positioning */}
-<div className={`relative z-40 bg-gradient-to-b from-black/95 via-black/70 to-transparent ${
+<div className={`relative z-50 bg-gradient-to-b from-black/95 via-black/70 to-transparent ${
 					isFullscreenMode ? 'p-3 md:p-4' : 'px-3 md:px-8 py-3 md:py-4'
 				}`}>
 					{/* Mobile Layout */}
@@ -1078,7 +1078,7 @@ export default function ReadStoryPage() {
 				</div>
 
 				{/* Progress Bar - Relative positioning */}
-				<div className={`relative z-30 ${
+				<div className={`relative z-40 ${
 					isFullscreenMode ? 'px-3 md:px-4' : 'px-3 md:px-8'
 				}`}>
 					<div className='space-y-2'>
@@ -1114,7 +1114,7 @@ export default function ReadStoryPage() {
 				</div>
 
 				{/* Reading Content - Positioned after progress bar */}
-				<div className={`relative z-20 pt-4 pb-32 md:pb-40 flex-1 overflow-y-auto ${
+				<div className={`relative z-30 pt-4 pb-32 md:pb-40 flex-1 overflow-y-auto ${
 					isFullscreenMode ? 'px-3 md:px-4' : 'px-3 md:px-8'
 				}`}>
 					<div className='w-full'>
@@ -1225,7 +1225,7 @@ export default function ReadStoryPage() {
 
 				{/* Navigation Controls - Always fixed at bottom */}
 				<div className={`fixed left-0 right-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent pb-safe ${
-					showReadingTip ? 'z-[60]' : 'z-50'
+					showReadingTip ? 'z-[110]' : 'z-50'
 				}`}>
 					<div className={`pt-8 pb-4 md:pb-6 ${
 						isFullscreenMode ? 'px-3 md:px-4' : 'px-3 md:px-8'
@@ -1292,7 +1292,7 @@ export default function ReadStoryPage() {
 
 				{/* Reading Tip Modal */}
 				{showReadingTip && (
-					<div className='fixed inset-0 z-[70] flex items-center justify-center p-4'>
+					<div className='fixed inset-0 z-[100] flex items-center justify-center p-4'>
 						{/* Backdrop */}
 						<div 
 							className='absolute inset-0 bg-black/50 backdrop-blur-sm'
