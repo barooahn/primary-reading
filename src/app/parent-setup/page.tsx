@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -171,7 +171,7 @@ const getTopicSuggestions = (age: number, gender: 'boy' | 'girl' | 'other') => {
 	return [...new Set(suggestions)];
 };
 
-export default function ParentSetupPage() {
+function ParentSetupContent() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const { user, loading: authLoading } = useAuth();
@@ -1582,5 +1582,17 @@ export default function ParentSetupPage() {
 				</div>
 			</div>
 		</ProtectedRoute>
+	);
+}
+
+export default function ParentSetupPage() {
+	return (
+		<Suspense fallback={
+			<div className="min-h-screen bg-gradient-to-br from-parent-light via-purple-50 to-pink-50 flex items-center justify-center">
+				<div className="h-8 w-8 border-2 border-parent border-t-transparent rounded-full animate-spin" />
+			</div>
+		}>
+			<ParentSetupContent />
+		</Suspense>
 	);
 }
