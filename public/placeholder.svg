@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200" role="img" aria-label="Placeholder image">
+  <rect width="300" height="200" fill="#f3f4f6" />
+  <rect x="10" y="10" width="280" height="180" fill="#e5e7eb" stroke="#d1d5db" />
+  <text x="150" y="105" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#6b7280">No image</text>
+</svg>
+

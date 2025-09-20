@@ -1,0 +1,11 @@
+Migrate to Tailwind CSS v4 and fix color display issues
+
+- Update globals.css to use Tailwind v4 @theme configuration syntax
+- Replace all hex color references with semantic theme classes across all components
+- Remove outdated tailwind.config.ts (not needed in v4)
+- Fix hamburger menu and parent button contrast with proper brand colors
+- Ensure orange (student) and blue (parent) color scheme displays correctly
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

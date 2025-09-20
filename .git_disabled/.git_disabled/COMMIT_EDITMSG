@@ -1,0 +1,13 @@
+Enhance authentication system and add database integration for child profiles
+
+- Add database integration for child profiles with full CRUD operations
+- Implement enhanced login/signup UI with two-column responsive layout
+- Add dynamic contextual headers that change based on form mode
+- Improve authentication flow with proper middleware redirects
+- Fix all ESLint warnings and TypeScript errors
+- Add mobile-optimized design with viewport-friendly layout
+- Integrate role-based messaging for students vs parents/teachers
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
